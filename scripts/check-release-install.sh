@@ -62,6 +62,7 @@ fi
 [[ $(sha256sum "$conf") == "$before" ]]
 DESTDIR="$scratch/stage" sh "$root/scripts/uninstall.sh"
 [[ ! -e $scratch/stage/usr/bin/soga ]]
+[[ ! -e $scratch/stage/usr/local/bin/soga ]]
 [[ ! -e $scratch/stage/usr/local/share/doc/soga-reconstructed/manager.py ]]
 grep -q preserve-this-setting "$scratch/stage/etc/soga/soga.conf"
 
@@ -87,7 +88,7 @@ cp "$root/scripts/soga" "$scratch/migration/usr/local/bin/soga"
 DESTDIR="$scratch/migration" bash <(cat "$root/install.sh")
 grep -Fxq 'node_id=71' "$scratch/migration/etc/soga/soga.conf"
 grep -Fxq 'node_id=72' "$scratch/migration/etc/soga/anytls/soga.conf"
-[[ ! -e $scratch/migration/usr/local/bin/soga ]]
+"$scratch/migration/usr/local/bin/soga" version | grep -q 'soga 管理脚本'
 "$scratch/migration/usr/bin/soga" version | grep -q 'soga 管理脚本'
 # Existing official files are backed up; official config takes precedence.
 printf '# existing official manager\n' > "$scratch/migration/usr/bin/soga"

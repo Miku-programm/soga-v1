@@ -24,7 +24,7 @@ doc="$stage/usr/local/share/doc/soga-reconstructed"
 for directory in "$program" "$config" "$units" "$doc" "$stage/usr/bin" "$stage/usr/local/bin"; do
   [ ! -L "$directory" ] || { echo "拒绝写入符号链接目录：$directory" >&2; exit 1; }
 done
-# A previous independent launcher would shadow /usr/bin/soga in PATH.
+# Preserve the old command path as a forwarder for parent-shell command caches.
 old_launcher="$stage/usr/local/bin/soga"
 if [ -e "$old_launcher" ] || [ -L "$old_launcher" ]; then
   [ ! -L "$old_launcher" ] && grep -q '^# soga-reconstructed manager launcher$' "$old_launcher" || {
@@ -46,7 +46,7 @@ if [ ! -e "$config/soga.conf" ] && [ -f "$stage/etc/soga-reconstructed/soga.conf
   cp -a -n "$stage/etc/soga-reconstructed/." "$config/"
   echo '已迁移先前重建版配置至 /etc/soga；原目录保留。'
 fi
-install -d -m 0755 "$program" "$units" "$doc" "$stage/usr/bin"
+install -d -m 0755 "$program" "$units" "$doc" "$stage/usr/bin" "$stage/usr/local/bin"
 [ -d "$config" ] || install -d -m 0700 "$config"
 # Replace executables atomically, allowing running instances to finish normally.
 tmp=$(mktemp "$program/.soga.XXXXXX")
@@ -100,13 +100,12 @@ if [ -f "$PROJECT_DIR/BUILD-INFO.json" ]; then
 else
   rm -f "$doc/build-info.json"
 fi
-if [ -f "$old_launcher" ]; then rm -f "$old_launcher"; fi
+compat_tmp=$(mktemp "$stage/usr/local/bin/.soga.XXXXXX")
+install -m 0755 "$PROJECT_DIR/scripts/soga-compat" "$compat_tmp"
+mv -f "$compat_tmp" "$old_launcher"
 # Stop only previously installed reconstruction services during migration.
 if [ -z "$stage" ] && [ -d /run/systemd/system ]; then
-  old_loaded=$(systemctl list-units --all --plain --no-legend 'soga-reconstructed@*.service')
-  old_installed=$(systemctl list-unit-files --plain --no-legend 'soga-reconstructed@*.service')
-  old_units=$(printf '%s\n%s\n' "$old_loaded" "$old_installed" | awk '$1 ~ /^soga-reconstructed@[A-Za-z0-9_-]+[.]service$/ {print $1}' | sort -u)
-  for old in $old_units; do systemctl disable --now "$old"; done
-  systemctl daemon-reload
+  . "$PROJECT_DIR/scripts/service-migration.sh"
+  retire_legacy_services
 fi
 printf 'soga 安装完成，配置目录：%s\n输入 soga 打开管理菜单。\n' "$config"

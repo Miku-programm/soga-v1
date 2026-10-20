@@ -25,6 +25,26 @@ class Manager:
         self.binary = Path(binary) if binary else self.doc.parents[2] / "soga/soga"
         self.release_cache = {}
 
+    @staticmethod
+    def color(text, code):
+        if sys.stdout.isatty() and os.environ.get("TERM") != "dumb" and "NO_COLOR" not in os.environ:
+            return "\033[" + code + "m" + text + "\033[0m"
+        return text
+
+    def display(self, *items):
+        text = " ".join(str(item) for item in items)
+        text = re.sub(r"(?m)^(\s*\d+\.)", lambda m: self.color(m[0], "32"), text)
+        for value, code in (("已运行", "32"), ("未运行", "31"), ("启动失败", "31"),
+                            ("启动中", "33"), ("停止中", "33"), ("自启: 是", "32"),
+                            ("自启: 否", "31")):
+            text = text.replace("[" + value + "]", self.color("[" + value + "]", code))
+        text = re.sub(r"(?m)^(.*soga 管理脚本 v[^\n]*)$", lambda m: self.color(m[0], "32"), text)
+        text = re.sub(r"(?m)^(.*(?:发现新版本|暂时无法检查更新)[^\n]*)$", lambda m: self.color(m[0], "33"), text)
+        print(text)
+
+    def ask(self, prompt):
+        return input(self.color(prompt, "33"))
+
     def run(self, args, capture=False):
         if capture:
             return subprocess.run([str(x) for x in args], text=True, encoding="utf-8",
@@ -146,21 +166,21 @@ class Manager:
 
     def show(self):
         names = self.instances()
-        print("\n  soga 管理脚本 v%s  [soga: %s]" % (VERSION, self.program_version()))
-        print("  " + self.update_notice())
-        print("\n  0. 退出\n————————————————")
-        print("  1. 安装/更新 soga\n  2. 完全卸载 soga")
-        print("  3. 切换 soga 安装分支  [当前: %s]" %
+        self.display("\n  soga 管理脚本 v%s  [soga: %s]" % (VERSION, self.program_version()))
+        self.display("  " + self.update_notice())
+        self.display("\n  0. 退出\n————————————————")
+        self.display("  1. 安装/更新 soga\n  2. 完全卸载 soga")
+        self.display("  3. 切换 soga 安装分支  [当前: %s]" %
               ("稳定版" if self.channel() == "stable" else "测试版"))
-        print("————————————————\n  4. 更新管理脚本\n  5. 新增 soga 实例\n————————————————")
+        self.display("————————————————\n  4. 更新管理脚本\n  5. 新增 soga 实例\n————————————————")
         for number, name in enumerate(names, 6):
-            print("  %d. 管理实例 [%s]" % (number, name))
-        print("\n  实例列表:")
+            self.display("  %d. 管理实例 [%s]" % (number, name))
+        self.display("\n  实例列表:")
         for name in names:
             active, enabled = self.state(name)
-            print("    %-12s [%s] [自启: %s]  %s" % (name, active, enabled, self.config_path(name)))
+            self.display("    %-12s [%s] [自启: %s]  %s" % (name, active, enabled, self.config_path(name)))
         if not names:
-            print("    暂无实例")
+            self.display("    暂无实例")
         return names
 
     @staticmethod
@@ -190,7 +210,7 @@ class Manager:
         with tempfile.TemporaryDirectory(prefix="soga-update-") as folder:
             path = Path(folder) / "install.sh"
             path.write_bytes(script)
-            self.run(["bash", path, tag])
+            self.run(["env", "SOGA_NO_MENU=1", "bash", path, tag])
         self.release_cache.clear()
 
     def self_update(self):
@@ -210,27 +230,27 @@ class Manager:
             raise ValueError("管理脚本 SHA-256 校验失败，未替换原文件。")
         ast.parse(data.decode("utf-8"))
         self.atomic_write(self.doc / "manager.py", data, 0o644)
-        print("管理脚本已更新；重新运行 soga 即可使用新版菜单。")
+        self.display("管理脚本已更新；重新运行 soga 即可使用新版菜单。")
 
     def uninstall(self):
         self.require_root()
         if self.root != Path("/etc/soga") or self.root.is_symlink():
             raise ValueError("拒绝完全卸载非标准配置路径。")
-        print("将停止并卸载本重建版，删除 %s 中的配置、证书和状态。" % self.root)
-        if input("输入「卸载」确认，其他输入取消: ").strip() != "卸载":
+        self.display("将停止并卸载本重建版，删除 %s 中的配置、证书和状态。" % self.root)
+        if self.ask("输入 y 确认卸载，其他输入取消: ").strip().lower() != "y":
             return False
         self.run(["sh", self.doc / "uninstall.sh"])
         if self.root.exists():
             shutil.rmtree(self.root)
-        print("完全卸载完成。")
+        self.display("完全卸载完成。")
         return True
 
     def new_instance(self):
         self.require_root()
-        name = self.valid_name(input("新实例名称: ").strip())
-        changes = shlex.split(input("配置参数（key=value，可留空继承 default）: ").strip())
+        name = self.valid_name(self.ask("新实例名称: ").strip())
+        changes = shlex.split(self.ask("配置参数（key=value，可留空继承 default）: ").strip())
         self.backend("new", name, *changes)
-        if input("立即启动并设置自启？[y/N]: ").strip().lower() == "y":
+        if self.ask("立即启动并设置自启？[y/N]: ").strip().lower() == "y":
             self.backend("enable", name)
             self.backend("start", name)
 
@@ -238,12 +258,12 @@ class Manager:
         self.valid_name(name)
         while name in self.instances():
             active, enabled = self.state(name)
-            print("\n  实例 [%s] [%s] [自启: %s]\n  %s" %
+            self.display("\n  实例 [%s] [%s] [自启: %s]\n  %s" %
                   (name, active, enabled, self.config_path(name)))
-            print("  0. 返回\n  1. 启动\n  2. 停止\n  3. 重启\n  4. 开启自启\n"
+            self.display("  0. 返回\n  1. 启动\n  2. 停止\n  3. 重启\n  4. 开启自启\n"
                   "  5. 关闭自启\n  6. 查看日志\n  7. 实时日志\n  8. 查看配置\n"
                   "  9. 编辑配置\n  10. 重命名实例\n  11. 删除实例")
-            choice = input("请输入选择 [0-11]: ").strip()
+            choice = self.ask("请输入选择 [0-11]: ").strip()
             if choice == "0":
                 return
             try:
@@ -259,32 +279,32 @@ class Manager:
                     if not editor:
                         raise ValueError("EDITOR 为空。")
                     self.run([*editor, self.config_path(name)])
-                    if input("配置已保存，立即重启？[y/N]: ").strip().lower() == "y":
+                    if self.ask("配置已保存，立即重启？[y/N]: ").strip().lower() == "y":
                         self.backend("restart", name)
                 elif choice == "10":
                     if name == "default":
                         raise ValueError("default 实例不能重命名。")
-                    new = self.valid_name(input("新的实例名: ").strip())
+                    new = self.valid_name(self.ask("新的实例名: ").strip())
                     self.backend("rename", name, new)
                     name = new
                 elif choice == "11":
                     if name == "default":
                         raise ValueError("default 实例不能删除。")
-                    if input("输入实例名确认删除: ").strip() == name:
+                    if self.ask("输入实例名确认删除: ").strip() == name:
                         self.backend("remove", name)
                         return
                 else:
-                    print("无效选择。")
+                    self.display("无效选择。")
             except KeyboardInterrupt:
-                print("\n已返回实例菜单。")
+                self.display("\n已返回实例菜单。")
             except Exception as error:
-                print("操作失败:", error)
-            input("按回车继续...")
+                self.display("操作失败:", error)
+            self.ask("按回车继续...")
 
     def menu(self):
         while True:
             names = self.show()
-            value = input("\n请输入选择 [0-%d] 或 [实例名]: " % (5 + len(names))).strip()
+            value = self.ask("\n请输入选择 [0-%d] 或 [实例名]: " % (5 + len(names))).strip()
             try:
                 if value == "0":
                     return
@@ -299,21 +319,21 @@ class Manager:
                     if self.uninstall():
                         return
                 elif value == "3":
-                    option = input("1. 稳定版  2. 测试版（GitHub 预发布）\n请选择 [1/2]: ").strip()
+                    option = self.ask("1. 稳定版  2. 测试版（GitHub 预发布）\n请选择 [1/2]: ").strip()
                     if option not in ("1", "2"):
                         raise ValueError("无效分支。")
                     self.set_channel("stable" if option == "1" else "preview")
-                    print("安装分支已切换。选择「安装/更新」后生效。")
+                    self.display("安装分支已切换。选择「安装/更新」后生效。")
                 elif value == "4":
                     self.self_update()
                 elif value == "5":
                     self.new_instance()
                 else:
-                    print("无效选择。")
+                    self.display("无效选择。")
             except KeyboardInterrupt:
-                print("\n已取消当前操作。")
+                self.display("\n已取消当前操作。")
             except Exception as error:
-                print("操作失败:", error)
+                self.display("操作失败:", error)
 
     def cli(self, args):
         if not args:
@@ -321,11 +341,11 @@ class Manager:
             return
         action, rest = args[0], args[1:]
         if action in ("version", "-v", "--version"):
-            print("soga 管理脚本 v%s [%s]" % (VERSION, self.program_version()))
+            self.display("soga 管理脚本 v%s [%s]" % (VERSION, self.program_version()))
         elif action == "list":
             for name in self.instances():
                 active, enabled = self.state(name)
-                print("%s\t%s\t自启: %s\t%s" % (name, active, enabled, self.config_path(name)))
+                self.display("%s\t%s\t自启: %s\t%s" % (name, active, enabled, self.config_path(name)))
         elif action in ("install", "update"):
             if len(rest) > 1:
                 raise ValueError("用法: soga update [release-tag]")

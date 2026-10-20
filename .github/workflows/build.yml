@@ -38,7 +38,7 @@ jobs:
         run: |
           python3 scripts/smoke.py bin/soga-reconstructed-linux-amd64 --output ci-results/cli.json
           python3 scripts/runtime_smoke.py bin/soga-reconstructed-linux-amd64 --output ci-results/runtime.json
-          python3 -m unittest discover -s scripts -p 'test_manager.py' -v
+          python3 -m unittest discover -s scripts -p 'test_*.py' -v
       - name: Package programs, source, and checksums
         env:
           CHANNEL: ${{ inputs.channel || 'stable' }}

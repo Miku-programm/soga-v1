@@ -7,9 +7,9 @@ umask 022
 finish_install_service() {
   local had_config=$1 supplied_config=$2
   local unit=soga
-  systemctl daemon-reload
-  systemctl stop "$unit"
-  systemctl enable "$unit"
+  systemctl daemon-reload || return $?
+  systemctl stop "$unit" || return $?
+  systemctl enable "$unit" || return $?
   if [[ $had_config == true || $supplied_config == true ]]; then
     if systemctl restart "$unit"; then
       sleep 2
@@ -24,6 +24,12 @@ finish_install_service() {
   printf '%s\n' '全新安装：尚未提供配置，暂不启动；已设置开机自启。' \
     '可重新执行本脚本并附上 type=... server_type=... webapi_url=... webapi_key=... node_id=...' \
     '也可编辑 /etc/soga/soga.conf，再运行 systemctl start soga'
+}
+
+open_install_menu() {
+  if [[ -z ${DESTDIR:-} && ${SOGA_NO_MENU:-0} != 1 && -t 0 && -t 1 ]]; then
+    "${1:-/usr/bin/soga}"
+  fi
 }
 
 # Allow isolated lifecycle tests to source the function without installing.
@@ -122,7 +128,13 @@ project="$scratch/soga-reconstructed"
 config_root="${DESTDIR:-}/etc/soga"
 had_config=false
 [[ ! -f $config_root/soga.conf && ! -f ${DESTDIR:-}/etc/soga-reconstructed/soga.conf ]] || had_config=true
-sh "$project/scripts/install.sh" "$arch"
+if sh "$project/scripts/install.sh" "$arch"; then
+  :
+else
+  install_status=$?
+  printf '安装未完成（退出码 %s），请保留上方错误信息；已有配置未删除。\n' "$install_status" >&2
+  exit "$install_status"
+fi
 supplied_config=false
 if [[ ${#configs[@]} -gt 0 ]]; then
   "${DESTDIR:-}/usr/local/soga/soga" \
@@ -130,8 +142,9 @@ if [[ ${#configs[@]} -gt 0 ]]; then
   supplied_config=true
   echo '已写入命令行配置（不回显密钥值）。'
 fi
+service_status=0
 if [[ -z ${DESTDIR:-} ]]; then
-  finish_install_service "$had_config" "$supplied_config"
+  finish_install_service "$had_config" "$supplied_config" || service_status=$?
   printf '\n%s\n' \
     '输入 soga 打开交互式管理菜单。' \
     '查看日志：journalctl -u soga -f'
@@ -150,3 +163,5 @@ printf '%s\n' 'soga 管理脚本使用方法:' \
   '  soga update [version]      更新程序' \
   '  soga self-update           更新管理菜单' \
   '  soga uninstall             完全卸载'
+open_install_menu
+exit "$service_status"

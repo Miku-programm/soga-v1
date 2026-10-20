@@ -147,7 +147,7 @@ class ManagerTests(unittest.TestCase):
     def test_update_executes_installer_with_exact_tag(self):
         with mock.patch.object(self.app, "download", return_value=b"#!/bin/bash\nexit 0\n"):
             self.app.update("build-123")
-        self.assertEqual(self.calls[-1][0], "bash")
+        self.assertEqual(self.calls[-1][:3], ["env", "SOGA_NO_MENU=1", "bash"])
         self.assertEqual(self.calls[-1][-1], "build-123")
         with self.assertRaises(ValueError):
             self.app.update("../escape")
@@ -169,6 +169,36 @@ class ManagerTests(unittest.TestCase):
                 contextlib.redirect_stdout(io.StringIO()):
             self.assertFalse(self.app.uninstall())
         self.assertFalse(self.calls)
+
+    def test_uninstall_accepts_y_and_uppercase_y_only(self):
+        self.app.root = Path("/etc/soga")
+        for answer in ("y", "Y"):
+            with mock.patch("builtins.input", return_value=answer) as prompt, \
+                    mock.patch.object(Path, "exists", return_value=False), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                self.assertTrue(self.app.uninstall())
+            self.assertIn("输入 y", prompt.call_args.args[0])
+        for answer in ("", "n", "卸载"):
+            with mock.patch("builtins.input", return_value=answer), \
+                    mock.patch.object(self.app, "run") as run, \
+                    contextlib.redirect_stdout(io.StringIO()):
+                self.assertFalse(self.app.uninstall())
+            run.assert_not_called()
+
+    def test_terminal_colors_and_plain_redirected_output(self):
+        import os
+        for tty in (True, False):
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output), \
+                    mock.patch.object(output, "isatty", return_value=tty), \
+                    mock.patch.dict(os.environ, {"TERM": "xterm"}, clear=True):
+                self.app.show()
+            text = output.getvalue()
+            if tty:
+                for code in ("\033[32m", "\033[31m", "\033[0m"):
+                    self.assertIn(code, text)
+            else:
+                self.assertNotIn("\033[", text)
 
 
 class RealConfigurationTests(unittest.TestCase):

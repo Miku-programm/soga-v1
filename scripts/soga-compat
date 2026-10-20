@@ -1,0 +1,6 @@
+#!/bin/sh
+# soga-reconstructed manager launcher
+# Keep an existing parent shell's cached /usr/local/bin/soga command usable.
+set -eu
+bindir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+exec "$bindir/../../bin/soga" "$@"

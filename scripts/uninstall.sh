@@ -15,6 +15,10 @@ if [ -z "$stage" ]; then
   fi
 fi
 rm -f "$stage/usr/bin/soga" "$stage/etc/systemd/system/soga.service" "$stage/etc/systemd/system/soga@.service"
+if [ -f "$stage/usr/local/bin/soga" ] &&
+   grep -q '^# soga-reconstructed manager launcher$' "$stage/usr/local/bin/soga"; then
+  rm -f "$stage/usr/local/bin/soga"
+fi
 rm -rf "$stage/usr/local/soga" "$stage/usr/local/share/doc/soga-reconstructed"
 if [ -z "$stage" ] && [ -d /run/systemd/system ]; then systemctl daemon-reload; fi
 printf '%s\n' "已卸载；配置保留于 $stage/etc/soga，备份保留于 $stage/var/backups/soga。"
