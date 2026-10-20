@@ -34,7 +34,7 @@ def main():
     version = run(["version"])
     assert "2.17.0" in version and "not original source" in version
     assert len(json.loads(run(["defaults"]))) == 157
-    inspect = json.loads(run(["inspect", "-c", "examples/soga.conf", "-node_id", "12"]))
+    inspect = json.loads(run(["inspect", "-c", "examples/soga.conf", "-node_id", "12", "-server_type", "vmess", "-webapi_key", "fixture-api-key"]))
     assert inspect["normalized_server_type"] == "v2ray"
     assert inspect["legacy_api_key_selected"] is False
     assert inspect["values"]["node_id"] == "12"

@@ -1,12 +1,11 @@
-GitHub 编译、安装和 key 填写说明
+# GitHub 编译、安装与密钥说明
 
-仓库：https://github.com/Miku-programm/soga-v1
-下载：https://github.com/Miku-programm/soga-v1/releases/latest
+[源码仓库](https://github.com/Miku-programm/soga-v1) · [下载最新版](https://github.com/Miku-programm/soga-v1/releases/latest)
 
-交互式管理菜单
+## 交互式管理菜单
 
-已核对官方 https://github.com/vaxilu/soga ：install_cmd.sh 下载
-https://github.com/vaxilu/soga-cmd 的管理程序；根目录 soga.sh 是旧版单实例菜单。
+官方 [soga 仓库](https://github.com/vaxilu/soga) 中的 `install_cmd.sh` 下载
+[soga-cmd](https://github.com/vaxilu/soga-cmd) 的管理程序；根目录 `soga.sh` 是旧版单实例菜单。
 截至本次核对，soga-cmd 仓库只提供 README 和发布程序，未公开菜单源码。
 这里按用户提供的新版多实例菜单独立实现，并接入本重建工程。
 
@@ -51,26 +50,36 @@ enable / disable / status / log / config / update / uninstall / self-update / ve
 
 这是独立兼容重建工程，不是原作者源码。原始 soga 二进制没有上传。
 用户要求保留现有业务实现；安装流程参照官方脚本的版本参数、配置写入及自动启动行为。
-参考：https://github.com/vaxilu/soga/blob/master/install.sh
+参考：[官方安装脚本](https://github.com/vaxilu/soga/blob/master/install.sh)。
 不是官方脚本原样副本：下载源、包结构、程序本体和管理器适配本重建工程，
 保留 SHA-256 校验；配置写入不会回显密钥。不会安装官方原版程序或 soga-cmd。
 已知 v2node 配置接口差异未修复，不承诺兼容 wyx2685/v2board 最新版 v2node。
 validation/ 是原本地交付的历史验收记录；每次 GitHub 构建的检查结果随 Release 发布。
 
-一键安装（Linux amd64/arm64）
+## 一键安装（Linux amd64/arm64）
 
-  bash <(curl -Ls https://raw.githubusercontent.com/Miku-programm/soga-v1/main/install.sh) type=v2board server_type=vmess \
-    webapi_url=https://你的面板域名 webapi_key=你的通讯密钥 node_id=1
+```bash
+bash <(curl -Ls https://raw.githubusercontent.com/Miku-programm/soga-v1/main/install.sh) type=v2board server_type=vmess \
+  webapi_url=https://你的面板域名 webapi_key=你的通讯密钥 node_id=1
+```
 
 以上为普通 V2Board VMess 节点示例；面板类型、协议和节点 ID 必须改成实际值。
 命令会写入配置并自动启动；不需要再手动编辑文件或执行启动命令。
 密钥若含特殊字符，请用 shell 引号包住整个 webapi_key=... 参数。
 以 root 执行以下命令安装或更新，然后输入 soga 打开管理菜单：
-  bash <(curl -Ls https://raw.githubusercontent.com/Miku-programm/soga-v1/main/install.sh)
+
+```bash
+bash <(curl -Ls https://raw.githubusercontent.com/Miku-programm/soga-v1/main/install.sh)
+```
+
 已有配置时保留配置并重启；全新安装需要提供实际节点配置。
 
 也可以给安装脚本传一个 Release 标签，安装固定版本：
-  bash <(curl -Ls https://raw.githubusercontent.com/Miku-programm/soga-v1/main/install.sh) build-1-1-abcdef0
+
+```bash
+bash <(curl -Ls https://raw.githubusercontent.com/Miku-programm/soga-v1/main/install.sh) build-1-1-abcdef0
+```
+
 以上标签只是格式示例；实际标签以 Releases 页面为准。
 
 真实安装支持 apt/dnf/yum，自动安装依赖及 acme.sh，并设置 Let’s Encrypt 默认 CA。
@@ -81,7 +90,7 @@ validation/ 是原本地交付的历史验收记录；每次 GitHub 构建的检
 真实安装会设置开机自启；DESTDIR 临时目录安装不操作宿主 systemd。
 已有安装的默认路径为 /etc/soga/soga.conf。
 
-key 的区别
+## 密钥的区别
 
 webapi_key：填机场面板的后端通讯密钥。对于 wyx2685/v2board，
 在后台系统配置的「节点」页签找到「通讯密钥」（源码字段 server_token）。
@@ -92,25 +101,30 @@ soga_key：原版商业授权字段。本独立重建工程不调用原商业授
 soga_panel_key / soga_panel_url：未恢复的自动配置服务，均留空。
 tunnel_password：仅开启隧道时使用，必须与对端隧道配置一致。
 
-常规 V2Board VMess 节点配置示例（不是 v2node 示例）
+## 常规 V2Board 节点配置示例
 
-  type=v2board
-  server_type=vmess
-  api=webapi
-  node_id=1
-  webapi_url=https://你的面板域名
-  webapi_key=面板后台的通讯密钥
-  soga_key=
-  soga_panel_url=
-  soga_panel_key=
+```ini
+type=v2board
+server_type=vmess
+api=webapi
+node_id=1
+webapi_url=https://你的面板域名
+webapi_key=面板后台的通讯密钥
+soga_key=
+soga_panel_url=
+soga_panel_key=
+```
 
 webapi_url 填面板基础地址，不要追加 /api/v1/server/UniProxy/config。
 node_id 和 server_type 应与面板创建的节点一致。
 手动配置时使用以下命令；安装脚本带参数运行时已自动完成：
-  sudo systemctl enable --now soga
-  sudo journalctl -u soga -f
 
-GitHub 编译
+```bash
+sudo systemctl enable --now soga
+sudo journalctl -u soga -f
+```
+
+## GitHub 编译
 
 推送 main 自动发布稳定版，也可进入 Actions → Build Linux programs → Run workflow，
 选择 stable 或 preview。稳定版更新 latest；测试版标记为预发布，不覆盖 latest。

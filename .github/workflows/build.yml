@@ -56,7 +56,7 @@ jobs:
             tar -czf "dist/soga-linux-${arch}.tar.gz" \
               --transform 's,^,soga-reconstructed/,' \
               "bin/soga-reconstructed-linux-${arch}" examples scripts \
-              LICENSE LICENSES THIRD_PARTY_NOTICES.txt README.txt GITHUB.txt BUILD-INFO.json
+              LICENSE LICENSES THIRD_PARTY_NOTICES.txt README.md GITHUB.md docs BUILD-INFO.json
           done
           git archive --format=tar.gz --prefix=soga-reconstructed/ \
             --output=dist/soga-source.tar.gz HEAD
@@ -84,7 +84,7 @@ jobs:
           Linux amd64 and arm64, plus complete source and third-party licenses.
           amd64 CLI and local-process smoke checks passed; arm64 is cross-compiled.
           This workflow does not repeat the historical full integration suite.
-          v2node API routing is unchanged at the user's request. See GITHUB.txt
+          v2node API routing is unchanged at the user's request. See GITHUB.md
           for configuration keys and known compatibility limitations.
           NOTES
           flags=(--latest)
