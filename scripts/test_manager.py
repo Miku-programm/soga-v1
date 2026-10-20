@@ -83,12 +83,94 @@ class ManagerTests(unittest.TestCase):
         self.assertIn([str(self.binary), "instance", "-root", str(self.root), "start", "anytls"], self.calls)
         self.assertIn([str(self.binary), "instance", "-root", str(self.root), "log", "anytls", "-f"], self.calls)
 
-    def test_default_delete_and_rename_are_rejected(self):
-        with mock.patch("builtins.input", side_effect=["10", "", "11", "", "0"]), \
+    def test_instance_menu_matches_requested_text(self):
+        output = io.StringIO()
+        with mock.patch("builtins.input", return_value="0") as prompt, \
+                contextlib.redirect_stdout(output):
+            self.app.instance_menu("default")
+        labels = ["返回上级", "启动", "停止", "重启", "重载配置", "查看服务状态详情",
+                  "查看最近日志 (1000行)", "持续输出日志", "设置开机自启", "取消开机自启",
+                  "快速配置 soga.conf", "编辑 soga.conf", "编辑 blockList", "编辑 whiteList",
+                  "编辑 routes.toml", "编辑 dns.yml"]
+        for i, label in enumerate(labels):
+            self.assertIn("%d. %s" % (i, label), output.getvalue())
+        self.assertEqual(output.getvalue().count("————————————————"), 4)
+        self.assertEqual(prompt.call_args.args[0], "请输入选择 [0-15]: ")
+
+    def test_all_instance_menu_choices_target_selected_instance(self):
+        answers = [item for i in range(1, 16) for item in (str(i), "")] + ["0"]
+        with mock.patch("builtins.input", side_effect=answers), \
+                mock.patch.object(self.app, "backend") as backend, \
+                mock.patch.object(self.app, "reload_instance") as reload, \
+                mock.patch.object(self.app, "service_details") as status, \
+                mock.patch.object(self.app, "quick_config") as quick, \
+                mock.patch.object(self.app, "edit_file") as editor, \
+                contextlib.redirect_stdout(io.StringIO()):
+            self.app.instance_menu("anytls")
+        self.assertEqual(backend.call_args_list, [
+            mock.call("start", "anytls"), mock.call("stop", "anytls"),
+            mock.call("restart", "anytls"), mock.call("log", "anytls"),
+            mock.call("log", "anytls", "-f"), mock.call("enable", "anytls"),
+            mock.call("disable", "anytls")])
+        reload.assert_called_once_with("anytls")
+        status.assert_called_once_with("anytls")
+        quick.assert_called_once_with("anytls")
+        self.assertEqual(editor.call_args_list, [
+            mock.call("anytls", filename)
+            for filename in ("soga.conf", "blockList", "whiteList", "routes.toml", "dns.yml")])
+
+    def test_reload_signal_targets_only_selected_main_process(self):
+        with contextlib.redirect_stdout(io.StringIO()):
+            for name in ("default", "anytls"):
+                self.app.reload_instance(name)
+        self.assertEqual(self.calls[-2:], [
+            ["systemctl", "kill", "--kill-whom=main", "--signal=HUP", "soga.service"],
+            ["systemctl", "kill", "--kill-whom=main", "--signal=HUP", "soga@anytls.service"]])
+
+    def test_editors_use_instance_directory_and_preserve_existing_file(self):
+        import os
+        before = (self.root / "anytls/soga.conf").read_bytes()
+        with mock.patch.dict(os.environ, {"EDITOR": "fixture-editor -n", "VISUAL": ""}), \
+                mock.patch("builtins.input", return_value="n"):
+            for filename in ("soga.conf", "blockList", "whiteList", "routes.toml", "dns.yml"):
+                self.app.edit_file("anytls", filename)
+                target = self.root / "anytls" / filename
+                self.assertEqual(self.calls[-1], ["fixture-editor", "-n", str(target)])
+                self.assertTrue(target.is_file())
+        self.assertEqual((self.root / "anytls/soga.conf").read_bytes(), before)
+        with self.assertRaises(ValueError):
+            self.app.edit_file("anytls", "../soga.conf")
+
+    def test_quick_config_preserves_blanks_and_hides_secret(self):
+        secret = "fixture-private-key"
+        output = io.StringIO()
+        with mock.patch("builtins.input", side_effect=["v2board", "vless", "", "https://panel.invalid", "7", "y"]), \
+                mock.patch("getpass.getpass", return_value=secret), \
+                mock.patch.object(self.app, "backend") as backend, \
+                contextlib.redirect_stdout(output):
+            self.app.quick_config("anytls")
+        self.assertEqual(backend.call_args_list, [
+            mock.call("config", "anytls", "type=v2board", "server_type=vless",
+                      "webapi_url=https://panel.invalid", "webapi_key="+secret, "node_id=7"),
+            mock.call("restart", "anytls")])
+        self.assertNotIn(secret, output.getvalue())
+        with mock.patch("builtins.input", return_value=""), \
+                mock.patch("getpass.getpass", return_value=""), \
                 mock.patch.object(self.app, "backend") as backend, \
                 contextlib.redirect_stdout(io.StringIO()):
-            self.app.instance_menu("default")
+            self.app.quick_config("anytls")
         backend.assert_not_called()
+
+    def test_backend_failure_does_not_print_config_secrets(self):
+        with mock.patch.object(self.app, "run", side_effect=subprocess.CalledProcessError(1, ["webapi_key=secret"])):
+            with self.assertRaises(ValueError) as caught:
+                self.app.backend("config", "anytls", "webapi_key=secret")
+        self.assertNotIn("secret", str(caught.exception))
+
+    def test_inactive_service_status_is_displayed_without_false_failure(self):
+        with mock.patch.object(self.app, "run", side_effect=subprocess.CalledProcessError(3, "systemctl")) as run:
+            self.app.service_details("anytls")
+        run.assert_called_once_with(["systemctl", "status", "--no-pager", "--full", "soga@anytls.service"])
 
     def test_new_instance_keeps_quoted_parameters(self):
         with mock.patch("builtins.input", side_effect=["new-node", "node_id=3 webapi_key='a b=c'", "n"]), \

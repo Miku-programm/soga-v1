@@ -2,6 +2,7 @@
 """Interactive management of the independently reconstructed soga service."""
 import ast
 import hashlib
+import getpass
 import json
 import os
 from pathlib import Path
@@ -53,7 +54,11 @@ class Manager:
         return subprocess.run([str(x) for x in args], check=True)
 
     def backend(self, action, *args):
-        return self.run([self.binary, "instance", "-root", self.root, action, *args])
+        try:
+            return self.run([self.binary, "instance", "-root", self.root, action, *args])
+        except subprocess.CalledProcessError as error:
+            # Configuration arguments can contain credentials.
+            raise ValueError("实例操作失败（退出码 %s），请查看上方错误。" % error.returncode) from None
 
     @staticmethod
     def require_root():
@@ -254,45 +259,101 @@ class Manager:
             self.backend("enable", name)
             self.backend("start", name)
 
+    def reload_instance(self, name):
+        self.valid_name(name)
+        unit = "soga.service" if name == "default" else "soga@" + name + ".service"
+        self.run(["systemctl", "kill", "--kill-whom=main", "--signal=HUP", unit])
+        self.display("已发送重载请求：刷新面板配置和规则；结果请查看日志。修改 soga.conf 后需重启实例。")
+
+    def service_details(self, name):
+        self.valid_name(name)
+        unit = "soga.service" if name == "default" else "soga@" + name + ".service"
+        try:
+            self.run(["systemctl", "status", "--no-pager", "--full", unit])
+        except subprocess.CalledProcessError as error:
+            # systemctl status uses nonzero exits for inactive/missing services.
+            if error.returncode not in (3, 4):
+                raise
+
+    def edit_file(self, name, filename):
+        if filename not in ("soga.conf", "blockList", "whiteList", "routes.toml", "dns.yml"):
+            raise ValueError("不支持的配置文件。")
+        path = self.config_path(name).parent / filename
+        editor = os.environ.get("VISUAL") or os.environ.get("EDITOR")
+        if not editor:
+            editor = "nano" if shutil.which("nano") else "vi"
+        command = shlex.split(editor)
+        if not command:
+            raise ValueError("编辑器命令为空。")
+        if not path.exists():
+            self.atomic_write(path, b"", 0o600)
+        self.run([*command, path])
+        if filename == "soga.conf":
+            if self.ask("配置已保存，立即重启实例使其生效？[y/N]: ").strip().lower() == "y":
+                self.backend("restart", name)
+        elif self.ask("配置已保存，立即重载规则？[y/N]: ").strip().lower() == "y":
+            self.reload_instance(name)
+
+    def quick_config(self, name):
+        values = {}
+        for line in self.config_path(name).read_text().splitlines():
+            key, separator, value = line.partition("=")
+            if separator and not key.strip().startswith("#"):
+                values[key.strip()] = value.strip()
+        self.display("快速配置 soga.conf：直接回车保留当前值；输入 - 清空该项。")
+        fields = (("type", "面板类型"), ("server_type", "节点协议"), ("api", "接口模式"),
+                  ("webapi_url", "面板地址"), ("webapi_key", "面板通讯密钥"),
+                  ("node_id", "节点 ID"))
+        changes = []
+        for key, label in fields:
+            current = values.get(key, "")
+            if key == "webapi_key":
+                prompt = "%s [%s]: " % (label, "已设置，输入隐藏" if current else "未设置，输入隐藏")
+                value = getpass.getpass(self.color(prompt, "33"))
+            else:
+                value = self.ask("%s (%s) [%s]: " % (label, key, current))
+            if value:
+                changes.append(key + "=" + ("" if value == "-" else value))
+        if not changes:
+            self.display("配置未变更。")
+            return
+        self.backend("config", name, *changes)
+        if self.ask("配置已保存，立即重启实例使其生效？[y/N]: ").strip().lower() == "y":
+            self.backend("restart", name)
+
     def instance_menu(self, name):
         self.valid_name(name)
         while name in self.instances():
             active, enabled = self.state(name)
             self.display("\n  实例 [%s] [%s] [自启: %s]\n  %s" %
-                  (name, active, enabled, self.config_path(name)))
-            self.display("  0. 返回\n  1. 启动\n  2. 停止\n  3. 重启\n  4. 开启自启\n"
-                  "  5. 关闭自启\n  6. 查看日志\n  7. 实时日志\n  8. 查看配置\n"
-                  "  9. 编辑配置\n  10. 重命名实例\n  11. 删除实例")
-            choice = self.ask("请输入选择 [0-11]: ").strip()
+                         (name, active, enabled, self.config_path(name)))
+            self.display("  0. 返回上级\n————————————————\n"
+                         "  1. 启动\n  2. 停止\n  3. 重启\n  4. 重载配置\n————————————————\n"
+                         "  5. 查看服务状态详情\n  6. 查看最近日志 (1000行)\n  7. 持续输出日志\n————————————————\n"
+                         "  8. 设置开机自启\n  9. 取消开机自启\n————————————————\n"
+                         " 10. 快速配置 soga.conf\n 11. 编辑 soga.conf\n 12. 编辑 blockList\n"
+                         " 13. 编辑 whiteList\n 14. 编辑 routes.toml\n 15. 编辑 dns.yml")
+            choice = self.ask("请输入选择 [0-15]: ").strip()
             if choice == "0":
                 return
             try:
                 self.require_root()
-                commands = {"1": "start", "2": "stop", "3": "restart", "4": "enable",
-                            "5": "disable", "6": "log", "8": "config"}
+                commands = {"1": "start", "2": "stop", "3": "restart", "6": "log",
+                            "8": "enable", "9": "disable"}
+                files = {"11": "soga.conf", "12": "blockList", "13": "whiteList",
+                         "14": "routes.toml", "15": "dns.yml"}
                 if choice in commands:
                     self.backend(commands[choice], name)
+                elif choice == "4":
+                    self.reload_instance(name)
+                elif choice == "5":
+                    self.service_details(name)
                 elif choice == "7":
                     self.backend("log", name, "-f")
-                elif choice == "9":
-                    editor = shlex.split(os.environ.get("EDITOR", "vi"))
-                    if not editor:
-                        raise ValueError("EDITOR 为空。")
-                    self.run([*editor, self.config_path(name)])
-                    if self.ask("配置已保存，立即重启？[y/N]: ").strip().lower() == "y":
-                        self.backend("restart", name)
                 elif choice == "10":
-                    if name == "default":
-                        raise ValueError("default 实例不能重命名。")
-                    new = self.valid_name(self.ask("新的实例名: ").strip())
-                    self.backend("rename", name, new)
-                    name = new
-                elif choice == "11":
-                    if name == "default":
-                        raise ValueError("default 实例不能删除。")
-                    if self.ask("输入实例名确认删除: ").strip() == name:
-                        self.backend("remove", name)
-                        return
+                    self.quick_config(name)
+                elif choice in files:
+                    self.edit_file(name, files[choice])
                 else:
                     self.display("无效选择。")
             except KeyboardInterrupt:
