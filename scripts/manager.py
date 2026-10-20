@@ -21,8 +21,8 @@ NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
 class Manager:
     def __init__(self, root=None, binary=None, doc=None):
         self.doc = Path(doc) if doc else Path(__file__).resolve().parent
-        self.root = Path(root or "/etc/soga-reconstructed")
-        self.binary = Path(binary) if binary else self.doc.parents[2] / "bin/soga-reconstructed"
+        self.root = Path(root or "/etc/soga")
+        self.binary = Path(binary) if binary else self.doc.parents[2] / "soga/soga"
         self.release_cache = {}
 
     def run(self, args, capture=False):
@@ -72,7 +72,7 @@ class Manager:
 
     def state(self, name):
         self.valid_name(name)
-        unit = "soga-reconstructed@" + name + ".service"
+        unit = "soga.service" if name == "default" else "soga@" + name + ".service"
         try:
             active = self.run(["systemctl", "is-active", unit], capture=True).stdout.strip()
             enabled = self.run(["systemctl", "is-enabled", unit], capture=True).stdout.strip()
@@ -214,7 +214,7 @@ class Manager:
 
     def uninstall(self):
         self.require_root()
-        if self.root != Path("/etc/soga-reconstructed") or self.root.is_symlink():
+        if self.root != Path("/etc/soga") or self.root.is_symlink():
             raise ValueError("拒绝完全卸载非标准配置路径。")
         print("将停止并卸载本重建版，删除 %s 中的配置、证书和状态。" % self.root)
         if input("输入「卸载」确认，其他输入取消: ").strip() != "卸载":
@@ -320,7 +320,7 @@ class Manager:
             self.menu()
             return
         action, rest = args[0], args[1:]
-        if action == "version":
+        if action in ("version", "-v", "--version"):
             print("soga 管理脚本 v%s [%s]" % (VERSION, self.program_version()))
         elif action == "list":
             for name in self.instances():

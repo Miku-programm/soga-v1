@@ -35,9 +35,9 @@ class ManagerTests(unittest.TestCase):
             if args[-1:] == ["version"]:
                 text = "soga-reconstructed 0.1.0 (independent reconstruction)\n"
             elif args[:2] == ["systemctl", "is-active"]:
-                text = "active" if "@default." in args[-1] else "inactive"
+                text = "active" if args[-1] == "soga.service" else "inactive"
             elif args[:2] == ["systemctl", "is-enabled"]:
-                text = "enabled" if "@default." in args[-1] else "disabled"
+                text = "enabled" if args[-1] == "soga.service" else "disabled"
             return subprocess.CompletedProcess(args, code, stdout=text)
 
         self.run_patch = mock.patch.object(self.app, "run", side_effect=run)
@@ -164,7 +164,7 @@ class ManagerTests(unittest.TestCase):
     def test_purge_cancellation_and_path_guard(self):
         with self.assertRaisesRegex(ValueError, "非标准"):
             self.app.uninstall()
-        self.app.root = Path("/etc/soga-reconstructed")
+        self.app.root = Path("/etc/soga")
         with mock.patch("builtins.input", return_value="取消"), \
                 contextlib.redirect_stdout(io.StringIO()):
             self.assertFalse(self.app.uninstall())

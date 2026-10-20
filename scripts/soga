@@ -2,4 +2,4 @@
 # soga-reconstructed manager launcher
 set -eu
 bindir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
-exec python3 "$bindir/../share/doc/soga-reconstructed/manager.py" "$@"
+exec python3 "$bindir/../local/share/doc/soga-reconstructed/manager.py" "$@"

@@ -32,10 +32,10 @@ VERSION=0.1.0 可覆盖重建版本号；不设置时使用源码常量，
 二、安装到 Linux 主机
 
 安装器只复制本工程已构建的程序，不下载原始 soga。
-路径与原程序分开：
-  程序：/usr/local/bin/soga-reconstructed
-  配置：/etc/soga-reconstructed
-  服务：soga-reconstructed@.service
+主机安装采用官方目录与服务布局（安装/升级推荐使用根目录 install.sh）：
+  程序：/usr/local/soga/soga；管理入口：/usr/bin/soga
+  配置：/etc/soga
+  服务：soga.service、soga@.service
 
   sudo scripts/install.sh
 
@@ -54,7 +54,7 @@ VERSION=0.1.0 可覆盖重建版本号；不设置时使用源码常量，
 三、准备真实配置并启动默认实例
 
 首次安装复制 examples/soga.conf；它含虚构值，仅用于解析示例。
-请编辑 /etc/soga-reconstructed/soga.conf，填入实际面板类型、接口地址、
+请编辑 /etc/soga/soga.conf，填入实际面板类型、接口地址、
 密钥、节点 ID 和对应协议。不能直接把示例当作可用节点配置。
 
 例如 soga-v1 HTTP 面板的一组基本字段如下，所有占位值都须替换：
@@ -78,22 +78,22 @@ cert_mode=dns 使用真实 DNS API 凭据，按对应提供者配置；
 
 先只解析配置（默认隐藏敏感字段）：
 
-  sudo soga-reconstructed inspect -c /etc/soga-reconstructed/soga.conf
+  sudo /usr/local/soga/soga inspect -c /etc/soga/soga.conf
 
 inspect 验证配置转换，不代表面板请求、证书、监听端口均已就绪。
 确认端口不与原程序或其他服务冲突，再显式启动：
 
-  sudo soga-reconstructed instance start default
-  sudo soga-reconstructed instance status default
-  sudo soga-reconstructed instance log default -f
-  sudo soga-reconstructed instance enable default
+  sudo soga start default
+  sudo soga status default
+  sudo soga log default -f
+  sudo soga enable default
 
 停止或重启：
 
-  sudo soga-reconstructed instance stop default
-  sudo soga-reconstructed instance restart default
+  sudo soga stop default
+  sudo soga restart default
 
-默认实例使用 /etc/soga-reconstructed/soga.conf。
+默认实例使用 /etc/soga/soga.conf。
 同目录可放 blockList、whiteList、dns.yml、routes.toml；不需要的文件可缺省。
 geo 数据和 acme.sh 已嵌入程序，不必另行复制庞大数据目录。
 文件内容须按功能说明配置；不要把示例规则不加检查地用于真实节点。
@@ -102,28 +102,28 @@ geo 数据和 acme.sh 已嵌入程序，不必另行复制庞大数据目录。
 
 新实例从默认配置复制，以下命令只创建配置，不启动：
 
-  sudo soga-reconstructed instance new hk2 node_id=2
-  sudo soga-reconstructed instance config hk2 server_type=trojan
-  sudo soga-reconstructed instance list
+  sudo soga new hk2 node_id=2
+  sudo soga config hk2 server_type=trojan
+  sudo soga list
 
-hk2 使用 /etc/soga-reconstructed/hk2/soga.conf，规则与 state/ 也位于
+hk2 使用 /etc/soga/hk2/soga.conf，规则与 state/ 也位于
 该目录。新建时只继承 soga.conf，规则文件和既有证书状态不会自动复制。
 同一进程可按 node_id 配置管理多个节点；独立实例须避免监听端口冲突。
 不同实例的面板密钥或 node_id 应按实际需要分别设置。
 
-  sudo soga-reconstructed instance start hk2
-  sudo soga-reconstructed instance enable hk2
-  sudo soga-reconstructed instance log hk2 -f
+  sudo soga start hk2
+  sudo soga enable hk2
+  sudo soga log hk2 -f
 
 查看 config 会显示实际配置及凭据，勿把输出公开。
 配置修改后显式 restart 对应实例。
 rename 会先停止并禁用旧实例；之后须手动启动新名称：
 
-  sudo soga-reconstructed instance rename hk2 hk3
+  sudo soga rename hk2 hk3
 
 remove 会停止、禁用并删除指定实例整个目录，包含配置、证书和状态：
 
-  sudo soga-reconstructed instance remove hk3
+  sudo soga remove hk3
 
 默认实例不可 remove 或 rename。
 仅管理临时根中的文件时可使用 instance -root /绝对路径；
@@ -147,7 +147,7 @@ Docker Desktop 的网络行为与 Linux 主机不同，本说明不声称已验�
   docker compose -f docker-compose.example.yml up -d
   docker compose -f docker-compose.example.yml logs -f --tail=100
 
-Compose 把 deploy/ 持久化挂载到 /etc/soga-reconstructed；
+Compose 容器仍把 deploy/ 持久化挂载到 /etc/soga-reconstructed；
 证书与状态也写入此目录，删除容器不会丢失这部分数据。
 容器默认以 root 运行，以支持低端口和 ACME standalone。
 多个容器使用 host 网络时同样需要避免监听端口冲突。
@@ -170,8 +170,8 @@ geo 数据与 ACME 脚本已编入二进制，运行层不再复制它们。
 
   sudo /usr/local/share/doc/soga-reconstructed/uninstall.sh
 
-脚本只停止、禁用 soga-reconstructed@ 实例，删除其程序与服务模板；
-保留 /etc/soga-reconstructed 内全部配置、证书及 state/。
+脚本停止、禁用 soga 与 soga@ 实例，删除其程序与服务模板；
+保留 /etc/soga 内全部配置、证书及 state/。
 不停止、不卸载原始 soga。非 systemd 环境请先自行结束前台进程。
 临时根可用 DESTDIR=/绝对路径 scripts/uninstall.sh 验证卸载。
 不提供自动清空配置选项，需删除的数据请先自行备份。

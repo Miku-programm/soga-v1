@@ -20,9 +20,14 @@ default 不能重命名或删除。完全卸载需输入「卸载」确认，会
 
 管理器使用 Python 3 标准库；真实安装缺少 Python 3 时通过系统包管理器安装。
 管理器版本单独显示，不冒充原版 v0.0.6；程序版本标注「重建版」。
-命令入口为 /usr/local/bin/soga；管理 /etc/soga-reconstructed 下的实例，
-服务名为 soga-reconstructed@实例名。不会把原版 /etc/soga 的实例当作已接管实例。
-若 /usr/local/bin/soga 已有其他管理器，安装会要求先备份移走，避免覆盖。
+命令入口为 /usr/bin/soga；程序为 /usr/local/soga/soga。
+默认配置 /etc/soga/soga.conf，其他实例 /etc/soga/实例名/soga.conf。
+默认服务 soga.service，其他服务 soga@实例名.service，与官方布局一致。
+保留已有 /etc/soga 配置；不存在默认配置时迁移之前的 /etc/soga-reconstructed，
+保留旧目录，并停用之前重建版服务，防止端口冲突。
+覆盖的程序、菜单及服务文件备份在 /var/backups/soga/时间戳-进程号/。
+之前重建版的 /usr/local/bin/soga 启动器会移除，以免遮蔽 /usr/bin/soga。
+如果该位置是其他程序，安装会明确报错，避免误删。
 
 稳定版取 GitHub 最新正式 Release；测试版取最新非草稿预发布。
 维护者可在 Actions 手动运行时选择 preview，生成真正的测试版 Release。
@@ -38,32 +43,34 @@ enable / disable / status / log / config / update / uninstall / self-update / ve
 这是独立兼容重建工程，不是原作者源码。原始 soga 二进制没有上传。
 用户要求保留现有业务实现；安装流程参照官方脚本的版本参数、配置写入及自动启动行为。
 参考：https://github.com/vaxilu/soga/blob/master/install.sh
-不是官方脚本原样副本：下载源、包结构、程序目录、服务名使用本重建工程，
+不是官方脚本原样副本：下载源、包结构、程序本体和管理器适配本重建工程，
 保留 SHA-256 校验；配置写入不会回显密钥。不会安装官方原版程序或 soga-cmd。
 已知 v2node 配置接口差异未修复，不承诺兼容 wyx2685/v2board 最新版 v2node。
 validation/ 是原本地交付的历史验收记录；每次 GitHub 构建的检查结果随 Release 发布。
 
 一键安装（Linux amd64/arm64）
 
-  curl -fL https://raw.githubusercontent.com/Miku-programm/soga-v1/main/install.sh -o /tmp/soga-install.sh
-  sudo bash /tmp/soga-install.sh type=v2board server_type=vmess \
+  bash <(curl -Ls https://raw.githubusercontent.com/Miku-programm/soga-v1/main/install.sh) type=v2board server_type=vmess \
     webapi_url=https://你的面板域名 webapi_key=你的通讯密钥 node_id=1
 
 以上为普通 V2Board VMess 节点示例；面板类型、协议和节点 ID 必须改成实际值。
 命令会写入配置并自动启动；不需要再手动编辑文件或执行启动命令。
 密钥若含特殊字符，请用 shell 引号包住整个 webapi_key=... 参数。
-已有配置时直接 sudo bash /tmp/soga-install.sh 即可保留配置、更新并重启。
+以 root 执行以下命令安装或更新，然后输入 soga 打开管理菜单：
+  bash <(curl -Ls https://raw.githubusercontent.com/Miku-programm/soga-v1/main/install.sh)
+已有配置时保留配置并重启；全新安装需要提供实际节点配置。
 
 也可以给安装脚本传一个 Release 标签，安装固定版本：
-  sudo bash /tmp/soga-install.sh build-1-1-abcdef0
+  bash <(curl -Ls https://raw.githubusercontent.com/Miku-programm/soga-v1/main/install.sh) build-1-1-abcdef0
 以上标签只是格式示例；实际标签以 Releases 页面为准。
 
+真实安装支持 apt/dnf/yum，自动安装依赖及 acme.sh，并设置 Let’s Encrypt 默认 CA。
 脚本识别架构、下载 Release、校验 SHA-256，然后安装程序及 systemd 模板。
 配置参数可与版本参数混合排列，同名参数以后面的值为准。
 已有配置会保留，仅覆盖显式传入的字段；已有配置或传入参数时自动重启。
 首次未传任何配置参数时，仍按官方流程提示先配置，不启动空配置实例。
 真实安装会设置开机自启；DESTDIR 临时目录安装不操作宿主 systemd。
-已有安装的默认路径为 /etc/soga-reconstructed/soga.conf。
+已有安装的默认路径为 /etc/soga/soga.conf。
 
 key 的区别
 
@@ -91,8 +98,8 @@ tunnel_password：仅开启隧道时使用，必须与对端隧道配置一致�
 webapi_url 填面板基础地址，不要追加 /api/v1/server/UniProxy/config。
 node_id 和 server_type 应与面板创建的节点一致。
 手动配置时使用以下命令；安装脚本带参数运行时已自动完成：
-  sudo systemctl enable --now soga-reconstructed@default
-  sudo journalctl -u soga-reconstructed@default -f
+  sudo systemctl enable --now soga
+  sudo journalctl -u soga -f
 
 GitHub 编译
 

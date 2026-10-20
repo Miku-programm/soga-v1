@@ -25,12 +25,12 @@ chmod +x "$scratch/tools/curl"
 export TEST_ASSETS="$root/dist"
 export TEST_REQUESTS="$scratch/download-requests"
 export PATH="$scratch/tools:$PATH"
-DESTDIR="$scratch/stage" bash "$root/install.sh"
-cmp "$root/bin/soga-reconstructed-linux-amd64" "$scratch/stage/usr/local/bin/soga-reconstructed"
-"$scratch/stage/usr/local/bin/soga" version | grep -q 'soga 管理脚本'
-printf '\n# preserve-this-setting\n' >> "$scratch/stage/etc/soga-reconstructed/soga.conf"
-DESTDIR="$scratch/stage" bash "$root/install.sh"
-grep -q preserve-this-setting "$scratch/stage/etc/soga-reconstructed/soga.conf"
+DESTDIR="$scratch/stage" bash <(cat "$root/install.sh")
+cmp "$root/bin/soga-reconstructed-linux-amd64" "$scratch/stage/usr/local/soga/soga"
+"$scratch/stage/usr/bin/soga" version | grep -q 'soga 管理脚本'
+printf '\n# preserve-this-setting\n' >> "$scratch/stage/etc/soga/soga.conf"
+DESTDIR="$scratch/stage" bash <(cat "$root/install.sh")
+grep -q preserve-this-setting "$scratch/stage/etc/soga/soga.conf"
 mkdir "$scratch/bad-assets"
 cp "$root/dist/SHA256SUMS" "$scratch/bad-assets/SHA256SUMS"
 printf 'corrupted archive\n' > "$scratch/bad-assets/soga-linux-amd64.tar.gz"
@@ -38,7 +38,7 @@ if TEST_ASSETS="$scratch/bad-assets" DESTDIR="$scratch/rejected" bash "$root/ins
   echo 'Corrupted release unexpectedly installed.' >&2
   exit 1
 fi
-[[ ! -e $scratch/rejected/usr/local/bin/soga-reconstructed ]]
+[[ ! -e $scratch/rejected/usr/local/soga/soga ]]
 
 # Official-style key=value arguments, including values that must not be
 # interpreted as sed expressions or shell commands.
@@ -48,7 +48,7 @@ DESTDIR="$scratch/configured" bash "$root/install.sh" \
   type=v2board build-fixture webapi_url=https://panel.example.invalid \
   "webapi_key=$secret" node_id=2 node_id=3 > "$scratch/config-output"
 grep -Fxq 'https://github.com/Miku-programm/soga-v1/releases/download/build-fixture/soga-linux-amd64.tar.gz' "$TEST_REQUESTS"
-conf="$scratch/configured/etc/soga-reconstructed/soga.conf"
+conf="$scratch/configured/etc/soga/soga.conf"
 grep -Fxq "webapi_key=$secret" "$conf"
 grep -Fxq 'node_id=3' "$conf"
 [[ $(grep -c '^node_id=' "$conf") -eq 1 ]]
@@ -61,9 +61,9 @@ if DESTDIR="$scratch/configured" bash "$root/install.sh" $'webapi_key=a\nnode_id
 fi
 [[ $(sha256sum "$conf") == "$before" ]]
 DESTDIR="$scratch/stage" sh "$root/scripts/uninstall.sh"
-[[ ! -e $scratch/stage/usr/local/bin/soga ]]
+[[ ! -e $scratch/stage/usr/bin/soga ]]
 [[ ! -e $scratch/stage/usr/local/share/doc/soga-reconstructed/manager.py ]]
-grep -q preserve-this-setting "$scratch/stage/etc/soga-reconstructed/soga.conf"
+grep -q preserve-this-setting "$scratch/stage/etc/soga/soga.conf"
 
 mkdir -p "$scratch/collision/usr/local/bin"
 printf '#!/bin/sh\n# another manager\n' > "$scratch/collision/usr/local/bin/soga"
@@ -71,7 +71,30 @@ if DESTDIR="$scratch/collision" bash "$root/install.sh"; then
   echo 'Installer overwrote an unrelated soga command.' >&2; exit 1
 fi
 grep -q 'another manager' "$scratch/collision/usr/local/bin/soga"
-[[ ! -e $scratch/collision/usr/local/bin/soga-reconstructed ]]
+[[ ! -e $scratch/collision/usr/local/soga/soga ]]
+
+
+# Official layout includes all support files and both service units.
+for file in blockList whiteList dns.yml routes.toml soga.conf; do
+  [[ -f $scratch/configured/etc/soga/$file ]]
+done
+grep -Fxq 'ExecStart=/usr/local/soga/soga instance-run default' "$scratch/configured/etc/systemd/system/soga.service"
+grep -Fxq 'ExecStart=/usr/local/soga/soga instance-run %i' "$scratch/configured/etc/systemd/system/soga@.service"
+mkdir -p "$scratch/migration/etc/soga-reconstructed/anytls" "$scratch/migration/usr/local/bin"
+printf 'node_id=71\n' > "$scratch/migration/etc/soga-reconstructed/soga.conf"
+printf 'node_id=72\n' > "$scratch/migration/etc/soga-reconstructed/anytls/soga.conf"
+cp "$root/scripts/soga" "$scratch/migration/usr/local/bin/soga"
+DESTDIR="$scratch/migration" bash <(cat "$root/install.sh")
+grep -Fxq 'node_id=71' "$scratch/migration/etc/soga/soga.conf"
+grep -Fxq 'node_id=72' "$scratch/migration/etc/soga/anytls/soga.conf"
+[[ ! -e $scratch/migration/usr/local/bin/soga ]]
+"$scratch/migration/usr/bin/soga" version | grep -q 'soga 管理脚本'
+# Existing official files are backed up; official config takes precedence.
+printf '# existing official manager\n' > "$scratch/migration/usr/bin/soga"
+printf 'node_id=99\n' > "$scratch/migration/etc/soga/soga.conf"
+DESTDIR="$scratch/migration" bash "$root/install.sh"
+grep -Fxq 'node_id=99' "$scratch/migration/etc/soga/soga.conf"
+find "$scratch/migration/var/backups/soga" -path '*/usr/bin/soga' -type f -exec grep -l 'existing official manager' {} + | grep -q .
 
 # Verify service decisions with a command stub, never the host systemd.
 source "$root/install.sh"
@@ -84,13 +107,13 @@ systemctl() {
 sleep() { :; }
 finish_install_service false false
 ! grep -q '^restart ' "$service_log"
-grep -Fxq 'enable soga-reconstructed@default' "$service_log"
+grep -Fxq 'enable soga' "$service_log"
 : > "$service_log"
 finish_install_service false true
-grep -Fxq 'restart soga-reconstructed@default' "$service_log"
+grep -Fxq 'restart soga' "$service_log"
 : > "$service_log"
 finish_install_service true false
-grep -Fxq 'restart soga-reconstructed@default' "$service_log"
+grep -Fxq 'restart soga' "$service_log"
 simulate_failure=true
 if finish_install_service false true; then
   echo 'Failed service unexpectedly reported success.' >&2; exit 1

@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-const instanceRoot = "/etc/soga-reconstructed"
+const instanceRoot = "/etc/soga"
 
 var instanceName = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$`)
 
@@ -40,7 +40,7 @@ func instanceRun(args []string, out, errOut io.Writer) int {
 	return serve([]string{"-c", filepath.Join(dir, "soga.conf"),
 		"-b", filepath.Join(dir, "blockList"), "-w", filepath.Join(dir, "whiteList"),
 		"-d", filepath.Join(dir, "dns.yml"), "-r", filepath.Join(dir, "routes.toml"),
-		"-state-dir", filepath.Join(dir, "state"), "-restart-after-update"}, out, errOut)
+		"-state-dir", filepath.Join(dir, "state"), "-acme-executable", "/root/.acme.sh/acme.sh", "-restart-after-update"}, out, errOut)
 }
 
 func systemCommand(out, errOut io.Writer, program string, args ...string) error {
@@ -85,10 +85,15 @@ automatically. Commands that use systemd require the installed default root.`)
 }
 
 func manageInstances(root, action string, args []string, out, errOut io.Writer) error {
-	unit := func(name string) string { return "soga-reconstructed@" + name + ".service" }
+	unit := func(name string) string {
+		if name == "default" {
+			return "soga.service"
+		}
+		return "soga@" + name + ".service"
+	}
 	checkRoot := func() error {
 		if filepath.Clean(root) != instanceRoot {
-			return errors.New("systemd commands require /etc/soga-reconstructed; custom roots support only offline file operations")
+			return errors.New("systemd commands require /etc/soga; custom roots support only offline file operations")
 		}
 		return nil
 	}
