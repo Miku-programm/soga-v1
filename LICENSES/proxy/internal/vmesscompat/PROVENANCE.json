@@ -1,0 +1,102 @@
+{
+  "module": "github.com/sagernet/sing-vmess",
+  "version": "v0.2.9-0.20260929152519-9b95ab8c9478",
+  "source": "https://github.com/SagerNet/sing-vmess",
+  "license": "GPL-3.0",
+  "purpose": "Task-local compatibility fork: documented auto/md5/aead selection, alterId=0 legacy identity, synchronized legacy cache. Not original soga code.",
+  "files": [
+    {
+      "file": "chunk_aead.go",
+      "upstream_sha256": "3fc8f03d391ce7f2ad1ee5f2b103d1a52171862c24997492a97415d1f994ba1f",
+      "local_sha256": "3fc8f03d391ce7f2ad1ee5f2b103d1a52171862c24997492a97415d1f994ba1f",
+      "modified": false
+    },
+    {
+      "file": "chunk_length_aead.go",
+      "upstream_sha256": "bf218390c3c1f5be6bde46e14639552e3ae12d5c5e2d33b1d7ced7b9ec0316a4",
+      "local_sha256": "bf218390c3c1f5be6bde46e14639552e3ae12d5c5e2d33b1d7ced7b9ec0316a4",
+      "modified": false
+    },
+    {
+      "file": "chunk_length_stream.go",
+      "upstream_sha256": "f599bc7375e7c37650e4823c1b7ac712931866ccbdf9307497d0c69c93d19161",
+      "local_sha256": "f599bc7375e7c37650e4823c1b7ac712931866ccbdf9307497d0c69c93d19161",
+      "modified": false
+    },
+    {
+      "file": "chunk_stream.go",
+      "upstream_sha256": "1bd41234e826e7d55cd175e6da0a3010e5d3f0118fcf5e39e31aebb76ba31223",
+      "local_sha256": "1bd41234e826e7d55cd175e6da0a3010e5d3f0118fcf5e39e31aebb76ba31223",
+      "modified": false
+    },
+    {
+      "file": "chunk_stream_checksum.go",
+      "upstream_sha256": "866930be880547f3eea3d953908c1e9c4b72a836e127e3fc7d91b02ca90183e0",
+      "local_sha256": "866930be880547f3eea3d953908c1e9c4b72a836e127e3fc7d91b02ca90183e0",
+      "modified": false
+    },
+    {
+      "file": "client.go",
+      "upstream_sha256": "5faad873130c009c19b46c8b8bfec2ddc0703332d70d417f343b2f5b542d01bd",
+      "local_sha256": "5faad873130c009c19b46c8b8bfec2ddc0703332d70d417f343b2f5b542d01bd",
+      "modified": false
+    },
+    {
+      "file": "client_option.go",
+      "upstream_sha256": "628ead967d72de587034a7129c9b38bfdb1940a1b240f905ba754758bfeb5033",
+      "local_sha256": "c1f5a43150556410909b599ef122b9c75d760324e7a2a7e6c3ec93fb1f8e6d37",
+      "modified": true
+    },
+    {
+      "file": "kdf.go",
+      "upstream_sha256": "9703b679a50e609223ac46c15723eea987e1188e370dcce1ecd237d597c1be2a",
+      "local_sha256": "9703b679a50e609223ac46c15723eea987e1188e370dcce1ecd237d597c1be2a",
+      "modified": false
+    },
+    {
+      "file": "mux.go",
+      "upstream_sha256": "7061ce5af54ea04c212fb9184733a0f80d7bbcd541d25d097df2611bd02d4e9c",
+      "local_sha256": "7061ce5af54ea04c212fb9184733a0f80d7bbcd541d25d097df2611bd02d4e9c",
+      "modified": false
+    },
+    {
+      "file": "mux_wrapper.go",
+      "upstream_sha256": "c569927296dc5cdf191e0e8345d8e7457ff80a7bb65f0ecbb8b33bb28223081d",
+      "local_sha256": "c569927296dc5cdf191e0e8345d8e7457ff80a7bb65f0ecbb8b33bb28223081d",
+      "modified": false
+    },
+    {
+      "file": "protocol.go",
+      "upstream_sha256": "dc75dbcb9a5fd878fac0ed89dbe1fcbd166c5fbedb0d89122b9867db53cefb64",
+      "local_sha256": "dc75dbcb9a5fd878fac0ed89dbe1fcbd166c5fbedb0d89122b9867db53cefb64",
+      "modified": false
+    },
+    {
+      "file": "service.go",
+      "upstream_sha256": "a980891a8b434423d3f3ada560ea7b739a3503dbc3938a00004f4e26cdf6f64e",
+      "local_sha256": "8c7f48e1676c6fb38262ef6325e2bde3eaa5891b80ae85f8f072ebb1f78eb843",
+      "modified": true
+    },
+    {
+      "file": "service_option.go",
+      "upstream_sha256": "4f4508e8f50842c9df55c95a76dc4bdbf11f0014ae59cdb2f43ff59a61b72b59",
+      "local_sha256": "a66af306ba9de162816369ea57a4a0335672e92e56273c67b8d122da9f63bb39",
+      "modified": true
+    },
+    {
+      "file": "xudp.go",
+      "upstream_sha256": "67b1eede4fa9f3a31ba30dc04b303defe46faf6193023523b772444533ac523b",
+      "local_sha256": "67b1eede4fa9f3a31ba30dc04b303defe46faf6193023523b772444533ac523b",
+      "modified": false
+    }
+  ],
+  "license_file": "proxy/internal/vmesscompat/LICENSE",
+  "original_soga_source": false,
+  "changes": [
+    "Explicit auto/md5/aead acceptance policy including alterId=0 MD5 compatibility.",
+    "Synchronized legacy-auth cache and retain valid past entries on refresh.",
+    "Reduced-memory table (61 vs 251 entries/identity), strict ±25 vs ±120 second lookup.",
+    "IP-to-ID candidate ordering always followed by cryptographic authentication.",
+    "Task-local client option to exercise legacy alterId=0 in tests."
+  ]
+}

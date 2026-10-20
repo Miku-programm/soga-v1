@@ -1,0 +1,39 @@
+{
+  "checked_at_utc": "2026-10-20T16:59:56.793118+00:00",
+  "status": "PASS",
+  "counts": {
+    "files": 170,
+    "legal_texts": 146,
+    "vendored_modules": 97,
+    "modules_with_packages": 97,
+    "modules_missing_root_legal_file": 0
+  },
+  "all_copied_files_verified": true,
+  "source_mismatches": [],
+  "missing_root_legal_files": [],
+  "go_mod_sha256": "a913ed818cc4405c75fe9fdf318204dd495f43d8ec0bd88360c7a727c4bf17f8",
+  "go_sum_sha256": "15d9bc72d012647cab989b802437b8dfc471b882bb3ed06fcefed64f8c43658e",
+  "vendor_modules_sha256": "28c372ed0f4501fa4663b49a10f7c9adb0e1830a5a37d84bb8c04dd64f9a01b3",
+  "root_license_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+  "third_party_notices_sha256": "478790012cf5cb0ff1252fa81a42c60b24ec872f1938ea3474bdca3bf3777639",
+  "go_standard_library": {
+    "version": "go1.27.3",
+    "license_directory": "go-standard-library/go1.27.3",
+    "upstream": "https://go.dev/",
+    "note": "Go standard library and bundled legal notices; this is not a copy of the Go toolchain. Some included subcomponents may be inactive in the selected build."
+  },
+  "smux": {
+    "module": "github.com/xtaci/smux",
+    "version": "v1.5.57",
+    "packages": [
+      "github.com/xtaci/smux"
+    ],
+    "root_legal_files": [
+      "vendor/github.com/xtaci/smux/LICENSE"
+    ],
+    "nested_legal_files": [],
+    "status": "root-legal-file-present"
+  },
+  "limits": "Verifies preserved legal materials, source identity and module inventory; not a legal compatibility opinion.",
+  "source_files_byte_verified": 170
+}

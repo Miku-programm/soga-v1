@@ -1,0 +1,98 @@
+module	version	replacement	packages	status	root_legal_files	nested_legal_files
+filippo.io/edwards25519	v1.2.0		2	root-legal-file-present	vendor/filippo.io/edwards25519/LICENSE	
+github.com/ajg/form	v1.5.1		1	root-legal-file-present	vendor/github.com/ajg/form/LICENSE	
+github.com/andybalholm/brotli	v1.1.0		2	root-legal-file-present	vendor/github.com/andybalholm/brotli/LICENSE	
+github.com/anytls/sing-anytls	v0.0.11		6	root-legal-file-present	vendor/github.com/anytls/sing-anytls/LICENSE	
+github.com/apernet/quic-go	v0.59.1-0.20260217092621-db4786c77a22		21	root-legal-file-present	vendor/github.com/apernet/quic-go/LICENSE	
+github.com/caddyserver/certmagic	v0.25.3-0.20260421143802-60d9d8b415d6		2	root-legal-file-present	vendor/github.com/caddyserver/certmagic/LICENSE.txt	
+github.com/caddyserver/zerossl	v0.1.5		1	root-legal-file-present	vendor/github.com/caddyserver/zerossl/LICENSE	
+github.com/cloudflare/circl	v1.6.3		7	root-legal-file-present	vendor/github.com/cloudflare/circl/LICENSE	
+github.com/database64128/netx-go	v0.1.1		1	root-legal-file-present	vendor/github.com/database64128/netx-go/LICENSE	
+github.com/database64128/tfo-go/v2	v2.3.2		1	root-legal-file-present	vendor/github.com/database64128/tfo-go/v2/LICENSE	
+github.com/enfein/mieru/v3	v3.38.1		25	root-legal-file-present	vendor/github.com/enfein/mieru/v3/LICENSE	vendor/github.com/enfein/mieru/v3/pkg/log/LICENSE;vendor/github.com/enfein/mieru/v3/pkg/socks5/LICENSE
+github.com/florianl/go-nfqueue/v2	v2.1.0		2	root-legal-file-present	vendor/github.com/florianl/go-nfqueue/v2/LICENSE	
+github.com/fsnotify/fsnotify	v1.9.0		2	root-legal-file-present	vendor/github.com/fsnotify/fsnotify/LICENSE	
+github.com/go-chi/chi/v5	v5.2.5		2	root-legal-file-present	vendor/github.com/go-chi/chi/v5/LICENSE	
+github.com/go-chi/render	v1.0.3		1	root-legal-file-present	vendor/github.com/go-chi/render/LICENSE	
+github.com/go-ole/go-ole	v1.3.0		2	root-legal-file-present	vendor/github.com/go-ole/go-ole/LICENSE	
+github.com/go-sql-driver/mysql	v1.10.1		1	root-legal-file-present	vendor/github.com/go-sql-driver/mysql/AUTHORS;vendor/github.com/go-sql-driver/mysql/LICENSE	
+github.com/gobwas/httphead	v0.1.0		1	root-legal-file-present	vendor/github.com/gobwas/httphead/LICENSE	
+github.com/gobwas/pool	v0.2.1		4	root-legal-file-present	vendor/github.com/gobwas/pool/LICENSE	
+github.com/godbus/dbus/v5	v5.2.2		1	root-legal-file-present	vendor/github.com/godbus/dbus/v5/LICENSE	
+github.com/gofrs/uuid/v5	v5.5.1		1	root-legal-file-present	vendor/github.com/gofrs/uuid/v5/LICENSE	
+github.com/google/btree	v1.1.3		1	root-legal-file-present	vendor/github.com/google/btree/LICENSE	
+github.com/google/go-cmp	v0.7.0		5	root-legal-file-present	vendor/github.com/google/go-cmp/LICENSE	
+github.com/google/gopacket	v1.1.19		1	root-legal-file-present	vendor/github.com/google/gopacket/AUTHORS;vendor/github.com/google/gopacket/LICENSE	
+github.com/gorilla/websocket	v1.5.3		1	root-legal-file-present	vendor/github.com/gorilla/websocket/AUTHORS;vendor/github.com/gorilla/websocket/LICENSE	
+github.com/hashicorp/yamux	v0.1.2		1	root-legal-file-present	vendor/github.com/hashicorp/yamux/LICENSE	
+github.com/huin/goupnp	v1.3.0		7	root-legal-file-present	vendor/github.com/huin/goupnp/LICENSE	
+github.com/jackpal/go-nat-pmp	v1.0.2		1	root-legal-file-present	vendor/github.com/jackpal/go-nat-pmp/LICENSE	
+github.com/jsimonetti/rtnetlink	v1.4.1		2	root-legal-file-present	vendor/github.com/jsimonetti/rtnetlink/LICENSE.md	
+github.com/juju/ratelimit	v1.0.2		1	root-legal-file-present	vendor/github.com/juju/ratelimit/LICENSE	
+github.com/klauspost/compress	v1.19.1		8	root-legal-file-present	vendor/github.com/klauspost/compress/LICENSE	vendor/github.com/klauspost/compress/internal/snapref/LICENSE;vendor/github.com/klauspost/compress/zstd/internal/xxhash/LICENSE.txt
+github.com/klauspost/cpuid/v2	v2.3.0		1	root-legal-file-present	vendor/github.com/klauspost/cpuid/v2/LICENSE	
+github.com/koron/go-ssdp	v0.0.4		3	root-legal-file-present	vendor/github.com/koron/go-ssdp/LICENSE	
+github.com/libdns/acmedns	v0.5.0		1	root-legal-file-present	vendor/github.com/libdns/acmedns/LICENSE	
+github.com/libdns/alidns	v1.0.6		1	root-legal-file-present	vendor/github.com/libdns/alidns/LICENSE	
+github.com/libdns/cloudflare	v0.2.2		1	root-legal-file-present	vendor/github.com/libdns/cloudflare/LICENSE	
+github.com/libdns/libdns	v1.1.1		1	root-legal-file-present	vendor/github.com/libdns/libdns/LICENSE	
+github.com/libp2p/go-nat	v1.0.1-0.20250821073202-01afc089f138		1	root-legal-file-present	vendor/github.com/libp2p/go-nat/LICENSE	
+github.com/libp2p/go-netroute	v0.2.1		1	root-legal-file-present	vendor/github.com/libp2p/go-netroute/LICENSE	
+github.com/logrusorgru/aurora	v2.0.3+incompatible		1	root-legal-file-present	vendor/github.com/logrusorgru/aurora/AUTHORS.md;vendor/github.com/logrusorgru/aurora/LICENSE	
+github.com/mdlayher/netlink	v1.11.2		3	root-legal-file-present	vendor/github.com/mdlayher/netlink/LICENSE.md	
+github.com/mdlayher/socket	v0.6.0		1	root-legal-file-present	vendor/github.com/mdlayher/socket/LICENSE.md	
+github.com/metacubex/utls	v1.8.7		15	root-legal-file-present	vendor/github.com/metacubex/utls/CONTRIBUTORS_GUIDE.md;vendor/github.com/metacubex/utls/LICENSE	vendor/github.com/metacubex/utls/dicttls/LICENSE
+github.com/mholt/acmez/v3	v3.1.6		2	root-legal-file-present	vendor/github.com/mholt/acmez/v3/LICENSE	
+github.com/miekg/dns	v1.1.72		1	root-legal-file-present	vendor/github.com/miekg/dns/AUTHORS;vendor/github.com/miekg/dns/CONTRIBUTORS;vendor/github.com/miekg/dns/COPYRIGHT;vendor/github.com/miekg/dns/LICENSE	
+github.com/pelletier/go-toml/v2	v2.2.4		5	root-legal-file-present	vendor/github.com/pelletier/go-toml/v2/LICENSE	
+github.com/pires/go-proxyproto	v0.11.0		1	root-legal-file-present	vendor/github.com/pires/go-proxyproto/LICENSE	
+github.com/quic-go/qpack	v0.6.0		1	root-legal-file-present	vendor/github.com/quic-go/qpack/LICENSE.md	
+github.com/refraction-networking/utls	v1.8.3-0.20260301010127-aa6edf4b11af		12	root-legal-file-present	vendor/github.com/refraction-networking/utls/CONTRIBUTORS_GUIDE.md;vendor/github.com/refraction-networking/utls/LICENSE	vendor/github.com/refraction-networking/utls/dicttls/LICENSE
+github.com/robfig/cron/v3	v3.0.1		1	root-legal-file-present	vendor/github.com/robfig/cron/v3/LICENSE	
+github.com/sagernet/bbolt	v0.0.0-20260915102804-500ee1e84832		4	root-legal-file-present	vendor/github.com/sagernet/bbolt/LICENSE	
+github.com/sagernet/fswatch	v0.1.2		1	root-legal-file-present	vendor/github.com/sagernet/fswatch/LICENSE	
+github.com/sagernet/gvisor	v0.0.0-20260727.0-sing-box-mod.1		49	root-legal-file-present	vendor/github.com/sagernet/gvisor/AUTHORS;vendor/github.com/sagernet/gvisor/LICENSE	
+github.com/sagernet/netlink	v0.0.0-20260814022025-64455d367bbf		2	root-legal-file-present	vendor/github.com/sagernet/netlink/LICENSE	
+github.com/sagernet/nftables	v0.3.0-mod.4		7	root-legal-file-present	vendor/github.com/sagernet/nftables/LICENSE	
+github.com/sagernet/quic-go	v0.61.0-sing-box-mod.9		20	root-legal-file-present	vendor/github.com/sagernet/quic-go/LICENSE	
+github.com/sagernet/sing	v0.9.7-0.20260929150544-0ad23b637bd4		61	root-legal-file-present	vendor/github.com/sagernet/sing/LICENSE	vendor/github.com/sagernet/sing/contrab/freelru/LICENSE;vendor/github.com/sagernet/sing/contrab/freelru/NOTICE
+github.com/sagernet/sing-box	v1.14.3	./third_party/sing-box	76	root-legal-file-present	vendor/github.com/sagernet/sing-box/LICENSE	vendor/github.com/sagernet/sing-box/common/ja3/LICENSE
+github.com/sagernet/sing-mux	v0.3.10-0.20260929204512-caf09fe32475		1	root-legal-file-present	vendor/github.com/sagernet/sing-mux/LICENSE	
+github.com/sagernet/sing-quic	v0.7.2-0.20261002084117-75c3ac4fa12b		8	root-legal-file-present	vendor/github.com/sagernet/sing-quic/LICENSE	
+github.com/sagernet/sing-shadowsocks	v0.2.9-0.20260929204512-65740e0f0e3e		3	root-legal-file-present	vendor/github.com/sagernet/sing-shadowsocks/LICENSE	
+github.com/sagernet/sing-shadowsocks2	v0.2.2-0.20260929152114-a69d1086332b		7	root-legal-file-present	vendor/github.com/sagernet/sing-shadowsocks2/LICENSE	
+github.com/sagernet/sing-snell	v0.0.0-20260904135315-bc5a12ac736f		1	root-legal-file-present	vendor/github.com/sagernet/sing-snell/LICENSE	
+github.com/sagernet/sing-tun	v0.9.7-0.20261009020158-bca4bf029237		16	root-legal-file-present	vendor/github.com/sagernet/sing-tun/LICENSE	
+github.com/sagernet/sing-usbip	v0.0.0-20260817040617-28bd42667eca		6	root-legal-file-present	vendor/github.com/sagernet/sing-usbip/LICENSE	
+github.com/sagernet/sing-vmess	v0.2.9-0.20260929152519-9b95ab8c9478		3	root-legal-file-present	vendor/github.com/sagernet/sing-vmess/LICENSE	
+github.com/sagernet/smux	v1.5.50-sing-box-mod.1		1	root-legal-file-present	vendor/github.com/sagernet/smux/LICENSE	
+github.com/sagernet/ws	v0.0.0-20231204124109-acfe8907c854		2	root-legal-file-present	vendor/github.com/sagernet/ws/LICENSE	
+github.com/sirupsen/logrus	v1.10.2		1	root-legal-file-present	vendor/github.com/sirupsen/logrus/LICENSE	
+github.com/vishvananda/netlink	v1.3.1		2	root-legal-file-present	vendor/github.com/vishvananda/netlink/LICENSE	
+github.com/vishvananda/netns	v0.0.5		1	root-legal-file-present	vendor/github.com/vishvananda/netns/LICENSE	
+github.com/xtaci/smux	v1.5.57		1	root-legal-file-present	vendor/github.com/xtaci/smux/LICENSE	
+github.com/xtls/reality	v0.0.0-20260322125925-9234c772ba8f		5	root-legal-file-present	vendor/github.com/xtls/reality/LICENSE;vendor/github.com/xtls/reality/LICENSE-Go	
+github.com/xtls/xray-core	v1.260327.0	./third_party/xray-core	145	root-legal-file-present	vendor/github.com/xtls/xray-core/LICENSE	
+github.com/zeebo/blake3	v0.2.4		10	root-legal-file-present	vendor/github.com/zeebo/blake3/LICENSE	
+gitlab.com/yawning/chacha20.git	v0.0.0-20230427033715-7877545b1b37		4	root-legal-file-present	vendor/gitlab.com/yawning/chacha20.git/LICENSE	
+go.uber.org/multierr	v1.11.0		1	root-legal-file-present	vendor/go.uber.org/multierr/LICENSE.txt	
+go.uber.org/zap	v1.27.1		9	root-legal-file-present	vendor/go.uber.org/zap/LICENSE	vendor/go.uber.org/zap/exp/LICENSE
+go.uber.org/zap/exp	v0.3.0		1	root-legal-file-present	vendor/go.uber.org/zap/LICENSE;vendor/go.uber.org/zap/exp/LICENSE	
+go4.org/netipx	v0.0.0-20231129151722-fdeea329fbba		1	root-legal-file-present	vendor/go4.org/netipx/AUTHORS;vendor/go4.org/netipx/LICENSE	
+golang.org/x/crypto	v0.54.0		18	root-legal-file-present	vendor/golang.org/x/crypto/LICENSE;vendor/golang.org/x/crypto/PATENTS	
+golang.org/x/exp	v0.0.0-20260410095643-746e56fc9e2f		2	root-legal-file-present	vendor/golang.org/x/exp/LICENSE;vendor/golang.org/x/exp/PATENTS	
+golang.org/x/mod	v0.37.0		1	root-legal-file-present	vendor/golang.org/x/mod/LICENSE;vendor/golang.org/x/mod/PATENTS	
+golang.org/x/net	v0.57.0		18	root-legal-file-present	vendor/golang.org/x/net/LICENSE;vendor/golang.org/x/net/PATENTS	
+golang.org/x/sync	v0.22.0		3	root-legal-file-present	vendor/golang.org/x/sync/LICENSE;vendor/golang.org/x/sync/PATENTS	
+golang.org/x/sys	v0.47.0		4	root-legal-file-present	vendor/golang.org/x/sys/LICENSE;vendor/golang.org/x/sys/PATENTS	
+golang.org/x/text	v0.40.0		8	root-legal-file-present	vendor/golang.org/x/text/LICENSE;vendor/golang.org/x/text/PATENTS	
+golang.org/x/time	v0.15.0		1	root-legal-file-present	vendor/golang.org/x/time/LICENSE;vendor/golang.org/x/time/PATENTS	
+golang.org/x/tools	v0.47.0		19	root-legal-file-present	vendor/golang.org/x/tools/LICENSE;vendor/golang.org/x/tools/PATENTS	
+golang.zx2c4.com/wintun	v0.0.0-20230126152724-0fa3db229ce2		1	root-legal-file-present	vendor/golang.zx2c4.com/wintun/LICENSE	
+golang.zx2c4.com/wireguard	v0.0.0-20250521234502-f333402bd9cb		10	root-legal-file-present	vendor/golang.zx2c4.com/wireguard/LICENSE	
+google.golang.org/genproto/googleapis/rpc	v0.0.0-20251202230838-ff82c1b0f217		1	root-legal-file-present	vendor/google.golang.org/genproto/googleapis/rpc/LICENSE	
+google.golang.org/grpc	v1.79.3		65	root-legal-file-present	vendor/google.golang.org/grpc/AUTHORS;vendor/google.golang.org/grpc/LICENSE;vendor/google.golang.org/grpc/NOTICE.txt	
+google.golang.org/protobuf	v1.36.11		37	root-legal-file-present	vendor/google.golang.org/protobuf/LICENSE;vendor/google.golang.org/protobuf/PATENTS	
+gopkg.in/yaml.v3	v3.0.1		1	root-legal-file-present	vendor/gopkg.in/yaml.v3/LICENSE;vendor/gopkg.in/yaml.v3/NOTICE	
+gvisor.dev/gvisor	v0.0.0-20260122175437-89a5d21be8f0		47	root-legal-file-present	vendor/gvisor.dev/gvisor/AUTHORS;vendor/gvisor.dev/gvisor/LICENSE	
+lukechampine.com/blake3	v1.4.1		3	root-legal-file-present	vendor/lukechampine.com/blake3/LICENSE	

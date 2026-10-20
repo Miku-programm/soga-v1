@@ -1,0 +1,185 @@
+独立重建工程：构建与部署
+
+本工程是根据静态证据独立实现的兼容程序，不是找回的原始源码。
+本说明针对 Linux amd64 / arm64。已做本地测试的功能见交付功能表；
+真实面板、外部 DNS / CA 及生产负载仍须在你的环境验收。
+所有命令均在本工程根目录执行，除非特别注明。
+
+一、从源码构建
+
+使用 Go 1.27.3；依赖已由维护者收集到与 go.mod 匹配的 vendor/。
+脚本固定使用 -mod=vendor，不自动下载依赖或 Go 工具链。
+
+  GO=/实际路径/go scripts/build.sh
+
+或者 PATH 已有 Go：
+
+  scripts/build.sh amd64
+  scripts/build.sh arm64
+
+默认同时生成：
+  bin/soga-reconstructed-linux-amd64
+  bin/soga-reconstructed-linux-arm64
+  bin/SHA256SUMS
+
+两个目标均为 Linux、CGO_ENABLED=0。SHA256SUMS 记录本次选择构建的目标。
+OUTPUT_DIR 可修改输出目录；安装脚本固定读取本工程的 bin/。
+VERSION=0.1.0 可覆盖重建版本号；不设置时使用源码常量，
+它与原样本 2.17.0 是两个独立版本，不会改变原样本识别信息。
+如提示 vendor 不一致，须先取得完整、匹配本版本的源码依赖包，
+不要改成在线下载未知版本来绕过错误。
+
+二、安装到 Linux 主机
+
+安装器只复制本工程已构建的程序，不下载原始 soga。
+路径与原程序分开：
+  程序：/usr/local/bin/soga-reconstructed
+  配置：/etc/soga-reconstructed
+  服务：soga-reconstructed@.service
+
+  sudo scripts/install.sh
+
+也可显式指定安装包架构：
+
+  sudo scripts/install.sh arm64
+
+仅把文件安装到临时根、不操作宿主 systemd：
+
+  DESTDIR="$PWD/install-preview" scripts/install.sh amd64
+
+重复安装会更新程序与服务模板，但保留已有 soga.conf、规则、证书与状态。
+安装器不会启用、启动或重启服务；更新运行中的实例后须自行 restart。
+仅安装文件不会把原始 soga 的配置、服务或用户数据迁移过来。
+
+三、准备真实配置并启动默认实例
+
+首次安装复制 examples/soga.conf；它含虚构值，仅用于解析示例。
+请编辑 /etc/soga-reconstructed/soga.conf，填入实际面板类型、接口地址、
+密钥、节点 ID 和对应协议。不能直接把示例当作可用节点配置。
+
+例如 soga-v1 HTTP 面板的一组基本字段如下，所有占位值都须替换：
+
+  type=soga-v1
+  server_type=vmess
+  api=webapi
+  webapi_url=https://panel.example
+  webapi_key=替换成实际密钥
+  node_id=替换成实际节点ID
+  auto_update=false
+
+其他面板与协议请使用相应配置说明，不要照抄这组类型。
+安装目录中的 soga.conf 默认权限为 0600；不要公开配置或完整日志。
+自带证书可在配置中指定 cert_file / key_file 的绝对路径。
+证书状态写入实例目录的 state/，持久化保存才能复用及续期。
+cert_mode=http 的 ACME standalone 需要 sh、curl、openssl、socat 和
+系统 CA 证书；HTTP 挑战期间 TCP 80 必须可达且未被其他程序占用。
+cert_mode=dns 使用真实 DNS API 凭据，按对应提供者配置；
+本工程未替你完成真实 CA / DNS 验收。
+
+先只解析配置（默认隐藏敏感字段）：
+
+  sudo soga-reconstructed inspect -c /etc/soga-reconstructed/soga.conf
+
+inspect 验证配置转换，不代表面板请求、证书、监听端口均已就绪。
+确认端口不与原程序或其他服务冲突，再显式启动：
+
+  sudo soga-reconstructed instance start default
+  sudo soga-reconstructed instance status default
+  sudo soga-reconstructed instance log default -f
+  sudo soga-reconstructed instance enable default
+
+停止或重启：
+
+  sudo soga-reconstructed instance stop default
+  sudo soga-reconstructed instance restart default
+
+默认实例使用 /etc/soga-reconstructed/soga.conf。
+同目录可放 blockList、whiteList、dns.yml、routes.toml；不需要的文件可缺省。
+geo 数据和 acme.sh 已嵌入程序，不必另行复制庞大数据目录。
+文件内容须按功能说明配置；不要把示例规则不加检查地用于真实节点。
+
+四、多实例
+
+新实例从默认配置复制，以下命令只创建配置，不启动：
+
+  sudo soga-reconstructed instance new hk2 node_id=2
+  sudo soga-reconstructed instance config hk2 server_type=trojan
+  sudo soga-reconstructed instance list
+
+hk2 使用 /etc/soga-reconstructed/hk2/soga.conf，规则与 state/ 也位于
+该目录。新建时只继承 soga.conf，规则文件和既有证书状态不会自动复制。
+同一进程可按 node_id 配置管理多个节点；独立实例须避免监听端口冲突。
+不同实例的面板密钥或 node_id 应按实际需要分别设置。
+
+  sudo soga-reconstructed instance start hk2
+  sudo soga-reconstructed instance enable hk2
+  sudo soga-reconstructed instance log hk2 -f
+
+查看 config 会显示实际配置及凭据，勿把输出公开。
+配置修改后显式 restart 对应实例。
+rename 会先停止并禁用旧实例；之后须手动启动新名称：
+
+  sudo soga-reconstructed instance rename hk2 hk3
+
+remove 会停止、禁用并删除指定实例整个目录，包含配置、证书和状态：
+
+  sudo soga-reconstructed instance remove hk3
+
+默认实例不可 remove 或 rename。
+仅管理临时根中的文件时可使用 instance -root /绝对路径；
+该模式不支持调用宿主 systemd。
+
+五、Docker / Compose
+
+Dockerfile 使用 Go 1.27.3 多阶段构建，运行镜像为 Debian bookworm-slim，
+内含 CA 证书、curl、openssl、socat、tzdata。没有内嵌面板密钥。
+需支持 BuildKit 的 Docker 与 Docker Compose 插件。
+本示例使用 Linux host 网络，直接绑定宿主端口；不另写 ports 映射。
+Docker Desktop 的网络行为与 Linux 主机不同，本说明不声称已验证该环境。
+
+  mkdir -m 700 deploy
+  cp examples/soga.conf deploy/soga.conf
+  chmod 600 deploy/soga.conf
+
+先编辑 deploy/soga.conf 的真实面板、节点及凭据，再执行：
+
+  docker compose -f docker-compose.example.yml build
+  docker compose -f docker-compose.example.yml up -d
+  docker compose -f docker-compose.example.yml logs -f --tail=100
+
+Compose 把 deploy/ 持久化挂载到 /etc/soga-reconstructed；
+证书与状态也写入此目录，删除容器不会丢失这部分数据。
+容器默认以 root 运行，以支持低端口和 ACME standalone。
+多个容器使用 host 网络时同样需要避免监听端口冲突。
+不设置健康检查假装面板已连通；以启动日志及真实客户端检查为准。
+
+停止并移除容器，保留宿主 deploy/：
+
+  docker compose -f docker-compose.example.yml down
+
+更新容器请重新构建并 up -d；容器内保持 auto_update=false，
+避免把更新写入容器临时文件层。镜像由当前源码构建，
+geo 数据与 ACME 脚本已编入二进制，运行层不再复制它们。
+本工作环境未提供 Docker daemon，因此未宣称完成镜像启动验收。
+
+六、卸载与保留数据
+
+  sudo scripts/uninstall.sh
+
+或安装后：
+
+  sudo /usr/local/share/doc/soga-reconstructed/uninstall.sh
+
+脚本只停止、禁用 soga-reconstructed@ 实例，删除其程序与服务模板；
+保留 /etc/soga-reconstructed 内全部配置、证书及 state/。
+不停止、不卸载原始 soga。非 systemd 环境请先自行结束前台进程。
+临时根可用 DESTDIR=/绝对路径 scripts/uninstall.sh 验证卸载。
+不提供自动清空配置选项，需删除的数据请先自行备份。
+
+七、源码、授权与更新
+
+分发时保留完整源码、vendor 许可、内置数据许可和 SSR GPL-3.0 许可。
+源码归属和具体修订见各模块 SOURCE.json 及分析交付证据。
+本工程的更新接口只接受重建工程的发布清单；没有提供官方更新服务，
+不能把原始 soga 的下载地址填入 reconstruction_update_url。
+尚无经过验证的重建发布清单时，保持 auto_update=false。

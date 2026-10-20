@@ -1,0 +1,809 @@
+{
+  "repository": "https://github.com/acmesh-official/acme.sh",
+  "tag": "3.1.6",
+  "url": "https://api.github.com/repos/acmesh-official/acme.sh/tarball/3.1.6",
+  "archive_sha256": "10e2b8a9836628b98b55961f4e986794328253ad7a3d573bffb669d564d37063",
+  "license": "GPL-3.0",
+  "files": [
+    {
+      "path": "LICENSE.md",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "path": "acme.sh",
+      "sha256": "c7d68b021cfd6380ea83a82962abde5b484779fee0b97d38681dfa1396bbc8d7"
+    },
+    {
+      "path": "dnsapi/dns_1984hosting.sh",
+      "sha256": "6c34f6e31b6719a06f1083978fd22e48cf6739a97c14ef6c2cc840e106f31bd5"
+    },
+    {
+      "path": "dnsapi/dns_acmedns.sh",
+      "sha256": "8a325d23ad708b7abcbd13e9d5d42aab70aa9e4a81095f709f56448064660f7a"
+    },
+    {
+      "path": "dnsapi/dns_acmeproxy.sh",
+      "sha256": "f53a771157d89102455ec588e251993a1317f71002ba788c6a8db1e19db9da21"
+    },
+    {
+      "path": "dnsapi/dns_active24.sh",
+      "sha256": "034f2207a4e8d12232fae305244e5f4d2ab0c825ad8e33cfe9e43934a1aaa535"
+    },
+    {
+      "path": "dnsapi/dns_ad.sh",
+      "sha256": "44aa59e1429cb58be59a9ce15441b88db92f83c8a11438fe1b21880c91d52313"
+    },
+    {
+      "path": "dnsapi/dns_ali.sh",
+      "sha256": "6cfcca209d54747dc7b48fea9aa4a2c04a6017c4464f8f23a077e3eaa187c427"
+    },
+    {
+      "path": "dnsapi/dns_alviy.sh",
+      "sha256": "616b06719ef41b8cd16ab1cc65e17d280b222cd9b2e217c63f42653138eaa907"
+    },
+    {
+      "path": "dnsapi/dns_anx.sh",
+      "sha256": "eab46ab94a4e094643fe0667c8ee648ece48c07609792841c3651ab4ede16d55"
+    },
+    {
+      "path": "dnsapi/dns_artfiles.sh",
+      "sha256": "176a938d088cf836a969ca54f3238bc051701e31e679ae13713eeccc01cb1696"
+    },
+    {
+      "path": "dnsapi/dns_arubabusiness.sh",
+      "sha256": "07aa4a9929b041904462f9c69e2e4b315f3b726ab27904f7690d6c690e832e94"
+    },
+    {
+      "path": "dnsapi/dns_arvan.sh",
+      "sha256": "6088f5b5f3c57d36e363b50c37838dbfaa046f1053467d2679b361666d3b1c08"
+    },
+    {
+      "path": "dnsapi/dns_aurora.sh",
+      "sha256": "73d00661d292c669e153a94dc7833e47c93bae61bb8950d3e38a8909e154f00f"
+    },
+    {
+      "path": "dnsapi/dns_autodns.sh",
+      "sha256": "ddb7b6ac4ec6fa04890598de26f19800a614b97fae0fac579558c436c93117ae"
+    },
+    {
+      "path": "dnsapi/dns_aws.sh",
+      "sha256": "5366bc36dfcf8dfb16440e99bd1c744b7fa99741a42986773ca269fd12d0550a"
+    },
+    {
+      "path": "dnsapi/dns_azion.sh",
+      "sha256": "071ae4c68717a78b7e5bfdbd3e7bde3887fb9b8ffb0f319b24ca6b198488cbea"
+    },
+    {
+      "path": "dnsapi/dns_azure.sh",
+      "sha256": "7ecbaaa3ba8bcbd9d8b709e1001bc88725e2d876deabe0e4a606836b28cd36cc"
+    },
+    {
+      "path": "dnsapi/dns_baidu.sh",
+      "sha256": "8d81db00c62d4d22039afdcecd8ef33878c61ba7055d292d2af78413b99ca7bb"
+    },
+    {
+      "path": "dnsapi/dns_beget.sh",
+      "sha256": "d069d4551ccc7c237f64ad729d83ad9dfd09a72fef834f494ddfcedc3765c319"
+    },
+    {
+      "path": "dnsapi/dns_bh.sh",
+      "sha256": "b96e4af48ce0d476af2cdec41efc473261143ebc997d9640af44000ebf096fd5"
+    },
+    {
+      "path": "dnsapi/dns_bhosted.sh",
+      "sha256": "e975cebb38fcdd42608dae5f7c6b13ae6c96a65c4cd8cbc4807e99563c79ceb9"
+    },
+    {
+      "path": "dnsapi/dns_bookmyname.sh",
+      "sha256": "7362b8ae77b0bf981b89cfb5cd6851a564e0d436871bc14b139a627e4e00f796"
+    },
+    {
+      "path": "dnsapi/dns_bunny.sh",
+      "sha256": "7e6d55e0068b4c9f1fe6be33239db704ffaa4a297770a496dd7819dae9edc2b7"
+    },
+    {
+      "path": "dnsapi/dns_calrissia.sh",
+      "sha256": "4967642cc78dd50441d2f725dc595b0ae053be613407a801982e68e8620c15fb"
+    },
+    {
+      "path": "dnsapi/dns_cdmon.sh",
+      "sha256": "72c971ba00a8be1b8aa3491c5f4e39928f51cbecfac88a1789e77001372aa910"
+    },
+    {
+      "path": "dnsapi/dns_cf.sh",
+      "sha256": "9628ee8238cb3f9cfa1b1a985c0e9593436a3e4f8a9d65a6f775b981be9e76c8"
+    },
+    {
+      "path": "dnsapi/dns_clouddns.sh",
+      "sha256": "0be5c177ee35388ceb569c8ba8ca3365d98dd2900fa2498a1b1d36587e66c3cc"
+    },
+    {
+      "path": "dnsapi/dns_cloudns.sh",
+      "sha256": "ca714dd0a542ac7ba599bb8c52623a2eda0e0358c3d58bc93ebc4fab6a81d50d"
+    },
+    {
+      "path": "dnsapi/dns_cn.sh",
+      "sha256": "4be81d0ed1815137199f735b917c2697706474eca27a2f0c48e3b36ce0caade9"
+    },
+    {
+      "path": "dnsapi/dns_comlaude.sh",
+      "sha256": "d24c0b61a7fbcc5b20fb1ebf410ebeb0e07036f74d4e5554e24a281e458f3894"
+    },
+    {
+      "path": "dnsapi/dns_conoha.sh",
+      "sha256": "f42f0a7a84b9e39c124a7e99786b53e74d89d6f7538926fc8c2655402997d005"
+    },
+    {
+      "path": "dnsapi/dns_constellix.sh",
+      "sha256": "1787eda965d33cd748d4fc4f6ed4f32f49f90c0bf07c3016bbd164b80296ecc6"
+    },
+    {
+      "path": "dnsapi/dns_cpanel.sh",
+      "sha256": "fd91b211c80cf10c38c63e862fb13020d84060c5a95b45568cfc53436e5f2a00"
+    },
+    {
+      "path": "dnsapi/dns_cpanel_uapi.sh",
+      "sha256": "681e43a9ee6dc17823e77df437b26959602fc951a44ba6768f4702ae5d7943a8"
+    },
+    {
+      "path": "dnsapi/dns_creoline.sh",
+      "sha256": "87aa6f6a219dbaafd044adeb0bc7a261eac694ab2e1619893aacf887bdc75160"
+    },
+    {
+      "path": "dnsapi/dns_curanet.sh",
+      "sha256": "0cdfc518048298dd3c0580971c84ee0ab0c5c543738e0576883ecd3030907d8c"
+    },
+    {
+      "path": "dnsapi/dns_cyon.sh",
+      "sha256": "3e5292f0070697187b85ff563489b655e27a5dd967eaa24dfd0c01ff3f3dc821"
+    },
+    {
+      "path": "dnsapi/dns_czechia.sh",
+      "sha256": "a5c27b9d1ce4b35e55e83952314b8862878a895eb138cdf1f918ec80646d7ca1"
+    },
+    {
+      "path": "dnsapi/dns_da.sh",
+      "sha256": "6ebae62f5944b5273b0b57d876564330c809fc97a8cae40b0f266e4cb29e83b5"
+    },
+    {
+      "path": "dnsapi/dns_ddnss.sh",
+      "sha256": "8d03800e4b75a19eb698603b347ab6ef26be26f04e99a9f7bb1532a426dc95d3"
+    },
+    {
+      "path": "dnsapi/dns_desec.sh",
+      "sha256": "7b54708d30b39adc8e5966643d6780a01676633c2a96d87205e1a8e55b47a349"
+    },
+    {
+      "path": "dnsapi/dns_df.sh",
+      "sha256": "ca4c59edcf7fdadaf1f5d6747d9b1ed47677e5b24f77c4df454c5afa3eff4545"
+    },
+    {
+      "path": "dnsapi/dns_dgon.sh",
+      "sha256": "ddc3b8f13b237c8f016d95594f3e4ab575643e248f68f9a348a9e30b9ee003f0"
+    },
+    {
+      "path": "dnsapi/dns_dnsexit.sh",
+      "sha256": "3281901b21b84366871da6cf171616933e13dc9f51f3ce3333753b2aa8f3190b"
+    },
+    {
+      "path": "dnsapi/dns_dnshome.sh",
+      "sha256": "7bc9f3608193b1bc771f5ce49f182a11eab43f8c697d43c60603a0523713b623"
+    },
+    {
+      "path": "dnsapi/dns_dnsimple.sh",
+      "sha256": "cc79a59941d2972104710925da59d25b026e1aa6e4310000c6b7d41f51726323"
+    },
+    {
+      "path": "dnsapi/dns_dnsmint.sh",
+      "sha256": "45efc4edbc308a4bd16a75f7a09ae45479b3a945ddbf03cbf8b0d10bb4a84608"
+    },
+    {
+      "path": "dnsapi/dns_dnsservices.sh",
+      "sha256": "8d3d848acd0713d7ff35765ef70861d0244243a38bc5de76868b87a1c9b7ed22"
+    },
+    {
+      "path": "dnsapi/dns_doapi.sh",
+      "sha256": "c4dd1df118d093bc8212bbd29b302ac4831708381bd56f7a02bb13805550f3ff"
+    },
+    {
+      "path": "dnsapi/dns_domeneshop.sh",
+      "sha256": "8051f5b71b1fd30dad48471f774ff01cf5ff127a18a1c4ecc3d5e7e73349eea4"
+    },
+    {
+      "path": "dnsapi/dns_dp.sh",
+      "sha256": "a4b5b70c81235a033c6892359b09000097b88a0792b7029d14653a5494d282de"
+    },
+    {
+      "path": "dnsapi/dns_dpi.sh",
+      "sha256": "227e756adb513cb26eca8fb4d36ea9253013515448aef7604c73da69f728e24d"
+    },
+    {
+      "path": "dnsapi/dns_dreamhost.sh",
+      "sha256": "923c39612111f7552635f84276167cd7cbb011bad98ecb7b4f3f155ab5f5deb0"
+    },
+    {
+      "path": "dnsapi/dns_duckdns.sh",
+      "sha256": "8be535b8d6270b7a37671da954d89c896df7af29c2f38d5029054ec315fe77af"
+    },
+    {
+      "path": "dnsapi/dns_durabledns.sh",
+      "sha256": "a015d88b7a0956621b0357bf033adb1fbb63a4fb19ddda642e6653abf7f8c389"
+    },
+    {
+      "path": "dnsapi/dns_dyn.sh",
+      "sha256": "5b2a80bcb08fbe05695ccaaac93784673b1dcfd8d5073baadffc9f83a663e282"
+    },
+    {
+      "path": "dnsapi/dns_dynu.sh",
+      "sha256": "9b28bd15f524a185d9642c0ce352f48b3b0f7eb18bc8a09fee5cb58c2c63c963"
+    },
+    {
+      "path": "dnsapi/dns_dynv6.sh",
+      "sha256": "6dbf8e686a1ad506459a1d474fe6a880d0fa9c09c111376d288589df970bf6de"
+    },
+    {
+      "path": "dnsapi/dns_easydns.sh",
+      "sha256": "7505539d065d1dfd7671d2199f2e6c678dc611ffbac37cc42ebaa34931b7d709"
+    },
+    {
+      "path": "dnsapi/dns_edgecenter.sh",
+      "sha256": "d6916071fa93590f8624ae4863cb046874c217c8b2d5ce4656949067d7ea85b5"
+    },
+    {
+      "path": "dnsapi/dns_edgedns.sh",
+      "sha256": "7a3bc8becb44f494af3a48bf7d0064280a2a19f89a43af83be2acf19c3c8d877"
+    },
+    {
+      "path": "dnsapi/dns_efficientip.sh",
+      "sha256": "f0ceb5cf4e2e7f694e565da3e4a39fa21cd701a6116fbc5f46f064cc37553cf7"
+    },
+    {
+      "path": "dnsapi/dns_eurodns.sh",
+      "sha256": "2a72e00617b6ce09eb5bbb38bb949b436a6e09dd6a285fb37256ac2e6b1bad03"
+    },
+    {
+      "path": "dnsapi/dns_euserv.sh",
+      "sha256": "38a611950d7c0fb44c02f245a345302ab01eb9775d6519af48a3420f7496a945"
+    },
+    {
+      "path": "dnsapi/dns_exoscale.sh",
+      "sha256": "48f1d6cb53f070d8b8b0d73f53761c11191e5380c66373796852904b65ce3d43"
+    },
+    {
+      "path": "dnsapi/dns_firestorm.sh",
+      "sha256": "dea0683f61b00f9ed1225282813cd4735e4c5c862945f7c20948c2d05348248a"
+    },
+    {
+      "path": "dnsapi/dns_fornex.sh",
+      "sha256": "8ed01e5be0be786d20c2eb9d7e80461c63c8b16d666960f1fb9e9c55168d3074"
+    },
+    {
+      "path": "dnsapi/dns_freedns.sh",
+      "sha256": "4147a541147e53d3d54b80ae8b1acbc43fd73f214db71fa95b0c013c398db8ef"
+    },
+    {
+      "path": "dnsapi/dns_freemyip.sh",
+      "sha256": "3f88d216169e3447e1c722537eff3724e5987145811374d32df57e9e43f60863"
+    },
+    {
+      "path": "dnsapi/dns_gandi_livedns.sh",
+      "sha256": "196f2c18394030a82760eb38108c2980c6826656e7656b57cad5069c699495e4"
+    },
+    {
+      "path": "dnsapi/dns_gcloud.sh",
+      "sha256": "1c2e69de82f4d6efb538f057f79b63b9ffaa34dd6a0440c82b1349d6399a9a74"
+    },
+    {
+      "path": "dnsapi/dns_gcore.sh",
+      "sha256": "9417cee5fa60a9fe150664c6fe720dab9bff70f3e319e8218a1ae53ed191ac90"
+    },
+    {
+      "path": "dnsapi/dns_gd.sh",
+      "sha256": "c91194c623bb6df91d1c731d636807d6f65b81ca9c44568f2409bebe6e8f7b75"
+    },
+    {
+      "path": "dnsapi/dns_geoscaling.sh",
+      "sha256": "7309d3165d890ebd202af78662d7418c85a8bf001bb6f8770ca2e8b0b2332bc0"
+    },
+    {
+      "path": "dnsapi/dns_glesys.sh",
+      "sha256": "c0f90840c78204dbffac75c2b2d0ba4c38433652d4967fee5efbf9cdef155ef2"
+    },
+    {
+      "path": "dnsapi/dns_gname.sh",
+      "sha256": "e90e55da92dd076dfef63f38eb8972dae2bd03d0554ca2754e4cc1dd53fb9107"
+    },
+    {
+      "path": "dnsapi/dns_googledomains.sh",
+      "sha256": "a30801cd98f269c071bc14cfded48ba910f381101e1e22c5d85840634a960826"
+    },
+    {
+      "path": "dnsapi/dns_he.sh",
+      "sha256": "4d8de3b6ff6714f1f86c0c738c70434ee4edc685868301be55c06d30c9809a59"
+    },
+    {
+      "path": "dnsapi/dns_he_ddns.sh",
+      "sha256": "8f7110981f2bd137df045b37642af3e9efc46ca571a707b0b704fd021d8d236e"
+    },
+    {
+      "path": "dnsapi/dns_hestiacp.sh",
+      "sha256": "0b3efa2833841399fd809028d6c4b16756027f6740e1b5392ea73068e065992d"
+    },
+    {
+      "path": "dnsapi/dns_hetznercloud.sh",
+      "sha256": "6428e5c07720c9e90284be199f86429e4213b57625bccb5ab3e7af068c93d3f5"
+    },
+    {
+      "path": "dnsapi/dns_hexonet.sh",
+      "sha256": "818924739458598cbcc794e991c91987c5b427c7c160809397f17466c108116f"
+    },
+    {
+      "path": "dnsapi/dns_hostingde.sh",
+      "sha256": "b0b634149e715fa83d4da7b776a08aa1a08b30f94d149b37d1adfec51889c9d1"
+    },
+    {
+      "path": "dnsapi/dns_hostinger.sh",
+      "sha256": "5bebba1cbca0d4ef6165bcd0496531f036ea2452d42688f095f48c917b2b9870"
+    },
+    {
+      "path": "dnsapi/dns_hostup.sh",
+      "sha256": "d98cc54f72a691e46f2d5f96251a960829eb101b7e97ab04a797d6453590c086"
+    },
+    {
+      "path": "dnsapi/dns_huaweicloud.sh",
+      "sha256": "d061fca6aeac15ab65f8941dab03524513b0e7f10c24167e75d550637f8429ef"
+    },
+    {
+      "path": "dnsapi/dns_hw.sh",
+      "sha256": "96d7bb8cb82234116705697c7cc692fe87ffbe62e6280605255f8e17a1d02c02"
+    },
+    {
+      "path": "dnsapi/dns_infoblox.sh",
+      "sha256": "6cb2a691c5ff7d9b64c489e104fc9beff5a8e10554dbd5065e9525792ceac041"
+    },
+    {
+      "path": "dnsapi/dns_infoblox_uddi.sh",
+      "sha256": "de9726d47109de27be27107fffe28affd95800db17e7e898d7daf21543bbe9c8"
+    },
+    {
+      "path": "dnsapi/dns_infomaniak.sh",
+      "sha256": "82d53a597678d22f8a433d290c92950d59f299e8425d68a44a3d6c80ed14a735"
+    },
+    {
+      "path": "dnsapi/dns_internetbs.sh",
+      "sha256": "89d89cd8f78cd9eebaa969e054047165d53f73ee474caf53bb82c57e100c4657"
+    },
+    {
+      "path": "dnsapi/dns_inwx.sh",
+      "sha256": "5b2b1521871794afb70760e359795c61e1565f47a4c4cdbc370f8fdf4218171e"
+    },
+    {
+      "path": "dnsapi/dns_ionos.sh",
+      "sha256": "a96e5d4ddc3be93bb35110c4ac493bbfe2b4795fa2a10c6059cd93251888e24d"
+    },
+    {
+      "path": "dnsapi/dns_ionos_cloud.sh",
+      "sha256": "dec956e8de70ddd9b67d925547aa1a9e265a8a0436de5504e5f44fe6812046c3"
+    },
+    {
+      "path": "dnsapi/dns_ipprojects.sh",
+      "sha256": "f10f8ff59e20ce47068cf322dfac547e0842ee41c08da20722517ab561dab3ba"
+    },
+    {
+      "path": "dnsapi/dns_ipv64.sh",
+      "sha256": "f887129a8c079b98a1a215f39a38ca3e45190faf88f20559e6681f9b72994f3a"
+    },
+    {
+      "path": "dnsapi/dns_ispconfig.sh",
+      "sha256": "e24645b3308f47cfe43b314a6617d45cfb4fc71d9730b316ffc6b315d743601b"
+    },
+    {
+      "path": "dnsapi/dns_jd.sh",
+      "sha256": "7e61147f61d7e2b54a6e4f7e2612d2c539f8ee4fded7249757fc712eb3f9ee88"
+    },
+    {
+      "path": "dnsapi/dns_joker.sh",
+      "sha256": "3bd5b1f99ca96bdb5d8d846b4a992f41f6f79ad2861556304eaedfcfbdeebeff"
+    },
+    {
+      "path": "dnsapi/dns_kappernet.sh",
+      "sha256": "be18e8891ae6e853a0c7be6a86e7b635349765a6f3093e9b18e97c943812278c"
+    },
+    {
+      "path": "dnsapi/dns_kas.sh",
+      "sha256": "c65c083ec5b4eb0d8b42a8df7c1a2fa7768b014222f611e703632029574185e2"
+    },
+    {
+      "path": "dnsapi/dns_kinghost.sh",
+      "sha256": "2e524056c0df660bec487465eeb19c46af72212d5b4427b6b1c40d525476a649"
+    },
+    {
+      "path": "dnsapi/dns_knot.sh",
+      "sha256": "8206d00ca632549143d4d029744f9e1da970ef915bffa7afa0f4a0261b817882"
+    },
+    {
+      "path": "dnsapi/dns_la.sh",
+      "sha256": "b3f3c6b4079c2de594f0f4e9b17a1a2b21b7eb9d9f2f52647fbadce10031b410"
+    },
+    {
+      "path": "dnsapi/dns_laodc.sh",
+      "sha256": "a1c9033deb304f092b89b079b914cbb0a4c718b5b8ba7fdb326ff4d6b36141b5"
+    },
+    {
+      "path": "dnsapi/dns_leaseweb.sh",
+      "sha256": "1d5af7c6f088268af695c18d232ec72d3af58844170719641737ca6ef797b44d"
+    },
+    {
+      "path": "dnsapi/dns_level27.sh",
+      "sha256": "dd8fc6ce3092a152c0e2c999b963724d7ccfd2cfc77f027af90b52f2a32e5f41"
+    },
+    {
+      "path": "dnsapi/dns_lexicon.sh",
+      "sha256": "3c4425cf9e59d6214f50528deba4cce768621e81d424e57a824fac69a3111621"
+    },
+    {
+      "path": "dnsapi/dns_limacity.sh",
+      "sha256": "abd74e9f4ebe1099f65cee3d409499e8aa254c2cd5cb3cd514ae6e96ecaf96d8"
+    },
+    {
+      "path": "dnsapi/dns_linode_v4.sh",
+      "sha256": "6b3ef9284f151be258e1783cf52794b507fad12dcc18d616b83b4e85b67370b5"
+    },
+    {
+      "path": "dnsapi/dns_loopia.sh",
+      "sha256": "abc4dbe3d182070e50dbcf6d079e0e9dbd1df9e7b624971c59360f4621480ea7"
+    },
+    {
+      "path": "dnsapi/dns_lua.sh",
+      "sha256": "b8d837d332b2573f51778ce66b7169c5ef434bcd152d281c49945d80e4b2745d"
+    },
+    {
+      "path": "dnsapi/dns_maradns.sh",
+      "sha256": "51ab288f04add36026fa05ead7c5392af074faf918d9fd1f923f31fc739e6e3e"
+    },
+    {
+      "path": "dnsapi/dns_me.sh",
+      "sha256": "4815916bf9fdcd56c3e1a8064f563f8b1202d5c15aa9f44db958d5c3029186cf"
+    },
+    {
+      "path": "dnsapi/dns_mgwm.sh",
+      "sha256": "55ee76efaf96e58de76f3020c0835772a50f6e54dcebc5381403dd631370800e"
+    },
+    {
+      "path": "dnsapi/dns_miab.sh",
+      "sha256": "1db669b4745e4ad2b469df0679483c40bd69eb03dd259e1f40bcac2e2e17a9bf"
+    },
+    {
+      "path": "dnsapi/dns_mijnhost.sh",
+      "sha256": "34d92e2c038f72803bae0bebb108eae123eef4a4a52c3f4e4951bf4464b98402"
+    },
+    {
+      "path": "dnsapi/dns_misaka.sh",
+      "sha256": "f72c48a9c375d7aee74739120195d323292eded8ce834eb3e706bb57d8593c05"
+    },
+    {
+      "path": "dnsapi/dns_muumuu.sh",
+      "sha256": "aede352d4b45e796158ace80eae7e2ef3b0ed349d1672dcfdedb324ea564e4c7"
+    },
+    {
+      "path": "dnsapi/dns_myapi.sh",
+      "sha256": "5a6b3729bc63f5333982eb0ced2cc4d17a90fc3107e2924b5155efb141f4cdb8"
+    },
+    {
+      "path": "dnsapi/dns_mydevil.sh",
+      "sha256": "fe00ff2db4366d8fc26cba08e66ee7b865f916159045dbf430b0696e0f18ffda"
+    },
+    {
+      "path": "dnsapi/dns_mydnsjp.sh",
+      "sha256": "cd45d440c3fd5e25654d93c803cfa222bdc721792c786b9f267d7cace885fc4d"
+    },
+    {
+      "path": "dnsapi/dns_myloc.sh",
+      "sha256": "4d79e7e593ecb3c15c6d661604e524c38d2171c4a0752faf635de11fc4266f5e"
+    },
+    {
+      "path": "dnsapi/dns_mythic_beasts.sh",
+      "sha256": "48220ff2dc0de12e49a38fcdcde5affd48278c4090e235f9ae0372fcda775276"
+    },
+    {
+      "path": "dnsapi/dns_namecheap.sh",
+      "sha256": "626215c93ad0df45b56bf6127c05b87013ad99c492cf4b2be49e85d1649df18c"
+    },
+    {
+      "path": "dnsapi/dns_namecom.sh",
+      "sha256": "7a3fd679fcc06eaf79d617b3ccd07c7a60b8cfaede7d4b9de60111bf700c857b"
+    },
+    {
+      "path": "dnsapi/dns_namesilo.sh",
+      "sha256": "2f8521f959b6f118703e3f105dca6b12647a6aca5d4f72a8801c026b02950c41"
+    },
+    {
+      "path": "dnsapi/dns_nanelo.sh",
+      "sha256": "f805f8b6a881632cfe5a32a0df7eeba82d1577cec1c8be35cf7c9a51374471e0"
+    },
+    {
+      "path": "dnsapi/dns_nederhost.sh",
+      "sha256": "9bfa2ca5eebe0bd5371f906f2bd87c59b0edd63414c399b8ecb9f1f7a31fb165"
+    },
+    {
+      "path": "dnsapi/dns_neodigit.sh",
+      "sha256": "023a64d3438e5a9f2e82d4e396139830fe1519df401d3b80d312a9243db0fbe7"
+    },
+    {
+      "path": "dnsapi/dns_netcup.sh",
+      "sha256": "a2eb5fa32d4b3c5a20d4a8d797420cff7d62c265d13b5bd8aca66d070e4f763c"
+    },
+    {
+      "path": "dnsapi/dns_netlify.sh",
+      "sha256": "78c8cb43b0407d6c6e2a6c17ccb9b7a032d5504abed6fa5f603a57aded437512"
+    },
+    {
+      "path": "dnsapi/dns_nexdns.sh",
+      "sha256": "90f79e937551819d5f2212b35ca5ce8f1d040d5536f91f5f44fe8e898eab7ef2"
+    },
+    {
+      "path": "dnsapi/dns_nic.sh",
+      "sha256": "6d3ab2269c3c18a1902edc26dbe9640238713d78f67cab2a8752985e082e75b8"
+    },
+    {
+      "path": "dnsapi/dns_njalla.sh",
+      "sha256": "5c38cf20fa27663d472e49f240fde99a81ee2c25787ef280acbb8c63087541d9"
+    },
+    {
+      "path": "dnsapi/dns_nm.sh",
+      "sha256": "b9a058ee6950f477368eebf42a0a613049842cf4edbc6560c44592a1300a398b"
+    },
+    {
+      "path": "dnsapi/dns_nsd.sh",
+      "sha256": "6ca0dd0549188cf80d99f3b27a8699c2b9f54b8a785b31d316f64d659f8cf442"
+    },
+    {
+      "path": "dnsapi/dns_nsone.sh",
+      "sha256": "95512db0ec16e4eca466eece6a187f71378e05cb52824d68837d5ce535b23c0d"
+    },
+    {
+      "path": "dnsapi/dns_nsupdate.sh",
+      "sha256": "916ff21405afc64c7f2cea6f0f75e798a89f7d01910dbeaa62ab5324a8fe9e1b"
+    },
+    {
+      "path": "dnsapi/dns_nw.sh",
+      "sha256": "6b95a98dc59c97d33c622a604e94f721f3c9769fe37c7edc194c98c134416694"
+    },
+    {
+      "path": "dnsapi/dns_oci.sh",
+      "sha256": "81be24e55a918713119a284606416551345127704b6ed8eb1a54b58de86c7c7d"
+    },
+    {
+      "path": "dnsapi/dns_omglol.sh",
+      "sha256": "d3d9a679749b5876d1fef64a272c945311965f577daf3895eddcd8bdb69c6584"
+    },
+    {
+      "path": "dnsapi/dns_one.sh",
+      "sha256": "1ce11419deedab2052708287efbd63dfffd5b76d9b9067e9671969864e5fe8e4"
+    },
+    {
+      "path": "dnsapi/dns_online.sh",
+      "sha256": "2069137ea82dbbc1dc2282e3c6ba58767df9e6d9993e64e0c06a7ee8129c970e"
+    },
+    {
+      "path": "dnsapi/dns_openprovider.sh",
+      "sha256": "93990c33cf59939f40d46831a6d3dca3b4d263315d4f6fbb58a6c3424015a41a"
+    },
+    {
+      "path": "dnsapi/dns_openprovider_rest.sh",
+      "sha256": "81a911d10c00545813a8b486742b13fe6e7b0409d759867354ff7e109fb107be"
+    },
+    {
+      "path": "dnsapi/dns_openstack.sh",
+      "sha256": "e0edad3f25ebe888adfc29ed94473f5a4364304d9b5fd3ac4354ec5cc958ab70"
+    },
+    {
+      "path": "dnsapi/dns_opnsense.sh",
+      "sha256": "9a49c1705c5d604bc2eab0d2357c0da5b821be0c791326fa5a59705fb89626f5"
+    },
+    {
+      "path": "dnsapi/dns_opteamax.sh",
+      "sha256": "c4946d2bd8b2ba2b52ab6a79f2f5d934f8e2d8ae67f301bc34414155619b85db"
+    },
+    {
+      "path": "dnsapi/dns_optidata.sh",
+      "sha256": "364c662620caf81a725f8aed86f5a10523c25475cc1278c91b226c08dc815cae"
+    },
+    {
+      "path": "dnsapi/dns_opusdns.sh",
+      "sha256": "47c0cf5a4e76bee3d900116788df761529d431c35d779a6787e25dbfe347fa84"
+    },
+    {
+      "path": "dnsapi/dns_ovh.sh",
+      "sha256": "a2a628f88d541672da673cf4b3cc2ffedc1b95585044bbff1ecc1171e778d2a6"
+    },
+    {
+      "path": "dnsapi/dns_pdns.sh",
+      "sha256": "61034cef997b022d57cd947ad23ca2856cfc7188616a4428f66035bbd973cced"
+    },
+    {
+      "path": "dnsapi/dns_pleskxml.sh",
+      "sha256": "96791c080afddf80717eb46fa9c59ab01bd710cf331841d304e0f497dca69cf8"
+    },
+    {
+      "path": "dnsapi/dns_pointhq.sh",
+      "sha256": "3b4ae44974e0368e283c2701c277b54d9c14b0e554322c82a59daa1351548378"
+    },
+    {
+      "path": "dnsapi/dns_porkbun.sh",
+      "sha256": "f3f538e3ee70d1faf1922af3df038f2d0f8e027e366aceebf8e89ac7a49347ca"
+    },
+    {
+      "path": "dnsapi/dns_poweradmin.sh",
+      "sha256": "b36627cc495d7f1f73ec6298ab7cee3effe2ecfd18796db99ac3878faf9dd567"
+    },
+    {
+      "path": "dnsapi/dns_qc.sh",
+      "sha256": "7dcf8df129120e2098a98f7627c024561bbb0669510312358f6752e6ba5413a8"
+    },
+    {
+      "path": "dnsapi/dns_rackcorp.sh",
+      "sha256": "3a5eb0e9e3c438e973a2b16c4904b75a5a018f4bd5c4b5e9e0cae0cffa4fa5d0"
+    },
+    {
+      "path": "dnsapi/dns_rackspace.sh",
+      "sha256": "6815e2440de4ea2f772fde6793fab5362a53b05a0e0bc024f1ce178aa0e63d2e"
+    },
+    {
+      "path": "dnsapi/dns_rage4.sh",
+      "sha256": "4701469fc991d7644cc578a5ca93d258757a2897346e855d4ecedcaf3a8c8969"
+    },
+    {
+      "path": "dnsapi/dns_rcode0.sh",
+      "sha256": "6751c0b7073dfd9de35b1e5df64d448774d7569dcfac57083ce701f911cb9ac8"
+    },
+    {
+      "path": "dnsapi/dns_regru.sh",
+      "sha256": "cef1456b387c861070681798aa2f95ae77235fb829aa282b6da39fb1b6a4a735"
+    },
+    {
+      "path": "dnsapi/dns_rltx.sh",
+      "sha256": "e02af331cf1b03a3e66509686340faf8c81584540f7c55aaeb008364df75c49d"
+    },
+    {
+      "path": "dnsapi/dns_scaleway.sh",
+      "sha256": "24762aaef592001b57b3a99f0a3c0a873ee5b5ad8838319602fad49b27511ef6"
+    },
+    {
+      "path": "dnsapi/dns_schlundtech.sh",
+      "sha256": "8deab2d59fe1ed3ccb406fce26029a3540ce53e914b864f3c11f27d8776d05ce"
+    },
+    {
+      "path": "dnsapi/dns_selectel.sh",
+      "sha256": "fed141d989f2312a56f5ad4517037f4cc2c3ff4e3ceb6cd53e5b939c33a80b3e"
+    },
+    {
+      "path": "dnsapi/dns_selfhost.sh",
+      "sha256": "62adf649c0832d3428b9c0eaacd76c9ad46661694f938e22933f479871338b4d"
+    },
+    {
+      "path": "dnsapi/dns_servercow.sh",
+      "sha256": "0f7ece7349c7a4f62dda42d28d56de2d1331d5c55556a171a59bde2bff0f464d"
+    },
+    {
+      "path": "dnsapi/dns_simply.sh",
+      "sha256": "27e719fc987810af7b65cc9a1a0d908df037ceabb4c55256dbc95cfe785cc241"
+    },
+    {
+      "path": "dnsapi/dns_sitehost.sh",
+      "sha256": "cee749583d2e23874bf57604aa97760bfd80ec99a0394eef3fe4ab75ca821145"
+    },
+    {
+      "path": "dnsapi/dns_sotoon.sh",
+      "sha256": "b7e444fdb53f4f6d0f46e341a9579d21ad27cc19b7c22d4238916512baff7e8a"
+    },
+    {
+      "path": "dnsapi/dns_spaceship.sh",
+      "sha256": "522ea1de61415bca41ada79e48b912ca97a546ac729bf0ea29663c1cc0e994d8"
+    },
+    {
+      "path": "dnsapi/dns_subreg.sh",
+      "sha256": "10eeef3cd3822edf5398a5b99b790075beb8c841d0665df806f7a670a38cfe80"
+    },
+    {
+      "path": "dnsapi/dns_technitium.sh",
+      "sha256": "6e6b4700da4c3b0afb7d459fdbe6bc612add23683117a83082084019d13a2c3a"
+    },
+    {
+      "path": "dnsapi/dns_tele3.sh",
+      "sha256": "db245951f908e1817daf1a282f5d69a264d865098228ba4c48693e28b8c5cb0c"
+    },
+    {
+      "path": "dnsapi/dns_tencent.sh",
+      "sha256": "bedbc48380d54e28d929c271495533beb77e254a50fefc258565246641163159"
+    },
+    {
+      "path": "dnsapi/dns_timeweb.sh",
+      "sha256": "15a8695b5d38ae8136866182c1b022b7589c5395056d219a26258b27f58e93ea"
+    },
+    {
+      "path": "dnsapi/dns_transip.sh",
+      "sha256": "570be35a29ce2ccd306e06a13a9de2f201fdea6e65fd86df193a29ee672a1b0a"
+    },
+    {
+      "path": "dnsapi/dns_udr.sh",
+      "sha256": "01d4c549abc7c7452dbd3351149efa3b9f82e747d78d83b72f88ce4b3b8152c4"
+    },
+    {
+      "path": "dnsapi/dns_ultra.sh",
+      "sha256": "9cf5c6477a3c3bd19849943e84ac10157f914c2c28488caada73d6c6b8022b55"
+    },
+    {
+      "path": "dnsapi/dns_unoeuro.sh",
+      "sha256": "0699cc97358f1b444d34e6d6741241f3193ce4620241e536511ca6179ae4a8fa"
+    },
+    {
+      "path": "dnsapi/dns_variomedia.sh",
+      "sha256": "1a99a0cf171f556c89b5f552cfa7ccd7dc165c994bd3f04a0e5f6922773aed2d"
+    },
+    {
+      "path": "dnsapi/dns_veesp.sh",
+      "sha256": "d80edf8ad896124a863b406a88c28024122709f39e13862c2faebb21114b822e"
+    },
+    {
+      "path": "dnsapi/dns_vercel.sh",
+      "sha256": "cec381f3e84a13c6414647337ae810e833d638a54fdc4442888936b035152b93"
+    },
+    {
+      "path": "dnsapi/dns_virakcloud.sh",
+      "sha256": "15ad2758f6d790444def451cc8ef78e96d9159363bc336af4c75c1879c6f097e"
+    },
+    {
+      "path": "dnsapi/dns_volcengine.sh",
+      "sha256": "7afa569f537665b60b904b9fc04b1b819f1008921997615ab4ca1bb90359c8ee"
+    },
+    {
+      "path": "dnsapi/dns_vscale.sh",
+      "sha256": "6696338d3531ce71ce55a097173542c2dd91cd08125bc72bd4dcebb54365907b"
+    },
+    {
+      "path": "dnsapi/dns_vultr.sh",
+      "sha256": "7e62c1e13df02a931e1943258aa564688814d0ba4bdffb25a977fa9fb28b15cf"
+    },
+    {
+      "path": "dnsapi/dns_websupport.sh",
+      "sha256": "7a1573eee43994a425d05c4689eb83e67804cc77f860aa72c3313f9f2f815f5f"
+    },
+    {
+      "path": "dnsapi/dns_wedos.sh",
+      "sha256": "e059946b4aaf0d250606c190579d58bc4b44fb6d4e8a0c100b438127179067ba"
+    },
+    {
+      "path": "dnsapi/dns_west_cn.sh",
+      "sha256": "2171d734ff69bbb6bd6283846a4af4257efc762106dea37138f3d25a283b2bbd"
+    },
+    {
+      "path": "dnsapi/dns_world4you.sh",
+      "sha256": "f1f59bad389ea83f7d40791d7c70fbd0d5e4376ac0ad78cda6292cf27dc75995"
+    },
+    {
+      "path": "dnsapi/dns_yandex360.sh",
+      "sha256": "d029b5edc862c057b49788e8d6f294c136166ddcd908389da45471e5d7e12f61"
+    },
+    {
+      "path": "dnsapi/dns_yc.sh",
+      "sha256": "009136f0b3ab23cafc17a0a2208309c40a240f06ae4596c289a18da9e22afaa4"
+    },
+    {
+      "path": "dnsapi/dns_zilore.sh",
+      "sha256": "37897bb31c46d1d2cbca2b634c5c5424aa2b264d15af899181ea8c4ab4584435"
+    },
+    {
+      "path": "dnsapi/dns_zone.sh",
+      "sha256": "933f38bc35ada54d24e869c26ecb2a7e54d7a2ec44f9edafd559a75ca15366f0"
+    },
+    {
+      "path": "dnsapi/dns_zoneedit.sh",
+      "sha256": "b1429f87ebff34a7059897439af53bd93ada5b5cdf70a58c3fe6641ef7d47488"
+    },
+    {
+      "path": "dnsapi/dns_zonomi.sh",
+      "sha256": "844323987b18476a681f7d4cfda16617bb9d5fd932eaafd579426e235138abc2"
+    }
+  ]
+}

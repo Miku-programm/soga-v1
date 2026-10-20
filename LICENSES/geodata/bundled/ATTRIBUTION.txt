@@ -1,0 +1,4 @@
+Unmodified pinned datasets; see SOURCE.json for exact release URLs and hashes.
+GeoIP: v2fly/geoip, CC-BY-SA-4.0. Contains free IP Geolocation data by DB-IP (https://db-ip.com), CC-BY-4.0 (https://creativecommons.org/licenses/by/4.0/).
+GeoSite: v2fly/domain-list-community contributors, MIT. dlc.dat is stored as geosite.dat without changing its bytes.
+The datasets are separate from the reconstructed application code.

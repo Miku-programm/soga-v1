@@ -1,0 +1,20 @@
+# 默认直连；启用自定义路由时改为 true。
+enable = false
+
+# 使用自定义出口时，应保留最后一条 "*" 兜底。
+# [[routes]]
+# rules = ["domain:example.com"]
+# protocol = "tcp"
+# balance = "round_robin"
+# health_check = true
+#
+# [[routes.Outs]]
+# type = "socks"
+# server = "127.0.0.1"
+# port = 1080
+#
+# [[routes]]
+# rules = ["*"]
+#
+# [[routes.Outs]]
+# type = "direct"

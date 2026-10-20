@@ -1,0 +1,22 @@
+--- a/common/tls/reality_server.go
++++ b/common/tls/reality_server.go
+@@ -64,7 +64,7 @@
+ 	if options.CipherSuites != nil {
+ 	find:
+ 		for _, cipherSuite := range options.CipherSuites {
+-			for _, tlsCipherSuite := range tls.CipherSuites() {
++			for _, tlsCipherSuite := range append(tls.CipherSuites(), tls.InsecureCipherSuites()...) {
+ 				if cipherSuite == tlsCipherSuite.Name {
+ 					tlsConfig.CipherSuites = append(tlsConfig.CipherSuites, tlsCipherSuite.ID)
+ 					continue find
+--- a/common/tls/std_server.go
++++ b/common/tls/std_server.go
+@@ -390,7 +390,7 @@
+ 	if options.CipherSuites != nil {
+ 	find:
+ 		for _, cipherSuite := range options.CipherSuites {
+-			for _, tlsCipherSuite := range tls.CipherSuites() {
++			for _, tlsCipherSuite := range append(tls.CipherSuites(), tls.InsecureCipherSuites()...) {
+ 				if cipherSuite == tlsCipherSuite.Name {
+ 					tlsConfig.CipherSuites = append(tlsConfig.CipherSuites, tlsCipherSuite.ID)
+ 					continue find

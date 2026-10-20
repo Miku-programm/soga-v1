@@ -1,0 +1,45 @@
+协议重建来源
+
+本目录是新编写的集成层及标明来源的公开协议组件，不是反编译直接还原的 soga 源码。没有执行用户提供的原二进制。模块版本是本次重建选择，不能用于推定原二进制的精确依赖版本。
+
+真实协议实现：
+1. sing-box v1.14.3：路由、VLESS、Trojan、AnyTLS、Hysteria v1/v2、SS 2022 与传输适配。
+   https://github.com/SagerNet/sing-box
+2. sing-vmess v0.2.9-0.20260929152519-9b95ab8c9478：
+   internal/vmesscompat 保留原协议加密与帧，增加文档对应 auto/md5/aead、
+   alterId=0 旧 MD5、同步缓存及 reduce_memory 时间窗策略。
+   https://github.com/SagerNet/sing-vmess
+3. sing-shadowsocks v0.2.9-0.20260929204512-65740e0f0e3e：
+   internal/shadowaeadcompat 保留 AEAD 算法，在多用户认证时增加经密码
+   验证的 IP -> ID 候选排序；缓存从不替代认证。
+   https://github.com/SagerNet/sing-shadowsocks
+4. Mieru v3.38.1：官方 SDK 服务端/客户端。没有重造明文替代协议。
+   https://github.com/enfein/mieru
+5. Xray v1.260327.0（tag v26.3.27）：VLESS encryption/decryption、XHTTP、
+   REALITY/Vision。任务局部副本在 ../third_party/xray-core；并发与 Go
+   checkptr 修复由其 PROVENANCE.txt、LOCAL_CHANGES.patch 逐项记录。
+   https://github.com/XTLS/Xray-core
+6. SSR：ssrcore 单独记录 VNet-SSR、原 SSR Python/C# 参考及修正；详见
+   ssrcore/README.txt 与其来源清单。协议 UID 与计费 ID 分离。
+7. simple-obfs：依官方 HTTP/TLS wire 格式编写服务端包装，与独立
+   sing-box 客户端实际互测。参考 commit:
+   486bebd9208539058e57e23a12f23103016e09b4
+   https://github.com/shadowsocks/simple-obfs
+8. PROXY protocol 头由 go-proxyproto v0.11.0 及 wireproxy UDP v2 封装处理。
+   https://github.com/pires/go-proxyproto
+
+静态证据与新实现边界：
+- 原二进制 RTTI/文档用于确认协议名、配置字段、面板类型及功能要求。
+- mu Host MD5 的原函数是 0x1822860；cipher 使用 carrier 的证据来自
+  0x1ca3160/0x1ca3220/0x1ca32e7，详见 runtime-reconstruction/ssr。
+- 累计计量、共享限速、策略回调、身份撤销、缓存文件格式是新接口。
+  回环测试证明新实现的行为，不证明与原程序的性能/内存完全相同。
+- 便携 Go 1.27.3 只是本次构建工具。原程序的 Go 版本不由它决定。
+
+完整模块校验和在根 go.sum；来源、原文件 SHA256、改后 SHA256 位于
+runtime-reconstruction/protocol/dependencies.json 与 *-provenance.json。
+两个局部兼容包也各自携带 PROVENANCE.json 和原 LICENSE。
+
+验证入口：go test ./proxy/...；go test -race ./proxy/...
+必须使用本工程 go.mod 的 Xray replace。首次失败的 XHTTP 竞态和
+Vision checkptr 日志保留在证据目录，不以最终成功覆盖早期失败。

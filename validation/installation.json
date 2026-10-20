@@ -1,0 +1,39 @@
+{
+  "status": "passed",
+  "passed": [
+    "installed exact locally built binary",
+    "created first-install example configuration",
+    "service invokes fixed instance-run interface",
+    "DESTDIR install did not call host systemctl",
+    "installed root license and third-party notices byte-for-byte",
+    "installed complete collected LICENSES tree byte-for-byte",
+    "reinstall preserved existing configuration exactly",
+    "reinstall preserved state and additional instances",
+    "systemd-analyze verify accepted staged unit and executable",
+    "uninstall removed only reconstruction binary and template",
+    "uninstall removed reconstruction documentation and copied licenses",
+    "uninstall preserved configuration, state and extra instances",
+    "original soga executable left untouched",
+    "DESTDIR uninstall did not call host systemctl",
+    "repeated uninstall is idempotent and preserves data",
+    "explicit arm64 install selected exact arm64 binary without executing it",
+    "architecture change preserved existing configuration",
+    "arm64 staging cleanup did not call host systemctl",
+    "install.sh refuses a symlink binary directory",
+    "uninstall.sh refuses a symlink binary directory"
+  ],
+  "file_modes_observed": {
+    "filesystem": "/mnt/c/Users/Mikuw/Documents/Codex/2026-10-20/ni-x/work/deployment-checks/final/stage with space gk58ytbm",
+    "config_mode": "0o777"
+  },
+  "host_install_performed": false,
+  "docker_build_or_run_performed": false,
+  "arm64_runtime_execution": false,
+  "limitations": [
+    "Temporary DESTDIR only; no host installation or service start.",
+    "This Windows-mounted filesystem reports mode 0777 even after install -m 0600; POSIX permission enforcement is not validated here.",
+    "ARM64 binary was staged and compared but not executed.",
+    "Docker image build/run was not performed because Docker/Podman is unavailable."
+  ],
+  "systemd_unit_syntax_validation": "systemd-analyze verify --root=<temporary stage>: exit 0"
+}

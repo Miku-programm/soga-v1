@@ -1,0 +1,37 @@
+{
+  "module": "github.com/sagernet/sing-shadowsocks",
+  "version": "v0.2.9-0.20260929204512-65740e0f0e3e",
+  "purpose": "Preserve official authenticated encryption; add verified IP-to-user authentication candidate ordering without bypassing crypto",
+  "files": [
+    {
+      "file": "aead.go",
+      "upstream_sha256": "754e2b66e5ec53cdcde5cf10c28d1eaca5effaaab330bfc1754a5eced64012d1",
+      "local_sha256": "754e2b66e5ec53cdcde5cf10c28d1eaca5effaaab330bfc1754a5eced64012d1",
+      "modified": false
+    },
+    {
+      "file": "protocol.go",
+      "upstream_sha256": "c177711b439ab33416651e8e039ff21affd6954d27d2e0a6cd3726936201cfc8",
+      "local_sha256": "c177711b439ab33416651e8e039ff21affd6954d27d2e0a6cd3726936201cfc8",
+      "modified": false
+    },
+    {
+      "file": "service.go",
+      "upstream_sha256": "da41782d174345ee1f5e28c44e70b9bbda7ec31efd5d4e9c01ed3160003b876a",
+      "local_sha256": "da41782d174345ee1f5e28c44e70b9bbda7ec31efd5d4e9c01ed3160003b876a",
+      "modified": false
+    },
+    {
+      "file": "service_multi.go",
+      "upstream_sha256": "13ee3e77c69d75c74200a384e3018a9e9c17dd2c2c48f78de7ae9eba3834428e",
+      "local_sha256": "ad49d70c52a641b39bb3406949d761a28b70fba9dd0b2f4a93406305cbd3579e",
+      "modified": true
+    }
+  ],
+  "license_file": "proxy/internal/shadowaeadcompat/LICENSE",
+  "original_soga_source": false,
+  "changes": [
+    "Verified IP-to-ID candidate ordering in multi-user AEAD authentication; no cryptographic verification bypass.",
+    "Imports repointed within task-local compatibility package."
+  ]
+}

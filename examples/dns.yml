@@ -1,0 +1,7 @@
+# 空映射表示使用 soga.conf 的 default_dns，再回退到系统 DNS。
+# 按需替换下面的示例；启用时删除 {}，取消示例前的注释。
+{}
+# "https://dns.google/dns-query":
+#   strategy: ipv4_first
+#   rules:
+#     - "domain:example.com"

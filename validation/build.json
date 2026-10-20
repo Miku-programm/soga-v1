@@ -1,0 +1,46 @@
+{
+  "checked_at_utc": "2026-10-20T17:03:26.322428+00:00",
+  "status": "PASS",
+  "command": "GO=<task-local Go 1.27.3> GOPROXY=off GOSUMDB=off GOFLAGS=-p=2 sh scripts/build.sh all",
+  "script_forces": [
+    "CGO_ENABLED=0",
+    "GOOS=linux",
+    "GOTOOLCHAIN=local",
+    "-mod=vendor",
+    "-trimpath",
+    "-buildvcs=false",
+    "-ldflags=-s -w"
+  ],
+  "go_toolchain": "go version go1.27.3 linux/amd64",
+  "go_mod_sha256": "a913ed818cc4405c75fe9fdf318204dd495f43d8ec0bd88360c7a727c4bf17f8",
+  "vendor_modules_sha256": "28c372ed0f4501fa4663b49a10f7c9adb0e1830a5a37d84bb8c04dd64f9a01b3",
+  "files": [
+    {
+      "path": "/mnt/c/Users/Mikuw/Documents/Codex/2026-10-20/ni-x/work/soga-reconstructed/bin/soga-reconstructed-linux-amd64",
+      "architecture": "amd64",
+      "os": "linux",
+      "bytes": 77418656,
+      "sha256": "7f20d7914b2560c57323ddfb7edcfb49a3d4699330b2aeb9737e10907a70a279",
+      "ELF_class": 64,
+      "ELF_machine": 62,
+      "CGO_ENABLED": 0,
+      "dynamic_interpreter": false,
+      "runtime_smoke_test": "parent CLI/runtime smoke reports"
+    },
+    {
+      "path": "/mnt/c/Users/Mikuw/Documents/Codex/2026-10-20/ni-x/work/soga-reconstructed/bin/soga-reconstructed-linux-arm64",
+      "architecture": "arm64",
+      "os": "linux",
+      "bytes": 73859232,
+      "sha256": "06d542c2cc7bf7ff181856816a31be0def17ad9a82d9d6a1e710874f36cb2957",
+      "ELF_class": 64,
+      "ELF_machine": 183,
+      "CGO_ENABLED": 0,
+      "dynamic_interpreter": false,
+      "runtime_smoke_test": "not executed on this amd64 host"
+    }
+  ],
+  "original_sample_executed": false,
+  "docker_build_performed": false,
+  "log": "/mnt/c/Users/Mikuw/Documents/Codex/2026-10-20/ni-x/work/final-dualarch-build.log"
+}

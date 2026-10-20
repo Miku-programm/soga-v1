@@ -1,0 +1,51 @@
+协议兼容性与验证边界
+
+这是根据本地二进制静态证据、离线文档和公开协议实现编写的独立重建，并非原 soga 源代码。没有执行原二进制。原程序文档声称独立内核；本重建复用 sing-box 1.14.3、Xray v1.260327.0、Mieru v3.38.1 等公开实现，不能据回环成功声称达到原程序的性能、内存或全部第三方客户端兼容性。
+
+已经用真实监听器、真实客户端密码验证和目标 TCP/UDP 套接字测试的内容：
+- VMess、VLESS、Trojan、SS、SSR、AnyTLS、Hysteria v1/v2、Mieru：TCP/UDP 载荷、错误凭据拒绝、累计用户流量。
+- VMess/VLESS/Trojan：WebSocket、HTTP/2、gRPC；VMess 兼容 MD5 alterId=0 与非零，auto/md5/aead 三模式，不把 TCP 普通转发冒称对应协议。
+- VLESS Xray：TCP 与 XHTTP，普通与新 encryption/decryption，REALITY + Vision 的 TCP/UDP。Xray 原生 streamSettings 由上游配置构建器校验。
+- AnyTLS/Mieru：官方会话及认证实现。Mieru TCP/UDP 底层传输、user hint 和 traffic pattern 通过官方 SDK 配置。
+- SS：aes-128/192/256-gcm、chacha20-ietf-poly1305、2022-blake3-aes-128/256-gcm；另测试 aes-128-cfb、aes-256-ctr、rc4-md5、chacha20-ietf 旧加密。每种配 plain/simple_obfs_http/simple_obfs_tls，30 组合均真实双向大数据及 UDP 回环。simple-obfs HTTP/TLS 服务端是按官方 wire 格式实现的独立封装，不是实际 TLS 加密或 WebSocket。
+- SS simple-obfs relaxed/strict/strict_path/strict_host。HTTP 比较 request URI；host 忽略大小写、末尾点和附带端口。TLS 没有 path。
+- SSR 真实实现、协议/混淆矩阵、独立 Python 参考客户端以及许可证见 ssrcore/README.txt；本目录只做注册与计量桥接。
+- SSR obfs 单端口中的 SS AEAD：4 种 2017 AEAD × HTTP/TLS，共用承载账号密钥，按恢复的 Host MD5 表选择普通用户计费；未知 Host 拒绝。
+- obfs 单端口 UDP 默认不绑定。显式开启后以承载密钥转发并标记 Unattributed，不伪造普通用户身份，不进入用户流量/在线、用户配额或 Redis 名额，保留节点限速与访问规则/路由。
+- TCP PROXY v1/v2 与 SS/SSR UDP PROXY v2：认证后来源是头中的真实地址，UDP 回复仍回到外层中转 peer。force 仅作用于对应已启用的 TCP/UDP 功能。直接开放到不受信任客户端的 PROXY 头不具有来源认证能力。
+- VLESS/Trojan 的旧 HTTP/2 + PROXY 组合使用真实协议 codec 与原生 HTTP/2 适配，并已测试 TLS 加密传输与来源恢复。
+- VMess/VLESS/Trojan/AnyTLS TLS 回落到真实 TCP 后端，同时有效协议连接可用；回落不收取用户流量。明确 force_close_ssl 时支持外部 TLS 终止后的明文协议后端。
+- 用户更新通过重启监听和关闭旧会话实现。更新后的密码撤销有效，累计统计保留。它不是原程序的无缝热更新实现。
+- 本地 TCP/IP/CID、跨监听共享用户/节点限速，CIDR /0 到完整前缀、真实或掩码在线上报；SSR UDP 不伪造 CID。Redis 准入由独立 redislimit 包通过 GlobalAdmission 桥接。
+- HTTP/TLS/QUIC 嗅探、目的地址可选替换、首包审计、每个 UDP 目的地址规则、显式真实出站选择；服务端先发数据的协议不无限等待嗅探。
+- 认证缓存仅保存 IP -> 用户 ID 候选和过期时间，始终重新进行密码/AEAD 验证。原子持久化、16 MiB 加载上限、65536 项、后台错误回调和关闭刷盘。
+- SS AEAD/VMess AEAD 错误访问窗口封禁。VMess 有效 MD5 不受 AEAD 封禁影响。MD5 reduce_memory 将预计算时间表从 251 项/身份降至 61 项，并限制时钟偏差 ±25 秒，默认模式 ±120 秒。
+
+实现策略与尚未等价的边界：
+- 计速使用十进制 Mbps，上传+下载合计，64 KiB burst；嗅探等待上限 300 ms。它们是明确的重建策略，不是对原始算法字节级恢复的声明。
+- user_tcp_limit 按底层 TCP peer 计数；QUIC/Mieru UDP 不计为 TCP。设置超时后按已认证应用载荷活动重置，协议加密心跳不作为应用载荷活动。
+- TFO/MPTCP 通过宿主 Go/系统 socket 支持设置，默认关闭。Mieru 通过官方 StreamListenerFactory 接入，同样设置 MPTCP/TFO；TCP、UDP 载荷回环已验证，实际 MPTCP 多路径协商仍取决于系统和对端。
+- 旧 SS stream cipher 没有 AEAD 的消息认证强度；通过旧协议服务实现兼容，不把它的密码解密描述为现代认证加密。
+- VMess 原生旧 UDP 帧不携带每包来源地址；要在客户端保留多目的地址/返回来源，应使用 packetaddr 或 xudp 扩展。核心允许来自第三方 UDP 来源的数据返回。
+- UDP association 已建立后可以按包检查/改写目的地；不允许同一 association 在中途切换不同 outbound tag，须新建 association。
+- 所选 Xray XUDP 客户端路径有单包载荷上限：length + 666 超过内部 8192 字节缓冲区时丢弃，因此该路径测试使用不超过 7526 字节的应用报文。隧道自身的 UDP framing 另有完整 65535 字节边界测试，不能据此消除内部协议核心的限制。
+- 9 种协议各自验证：同一 UDP association 先访问允许目标，再访问禁止目标，Hook 与 Transform 均重新执行且禁止目标收不到载荷。第三方 FullCone 回复单独验证，不复用出站目的地址策略误挡。
+- Xray 26 已移除旧 HTTP/2；VLESS 新 encryption/decryption + 旧 HTTP/2 由 sing-box HTTP/2 前端连接私有 Xray TCP 后端实现，保留真实加密、身份校验、UDP、PROXY 来源和 TCP 配额；已通过 4 种配置与重复 3 轮 race 测试。Vision + 旧 HTTP/2 仍明确拒绝。普通 VLESS/Trojan/VMess 的旧 HTTP/2 由原生适配支持。
+- 不支持把 carrier 无身份 UDP 混入普通用户计费。SSR obfs UDP 的不可归属是 wire 格式限制，不是缺失字段可以补猜。
+- pass 隧道已按静态恢复 wire 实现 TCP/TLS/WS/WS-TLS、四种 AEAD、smux v1/v2、TCP/UDP 报文及真实来源。业务 TLS/Reality/传输封装仍位于隧道内。已用独立 Python 加密客户端、真实协议客户端和并发边界测试验证；尚未用官方 pass 客户端验证全部发行版本。恢复公式、地址和新实现策略见 runtime-reconstruction/tunnel/wire-evidence.json。
+- quic-tunnel 名称虽出现在原工厂，恢复的 soga 入站链固定创建 TCP，且 IsQuic 时直接返回该监听器，没有可证实的 QUIC/ALPN 创建链，因此显式拒绝。Hysteria 未发现对应隧道工厂；Mieru 原文档所需 TCP 底层支持隧道及业务 TCP/UDP，其额外原生 UDP 底层不组合隧道。
+- 原程序完整功能、运行环境、第三方所有客户端、互联网公网及生产负载未全部验证。验证报告仅指本工作区可复现回环与指定静态证据。
+
+许可证：vmesscompat/shadowaeadcompat 保留上游 LICENSE，改动及原始哈希见 runtime-reconstruction/protocol/*-provenance.json。SSR 单独携带 GPL-3.0 来源与修改记录；重新分发必须保留适用许可证。
+
+此前协议阶段验证记录（2026-10-21，早于新增 pass 隧道与加密旧 H2；最终全工程验证另见 runtime-reconstruction/validation）：
+- go test ./proxy/... -count=1 -v 全部通过，proxy 主包 21.024 秒。
+- go test -race ./proxy/... -count=1 -v 全部通过，proxy 主包 22.853 秒；未关闭 race/checkptr。
+- XHTTP 四种传输/加密组合另重复 5 轮 -race，通过。
+- 早期发现的上游 XHTTP 竞态和 Vision checkptr 问题已在任务局部 Xray 副本修复，失败日志与最终成功日志均保留，详见 test-summary.json。
+
+后续隧道阶段专项验证：
+- tunnel 包及相关 proxy 真实回环的 race 验证通过（2.740 / 3.598 秒）；包括独立 Python peer、smux 两版本、四种外层传输和四种加密。
+- UDP 来源头只发送一次、后续报文保持来源的真实 SS 测试 race 重复 3 次通过（1.098 秒）。
+- 外层 WS-TLS+smux 与业务 TLS/WS、TLS/gRPC、VLESS 新加密+旧 H2 四组合，含两层 PROXY 与拒绝错误凭据，race 重复 3 次通过（2.750 秒）。
+- 这些专项记录位于 runtime-reconstruction/tunnel；全工程最终验收仍以 validation 的实际结果为准。

@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/shadowsocksrr/shadowsocksr",
+  "commit": "fd723a92c488d202b407323f0512987346944136",
+  "purpose": "independent protocol-layer interoperability tests",
+  "tls_reference": {
+    "url": "https://raw.githubusercontent.com/shadowsocksrr/shadowsocksr/fd723a92c488d202b407323f0512987346944136/shadowsocks/obfsplugin/obfs_tls.py",
+    "sha256": "48b89af31e3efc2823d5893c811f9715783e70563017d9269c79e7851c1a0dda"
+  }
+}

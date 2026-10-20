@@ -1,0 +1,10 @@
+.git
+bin
+validation
+evidence
+dist
+deploy
+*.log
+*.tar
+*.tar.gz
+*.zip

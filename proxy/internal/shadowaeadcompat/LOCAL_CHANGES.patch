@@ -1,0 +1,88 @@
+--- upstream/service_multi.go
++++ local/service_multi.go
+@@ -26,6 +26,8 @@
+ 	methodMap map[U]*Method
+ 	handler   shadowsocks.Handler
+ 	udpNat    *udpnat.Service[netip.AddrPort]
++	candidate func(string) (U, bool)
++	remember  func(string, U)
+ }
+ 
+ func NewMultiService[U comparable](method string, udpTimeout int64, handler shadowsocks.Handler) (*MultiService[U], error) {
+@@ -106,7 +108,8 @@
+ 
+ 	var reader *Reader
+ 	var readCipher cipher.AEAD
+-	for u, m := range methodMap {
++	for _, entry := range s.orderedMethods(metadata.Source.Addr.String(), methodMap) {
++		u, m := entry.user, entry.method
+ 		key := buf.NewSize(method.keySaltLength)
+ 		Kdf(m.key, header.To(m.keySaltLength), key)
+ 		readCipher, err = m.constructor(key.Bytes())
+@@ -133,6 +136,9 @@
+ 		return err
+ 	}
+ 
++	if s.remember != nil {
++		s.remember(metadata.Source.Addr.String(), user)
++	}
+ 	metadata.Protocol = "shadowsocks"
+ 	metadata.Destination = destination
+ 
+@@ -173,7 +179,8 @@
+ 	var readCipher cipher.AEAD
+ 	var err error
+ 	decrypted := make([]byte, 0, buffer.Len())
+-	for u, m := range methodMap {
++	for _, entry := range s.orderedMethods(metadata.Source.Addr.String(), methodMap) {
++		u, m := entry.user, entry.method
+ 		key := buf.NewSize(m.keySaltLength)
+ 		Kdf(m.key, buffer.To(m.keySaltLength), key)
+ 		readCipher, err = m.constructor(key.Bytes())
+@@ -203,6 +210,9 @@
+ 		return err
+ 	}
+ 
++	if s.remember != nil {
++		s.remember(metadata.Source.Addr.String(), user)
++	}
+ 	metadata.Protocol = "shadowsocks"
+ 	metadata.Destination = destination
+ 	s.udpNat.NewPacket(auth.ContextWithUser(ctx, user), metadata.Source.AddrPort(), buffer, metadata, func(natConn N.PacketConn) N.PacketWriter {
+@@ -214,3 +224,36 @@
+ func (s *MultiService[U]) NewError(ctx context.Context, err error) {
+ 	s.handler.NewError(ctx, err)
+ }
++
++// SetAuthenticationCache prioritizes a hint, but the normal AEAD checks remain
++// mandatory for every candidate. Call before serving connections.
++func (s *MultiService[U]) SetAuthenticationCache(candidate func(string) (U, bool), remember func(string, U)) {
++	s.candidate = candidate
++	s.remember = remember
++}
++
++type methodEntry[U comparable] struct {
++	user   U
++	method *Method
++}
++
++func (s *MultiService[U]) orderedMethods(ip string, methods map[U]*Method) []methodEntry[U] {
++	entries := make([]methodEntry[U], 0, len(methods))
++	var preferred U
++	var has bool
++	if s.candidate != nil {
++		preferred, has = s.candidate(ip)
++		if methods[preferred] == nil {
++			has = false
++		}
++	}
++	if has {
++		entries = append(entries, methodEntry[U]{preferred, methods[preferred]})
++	}
++	for user, method := range methods {
++		if !has || user != preferred {
++			entries = append(entries, methodEntry[U]{user, method})
++		}
++	}
++	return entries
++}

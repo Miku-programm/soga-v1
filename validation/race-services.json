@@ -1,0 +1,11 @@
+{
+  "original_binary_executed": false,
+  "system_install": false,
+  "run_directory": "/mnt/c/Users/Mikuw/Documents/Codex/2026-10-20/ni-x/work/runtime-acceptance/race/run-kt3079sj",
+  "loopback_only": true,
+  "server_stopped": true,
+  "test_exit_code": 0,
+  "version": "11.4.10-MariaDB",
+  "port": 40649,
+  "server_exit_code": 0
+}

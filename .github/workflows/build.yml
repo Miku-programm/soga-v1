@@ -1,0 +1,73 @@
+name: Build Linux programs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: linux-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: '1.27.3'
+          cache: false
+      - name: Build Linux amd64 and arm64 offline
+        env:
+          GOPROXY: 'off'
+          GOSUMDB: 'off'
+          GOTOOLCHAIN: local
+        run: sh scripts/build.sh all
+      - name: Check the amd64 program
+        run: |
+          python3 scripts/smoke.py bin/soga-reconstructed-linux-amd64 --output ci-results/cli.json
+          python3 scripts/runtime_smoke.py bin/soga-reconstructed-linux-amd64 --output ci-results/runtime.json
+      - name: Package programs, source, and checksums
+        run: |
+          mkdir -p dist
+          for arch in amd64 arm64; do
+            tar -czf "dist/soga-linux-${arch}.tar.gz" \
+              --transform 's,^,soga-reconstructed/,' \
+              "bin/soga-reconstructed-linux-${arch}" examples scripts \
+              LICENSE LICENSES THIRD_PARTY_NOTICES.txt README.txt GITHUB.txt
+          done
+          git archive --format=tar.gz --prefix=soga-reconstructed/ \
+            --output=dist/soga-source.tar.gz HEAD
+          cp bin/soga-reconstructed-linux-* dist/
+          cp ci-results/*.json dist/
+          cd dist
+          sha256sum soga-* *.json > SHA256SUMS
+      - name: Check one-command installer without changing this runner
+        run: bash scripts/check-release-install.sh
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: soga-linux-${{ github.sha }}
+          path: dist/*
+          if-no-files-found: error
+      - name: Publish downloadable build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          tag="build-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}-${GITHUB_SHA:0:7}"
+          cat > release-notes.txt <<'NOTES'
+          Independent soga-reconstructed build; not the original author's source.
+          Linux amd64 and arm64, plus complete source and third-party licenses.
+          amd64 CLI and local-process smoke checks passed; arm64 is cross-compiled.
+          This workflow does not repeat the historical full integration suite.
+          v2node API routing is unchanged at the user's request. See GITHUB.txt
+          for configuration keys and known compatibility limitations.
+          NOTES
+          gh release create "$tag" dist/* --repo "$REPOSITORY" \
+            --target "$GITHUB_SHA" --title "Linux build ${GITHUB_SHA:0:7}" \
+            --notes-file release-notes.txt --latest

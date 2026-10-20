@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "binary_sha256": "7f20d7914b2560c57323ddfb7edcfb49a3d4699330b2aeb9737e10907a70a279",
+  "scope": "rebuilt process: fixture panel startup, listener, unauthenticated connection probe, SIGTERM and final status",
+  "panel_requests": [
+    "/api/v1/node",
+    "/api/v1/users",
+    "/api/v1/white_list",
+    "/api/v1/audit_rules",
+    "/api/v1/alive_ip",
+    "/api/v1/status"
+  ],
+  "exit_code": 0,
+  "original_sample_executed": false
+}

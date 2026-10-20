@@ -1,0 +1,1051 @@
+# filippo.io/edwards25519 v1.2.0
+## explicit; go 1.24.0
+filippo.io/edwards25519
+filippo.io/edwards25519/field
+# github.com/ajg/form v1.5.1
+## explicit
+github.com/ajg/form
+# github.com/andybalholm/brotli v1.1.0
+## explicit; go 1.13
+github.com/andybalholm/brotli
+github.com/andybalholm/brotli/matchfinder
+# github.com/anytls/sing-anytls v0.0.11
+## explicit; go 1.23.1
+github.com/anytls/sing-anytls
+github.com/anytls/sing-anytls/padding
+github.com/anytls/sing-anytls/pipe
+github.com/anytls/sing-anytls/session
+github.com/anytls/sing-anytls/skiplist
+github.com/anytls/sing-anytls/util
+# github.com/apernet/quic-go v0.59.1-0.20260217092621-db4786c77a22
+## explicit; go 1.24
+github.com/apernet/quic-go
+github.com/apernet/quic-go/congestion
+github.com/apernet/quic-go/http3
+github.com/apernet/quic-go/http3/qlog
+github.com/apernet/quic-go/internal/ackhandler
+github.com/apernet/quic-go/internal/congestion
+github.com/apernet/quic-go/internal/flowcontrol
+github.com/apernet/quic-go/internal/handshake
+github.com/apernet/quic-go/internal/monotime
+github.com/apernet/quic-go/internal/protocol
+github.com/apernet/quic-go/internal/qerr
+github.com/apernet/quic-go/internal/utils
+github.com/apernet/quic-go/internal/utils/linkedlist
+github.com/apernet/quic-go/internal/utils/ringbuffer
+github.com/apernet/quic-go/internal/utils/tree
+github.com/apernet/quic-go/internal/wire
+github.com/apernet/quic-go/monotime
+github.com/apernet/quic-go/qlog
+github.com/apernet/quic-go/qlogwriter
+github.com/apernet/quic-go/qlogwriter/jsontext
+github.com/apernet/quic-go/quicvarint
+# github.com/caddyserver/certmagic v0.25.3-0.20260421143802-60d9d8b415d6
+## explicit; go 1.24.0
+github.com/caddyserver/certmagic
+github.com/caddyserver/certmagic/internal/atomicfile
+# github.com/caddyserver/zerossl v0.1.5
+## explicit; go 1.21.0
+github.com/caddyserver/zerossl
+# github.com/cloudflare/circl v1.6.3
+## explicit; go 1.22.0
+github.com/cloudflare/circl/internal/sha3
+github.com/cloudflare/circl/sign
+github.com/cloudflare/circl/sign/internal/dilithium
+github.com/cloudflare/circl/sign/internal/dilithium/params
+github.com/cloudflare/circl/sign/mldsa/mldsa65
+github.com/cloudflare/circl/sign/mldsa/mldsa65/internal
+github.com/cloudflare/circl/simd/keccakf1600
+# github.com/database64128/netx-go v0.1.1
+## explicit; go 1.23.0
+github.com/database64128/netx-go
+# github.com/database64128/tfo-go/v2 v2.3.2
+## explicit; go 1.24.0
+github.com/database64128/tfo-go/v2
+# github.com/enfein/mieru/v3 v3.38.1
+## explicit; go 1.20
+github.com/enfein/mieru/v3/apis/client
+github.com/enfein/mieru/v3/apis/common
+github.com/enfein/mieru/v3/apis/constant
+github.com/enfein/mieru/v3/apis/internal
+github.com/enfein/mieru/v3/apis/model
+github.com/enfein/mieru/v3/apis/server
+github.com/enfein/mieru/v3/apis/trafficpattern
+github.com/enfein/mieru/v3/pkg/appctl/appctlcommon
+github.com/enfein/mieru/v3/pkg/appctl/appctlpb
+github.com/enfein/mieru/v3/pkg/cipher
+github.com/enfein/mieru/v3/pkg/common
+github.com/enfein/mieru/v3/pkg/congestion
+github.com/enfein/mieru/v3/pkg/egress
+github.com/enfein/mieru/v3/pkg/log
+github.com/enfein/mieru/v3/pkg/mathext
+github.com/enfein/mieru/v3/pkg/metrics
+github.com/enfein/mieru/v3/pkg/metrics/metricspb
+github.com/enfein/mieru/v3/pkg/protocol
+github.com/enfein/mieru/v3/pkg/protocol/serveruser
+github.com/enfein/mieru/v3/pkg/replay
+github.com/enfein/mieru/v3/pkg/rng
+github.com/enfein/mieru/v3/pkg/sockopts
+github.com/enfein/mieru/v3/pkg/socks5
+github.com/enfein/mieru/v3/pkg/stderror
+github.com/enfein/mieru/v3/pkg/version
+# github.com/florianl/go-nfqueue/v2 v2.1.0
+## explicit; go 1.24.0
+github.com/florianl/go-nfqueue/v2
+github.com/florianl/go-nfqueue/v2/internal/unix
+# github.com/fsnotify/fsnotify v1.9.0
+## explicit; go 1.17
+github.com/fsnotify/fsnotify
+github.com/fsnotify/fsnotify/internal
+# github.com/go-chi/chi/v5 v5.2.5
+## explicit; go 1.22
+github.com/go-chi/chi/v5
+github.com/go-chi/chi/v5/middleware
+# github.com/go-chi/render v1.0.3
+## explicit; go 1.16
+github.com/go-chi/render
+# github.com/go-ole/go-ole v1.3.0
+## explicit; go 1.12
+github.com/go-ole/go-ole
+github.com/go-ole/go-ole/oleutil
+# github.com/go-sql-driver/mysql v1.10.1
+## explicit; go 1.24.0
+github.com/go-sql-driver/mysql
+# github.com/gobwas/httphead v0.1.0
+## explicit; go 1.15
+github.com/gobwas/httphead
+# github.com/gobwas/pool v0.2.1
+## explicit
+github.com/gobwas/pool
+github.com/gobwas/pool/internal/pmath
+github.com/gobwas/pool/pbufio
+github.com/gobwas/pool/pbytes
+# github.com/godbus/dbus/v5 v5.2.2
+## explicit; go 1.20
+github.com/godbus/dbus/v5
+# github.com/gofrs/uuid/v5 v5.5.1
+## explicit; go 1.25
+github.com/gofrs/uuid/v5
+# github.com/google/btree v1.1.3
+## explicit; go 1.18
+github.com/google/btree
+# github.com/google/go-cmp v0.7.0
+## explicit; go 1.21
+github.com/google/go-cmp/cmp
+github.com/google/go-cmp/cmp/internal/diff
+github.com/google/go-cmp/cmp/internal/flags
+github.com/google/go-cmp/cmp/internal/function
+github.com/google/go-cmp/cmp/internal/value
+# github.com/google/gopacket v1.1.19
+## explicit; go 1.12
+github.com/google/gopacket/routing
+# github.com/gorilla/websocket v1.5.3
+## explicit; go 1.12
+github.com/gorilla/websocket
+# github.com/hashicorp/yamux v0.1.2
+## explicit; go 1.20
+github.com/hashicorp/yamux
+# github.com/huin/goupnp v1.3.0
+## explicit; go 1.14
+github.com/huin/goupnp
+github.com/huin/goupnp/dcps/internetgateway1
+github.com/huin/goupnp/dcps/internetgateway2
+github.com/huin/goupnp/httpu
+github.com/huin/goupnp/scpd
+github.com/huin/goupnp/soap
+github.com/huin/goupnp/ssdp
+# github.com/jackpal/go-nat-pmp v1.0.2
+## explicit
+github.com/jackpal/go-nat-pmp
+# github.com/jsimonetti/rtnetlink v1.4.1
+## explicit; go 1.20
+github.com/jsimonetti/rtnetlink
+github.com/jsimonetti/rtnetlink/internal/unix
+# github.com/juju/ratelimit v1.0.2
+## explicit
+github.com/juju/ratelimit
+# github.com/klauspost/compress v1.19.1
+## explicit; go 1.24
+github.com/klauspost/compress
+github.com/klauspost/compress/fse
+github.com/klauspost/compress/huff0
+github.com/klauspost/compress/internal/cpuinfo
+github.com/klauspost/compress/internal/le
+github.com/klauspost/compress/internal/snapref
+github.com/klauspost/compress/zstd
+github.com/klauspost/compress/zstd/internal/xxhash
+# github.com/klauspost/cpuid/v2 v2.3.0
+## explicit; go 1.22
+github.com/klauspost/cpuid/v2
+# github.com/koron/go-ssdp v0.0.4
+## explicit; go 1.19
+github.com/koron/go-ssdp
+github.com/koron/go-ssdp/internal/multicast
+github.com/koron/go-ssdp/internal/ssdplog
+# github.com/libdns/acmedns v0.5.0
+## explicit; go 1.17
+github.com/libdns/acmedns
+# github.com/libdns/alidns v1.0.6
+## explicit; go 1.16
+github.com/libdns/alidns
+# github.com/libdns/cloudflare v0.2.2
+## explicit; go 1.18
+github.com/libdns/cloudflare
+# github.com/libdns/libdns v1.1.1
+## explicit; go 1.18
+github.com/libdns/libdns
+# github.com/libp2p/go-nat v1.0.1-0.20250821073202-01afc089f138
+## explicit; go 1.24
+github.com/libp2p/go-nat
+# github.com/libp2p/go-netroute v0.2.1
+## explicit; go 1.18
+github.com/libp2p/go-netroute
+# github.com/logrusorgru/aurora v2.0.3+incompatible
+## explicit
+github.com/logrusorgru/aurora
+# github.com/mdlayher/netlink v1.11.2
+## explicit; go 1.25.0
+github.com/mdlayher/netlink
+github.com/mdlayher/netlink/nlenc
+github.com/mdlayher/netlink/nltest
+# github.com/mdlayher/socket v0.6.0
+## explicit; go 1.25.0
+github.com/mdlayher/socket
+# github.com/metacubex/utls v1.8.7
+## explicit; go 1.20
+github.com/metacubex/utls
+github.com/metacubex/utls/dicttls
+github.com/metacubex/utls/internal/boring
+github.com/metacubex/utls/internal/byteorder
+github.com/metacubex/utls/internal/cpu
+github.com/metacubex/utls/internal/fips140tls
+github.com/metacubex/utls/internal/helper
+github.com/metacubex/utls/internal/hkdf
+github.com/metacubex/utls/internal/hpke
+github.com/metacubex/utls/internal/mlkem
+github.com/metacubex/utls/internal/quicvarint
+github.com/metacubex/utls/internal/quicvarint/protocol
+github.com/metacubex/utls/internal/ratelimit
+github.com/metacubex/utls/internal/tls12
+github.com/metacubex/utls/internal/tls13
+# github.com/mholt/acmez/v3 v3.1.6
+## explicit; go 1.24.0
+github.com/mholt/acmez/v3
+github.com/mholt/acmez/v3/acme
+# github.com/miekg/dns v1.1.72
+## explicit; go 1.24.0
+github.com/miekg/dns
+# github.com/pelletier/go-toml/v2 v2.2.4
+## explicit; go 1.21.0
+github.com/pelletier/go-toml/v2
+github.com/pelletier/go-toml/v2/internal/characters
+github.com/pelletier/go-toml/v2/internal/danger
+github.com/pelletier/go-toml/v2/internal/tracker
+github.com/pelletier/go-toml/v2/unstable
+# github.com/pires/go-proxyproto v0.11.0
+## explicit; go 1.24
+github.com/pires/go-proxyproto
+# github.com/quic-go/qpack v0.6.0
+## explicit; go 1.24
+github.com/quic-go/qpack
+# github.com/refraction-networking/utls v1.8.3-0.20260301010127-aa6edf4b11af
+## explicit; go 1.24
+github.com/refraction-networking/utls
+github.com/refraction-networking/utls/dicttls
+github.com/refraction-networking/utls/internal/boring
+github.com/refraction-networking/utls/internal/byteorder
+github.com/refraction-networking/utls/internal/fips140tls
+github.com/refraction-networking/utls/internal/helper
+github.com/refraction-networking/utls/internal/hkdf
+github.com/refraction-networking/utls/internal/hpke
+github.com/refraction-networking/utls/internal/quicvarint
+github.com/refraction-networking/utls/internal/quicvarint/protocol
+github.com/refraction-networking/utls/internal/tls12
+github.com/refraction-networking/utls/internal/tls13
+# github.com/robfig/cron/v3 v3.0.1
+## explicit; go 1.12
+github.com/robfig/cron/v3
+# github.com/sagernet/bbolt v0.0.0-20260915102804-500ee1e84832
+## explicit; go 1.25.0
+github.com/sagernet/bbolt
+github.com/sagernet/bbolt/errors
+github.com/sagernet/bbolt/internal/common
+github.com/sagernet/bbolt/internal/freelist
+# github.com/sagernet/fswatch v0.1.2
+## explicit; go 1.20
+github.com/sagernet/fswatch
+# github.com/sagernet/gvisor v0.0.0-20260727.0-sing-box-mod.1
+## explicit; go 1.25.0
+github.com/sagernet/gvisor/pkg/atomicbitops
+github.com/sagernet/gvisor/pkg/bits
+github.com/sagernet/gvisor/pkg/buffer
+github.com/sagernet/gvisor/pkg/context
+github.com/sagernet/gvisor/pkg/cpuid
+github.com/sagernet/gvisor/pkg/gohacks
+github.com/sagernet/gvisor/pkg/goid
+github.com/sagernet/gvisor/pkg/linewriter
+github.com/sagernet/gvisor/pkg/log
+github.com/sagernet/gvisor/pkg/rand
+github.com/sagernet/gvisor/pkg/rawfile
+github.com/sagernet/gvisor/pkg/refs
+github.com/sagernet/gvisor/pkg/sleep
+github.com/sagernet/gvisor/pkg/state
+github.com/sagernet/gvisor/pkg/state/wire
+github.com/sagernet/gvisor/pkg/sync
+github.com/sagernet/gvisor/pkg/sync/locking
+github.com/sagernet/gvisor/pkg/tcpip
+github.com/sagernet/gvisor/pkg/tcpip/adapters/gonet
+github.com/sagernet/gvisor/pkg/tcpip/checksum
+github.com/sagernet/gvisor/pkg/tcpip/hash/jenkins
+github.com/sagernet/gvisor/pkg/tcpip/header
+github.com/sagernet/gvisor/pkg/tcpip/header/parse
+github.com/sagernet/gvisor/pkg/tcpip/internal/tcp
+github.com/sagernet/gvisor/pkg/tcpip/link/channel
+github.com/sagernet/gvisor/pkg/tcpip/link/fdbased
+github.com/sagernet/gvisor/pkg/tcpip/link/qdisc
+github.com/sagernet/gvisor/pkg/tcpip/link/qdisc/fifo
+github.com/sagernet/gvisor/pkg/tcpip/link/stopfd
+github.com/sagernet/gvisor/pkg/tcpip/network/hash
+github.com/sagernet/gvisor/pkg/tcpip/network/internal/fragmentation
+github.com/sagernet/gvisor/pkg/tcpip/network/internal/ip
+github.com/sagernet/gvisor/pkg/tcpip/network/internal/multicast
+github.com/sagernet/gvisor/pkg/tcpip/network/ipv4
+github.com/sagernet/gvisor/pkg/tcpip/network/ipv6
+github.com/sagernet/gvisor/pkg/tcpip/ports
+github.com/sagernet/gvisor/pkg/tcpip/seqnum
+github.com/sagernet/gvisor/pkg/tcpip/stack
+github.com/sagernet/gvisor/pkg/tcpip/stack/gro
+github.com/sagernet/gvisor/pkg/tcpip/transport
+github.com/sagernet/gvisor/pkg/tcpip/transport/icmp
+github.com/sagernet/gvisor/pkg/tcpip/transport/internal/network
+github.com/sagernet/gvisor/pkg/tcpip/transport/internal/noop
+github.com/sagernet/gvisor/pkg/tcpip/transport/packet
+github.com/sagernet/gvisor/pkg/tcpip/transport/raw
+github.com/sagernet/gvisor/pkg/tcpip/transport/tcp
+github.com/sagernet/gvisor/pkg/tcpip/transport/tcpconntrack
+github.com/sagernet/gvisor/pkg/tcpip/transport/udp
+github.com/sagernet/gvisor/pkg/waiter
+# github.com/sagernet/netlink v0.0.0-20260814022025-64455d367bbf
+## explicit; go 1.18
+github.com/sagernet/netlink
+github.com/sagernet/netlink/nl
+# github.com/sagernet/nftables v0.3.0-mod.4
+## explicit; go 1.21
+github.com/sagernet/nftables
+github.com/sagernet/nftables/alignedbuff
+github.com/sagernet/nftables/binaryutil
+github.com/sagernet/nftables/expr
+github.com/sagernet/nftables/internal/parseexprfunc
+github.com/sagernet/nftables/userdata
+github.com/sagernet/nftables/xt
+# github.com/sagernet/quic-go v0.61.0-sing-box-mod.9
+## explicit; go 1.25.0
+github.com/sagernet/quic-go
+github.com/sagernet/quic-go/congestion
+github.com/sagernet/quic-go/http3
+github.com/sagernet/quic-go/http3/qlog
+github.com/sagernet/quic-go/internal/ackhandler
+github.com/sagernet/quic-go/internal/congestion
+github.com/sagernet/quic-go/internal/handshake
+github.com/sagernet/quic-go/internal/monotime
+github.com/sagernet/quic-go/internal/protocol
+github.com/sagernet/quic-go/internal/qerr
+github.com/sagernet/quic-go/internal/utils
+github.com/sagernet/quic-go/internal/utils/linkedlist
+github.com/sagernet/quic-go/internal/utils/ringbuffer
+github.com/sagernet/quic-go/internal/utils/tree
+github.com/sagernet/quic-go/internal/wire
+github.com/sagernet/quic-go/monotime
+github.com/sagernet/quic-go/qlog
+github.com/sagernet/quic-go/qlogwriter
+github.com/sagernet/quic-go/qlogwriter/jsontext
+github.com/sagernet/quic-go/quicvarint
+# github.com/sagernet/sing v0.9.7-0.20260929150544-0ad23b637bd4
+## explicit; go 1.25.0
+github.com/sagernet/sing/common
+github.com/sagernet/sing/common/abx
+github.com/sagernet/sing/common/abx/internal
+github.com/sagernet/sing/common/atomic
+github.com/sagernet/sing/common/auth
+github.com/sagernet/sing/common/baderror
+github.com/sagernet/sing/common/batch
+github.com/sagernet/sing/common/binary
+github.com/sagernet/sing/common/buf
+github.com/sagernet/sing/common/bufio
+github.com/sagernet/sing/common/bufio/deadline
+github.com/sagernet/sing/common/byteformats
+github.com/sagernet/sing/common/cache
+github.com/sagernet/sing/common/canceler
+github.com/sagernet/sing/common/cleanup
+github.com/sagernet/sing/common/control
+github.com/sagernet/sing/common/debug
+github.com/sagernet/sing/common/domain
+github.com/sagernet/sing/common/exceptions
+github.com/sagernet/sing/common/format
+github.com/sagernet/sing/common/json
+github.com/sagernet/sing/common/json/badjson
+github.com/sagernet/sing/common/json/badoption
+github.com/sagernet/sing/common/json/badoption/internal/my_time
+github.com/sagernet/sing/common/json/internal/contextjson
+github.com/sagernet/sing/common/logger
+github.com/sagernet/sing/common/memory
+github.com/sagernet/sing/common/metadata
+github.com/sagernet/sing/common/network
+github.com/sagernet/sing/common/ntp
+github.com/sagernet/sing/common/observable
+github.com/sagernet/sing/common/pipe
+github.com/sagernet/sing/common/random
+github.com/sagernet/sing/common/ranges
+github.com/sagernet/sing/common/replay
+github.com/sagernet/sing/common/rw
+github.com/sagernet/sing/common/shell
+github.com/sagernet/sing/common/task
+github.com/sagernet/sing/common/tls
+github.com/sagernet/sing/common/udpnat
+github.com/sagernet/sing/common/udpnat2
+github.com/sagernet/sing/common/uot
+github.com/sagernet/sing/common/varbin
+github.com/sagernet/sing/common/windnsapi
+github.com/sagernet/sing/common/wininet
+github.com/sagernet/sing/common/winiphlpapi
+github.com/sagernet/sing/common/winpowrprof
+github.com/sagernet/sing/common/winwlanapi
+github.com/sagernet/sing/common/x/collections
+github.com/sagernet/sing/common/x/constraints
+github.com/sagernet/sing/common/x/linkedhashmap
+github.com/sagernet/sing/common/x/list
+github.com/sagernet/sing/contrab/freelru
+github.com/sagernet/sing/contrab/maphash
+github.com/sagernet/sing/protocol/http
+github.com/sagernet/sing/protocol/socks
+github.com/sagernet/sing/protocol/socks/socks4
+github.com/sagernet/sing/protocol/socks/socks5
+github.com/sagernet/sing/service
+github.com/sagernet/sing/service/filemanager
+github.com/sagernet/sing/service/pause
+# github.com/sagernet/sing-box v1.14.3 => ./third_party/sing-box
+## explicit; go 1.25.5
+github.com/sagernet/sing-box
+github.com/sagernet/sing-box/adapter
+github.com/sagernet/sing-box/adapter/certificate
+github.com/sagernet/sing-box/adapter/endpoint
+github.com/sagernet/sing-box/adapter/inbound
+github.com/sagernet/sing-box/adapter/outbound
+github.com/sagernet/sing-box/adapter/service
+github.com/sagernet/sing-box/common/badtls
+github.com/sagernet/sing-box/common/badversion
+github.com/sagernet/sing-box/common/certificate
+github.com/sagernet/sing-box/common/compatible
+github.com/sagernet/sing-box/common/dialer
+github.com/sagernet/sing-box/common/httpclient
+github.com/sagernet/sing-box/common/ja3
+github.com/sagernet/sing-box/common/jni
+github.com/sagernet/sing-box/common/ktls
+github.com/sagernet/sing-box/common/listener
+github.com/sagernet/sing-box/common/mux
+github.com/sagernet/sing-box/common/netns
+github.com/sagernet/sing-box/common/process
+github.com/sagernet/sing-box/common/proxybridge
+github.com/sagernet/sing-box/common/redir
+github.com/sagernet/sing-box/common/schannel
+github.com/sagernet/sing-box/common/settings
+github.com/sagernet/sing-box/common/sniff
+github.com/sagernet/sing-box/common/sniff/internal/qtls
+github.com/sagernet/sing-box/common/srs
+github.com/sagernet/sing-box/common/taskmonitor
+github.com/sagernet/sing-box/common/tls
+github.com/sagernet/sing-box/common/tlsfragment
+github.com/sagernet/sing-box/common/tlsspoof
+github.com/sagernet/sing-box/common/trafficcontrol
+github.com/sagernet/sing-box/common/uot
+github.com/sagernet/sing-box/common/urltest
+github.com/sagernet/sing-box/common/windivert
+github.com/sagernet/sing-box/common/winmutex
+github.com/sagernet/sing-box/constant
+github.com/sagernet/sing-box/constant/goos
+github.com/sagernet/sing-box/dns
+github.com/sagernet/sing-box/dns/transport
+github.com/sagernet/sing-box/dns/transport/hosts
+github.com/sagernet/sing-box/dns/transport/local
+github.com/sagernet/sing-box/dns/transport/local/systemconfig
+github.com/sagernet/sing-box/dns/transport/mdns
+github.com/sagernet/sing-box/experimental
+github.com/sagernet/sing-box/experimental/cachefile
+github.com/sagernet/sing-box/experimental/clashmode
+github.com/sagernet/sing-box/experimental/deprecated
+github.com/sagernet/sing-box/experimental/locale
+github.com/sagernet/sing-box/log
+github.com/sagernet/sing-box/option
+github.com/sagernet/sing-box/protocol/anytls
+github.com/sagernet/sing-box/protocol/direct
+github.com/sagernet/sing-box/protocol/dns
+github.com/sagernet/sing-box/protocol/http
+github.com/sagernet/sing-box/protocol/hysteria
+github.com/sagernet/sing-box/protocol/hysteria2
+github.com/sagernet/sing-box/protocol/shadowsocks
+github.com/sagernet/sing-box/protocol/socks
+github.com/sagernet/sing-box/protocol/trojan
+github.com/sagernet/sing-box/protocol/vless
+github.com/sagernet/sing-box/protocol/vmess
+github.com/sagernet/sing-box/route
+github.com/sagernet/sing-box/route/rule
+github.com/sagernet/sing-box/schema
+github.com/sagernet/sing-box/service/powerreport
+github.com/sagernet/sing-box/transport/simple-obfs
+github.com/sagernet/sing-box/transport/sip003
+github.com/sagernet/sing-box/transport/trojan
+github.com/sagernet/sing-box/transport/v2ray
+github.com/sagernet/sing-box/transport/v2raygrpc
+github.com/sagernet/sing-box/transport/v2raygrpc/credentials
+github.com/sagernet/sing-box/transport/v2raygrpclite
+github.com/sagernet/sing-box/transport/v2rayhttp
+github.com/sagernet/sing-box/transport/v2rayhttpupgrade
+github.com/sagernet/sing-box/transport/v2raywebsocket
+# github.com/sagernet/sing-mux v0.3.10-0.20260929204512-caf09fe32475
+## explicit; go 1.25.0
+github.com/sagernet/sing-mux
+# github.com/sagernet/sing-quic v0.7.2-0.20261002084117-75c3ac4fa12b
+## explicit; go 1.25.0
+github.com/sagernet/sing-quic
+github.com/sagernet/sing-quic/congestion_meta2
+github.com/sagernet/sing-quic/hysteria
+github.com/sagernet/sing-quic/hysteria/congestion
+github.com/sagernet/sing-quic/hysteria2
+github.com/sagernet/sing-quic/hysteria2/internal/protocol
+github.com/sagernet/sing-quic/hysteria2/internal/stun
+github.com/sagernet/sing-quic/hysteria2/realm
+# github.com/sagernet/sing-shadowsocks v0.2.9-0.20260929204512-65740e0f0e3e
+## explicit; go 1.18
+github.com/sagernet/sing-shadowsocks
+github.com/sagernet/sing-shadowsocks/shadowaead
+github.com/sagernet/sing-shadowsocks/shadowaead_2022
+# github.com/sagernet/sing-shadowsocks2 v0.2.2-0.20260929152114-a69d1086332b
+## explicit; go 1.18
+github.com/sagernet/sing-shadowsocks2
+github.com/sagernet/sing-shadowsocks2/cipher
+github.com/sagernet/sing-shadowsocks2/internal/legacykey
+github.com/sagernet/sing-shadowsocks2/internal/shadowio
+github.com/sagernet/sing-shadowsocks2/shadowaead
+github.com/sagernet/sing-shadowsocks2/shadowaead_2022
+github.com/sagernet/sing-shadowsocks2/shadowstream
+# github.com/sagernet/sing-snell v0.0.0-20260904135315-bc5a12ac736f
+## explicit; go 1.24.0
+github.com/sagernet/sing-snell
+# github.com/sagernet/sing-tun v0.9.7-0.20261009020158-bca4bf029237
+## explicit; go 1.25.0
+github.com/sagernet/sing-tun
+github.com/sagernet/sing-tun/dnsinfo
+github.com/sagernet/sing-tun/gtcpip
+github.com/sagernet/sing-tun/gtcpip/checksum
+github.com/sagernet/sing-tun/gtcpip/header
+github.com/sagernet/sing-tun/gtcpip/seqnum
+github.com/sagernet/sing-tun/internal/fdbased_darwin
+github.com/sagernet/sing-tun/internal/rawfile_darwin
+github.com/sagernet/sing-tun/internal/stopfd_darwin
+github.com/sagernet/sing-tun/internal/tschecksum
+github.com/sagernet/sing-tun/internal/winfw
+github.com/sagernet/sing-tun/internal/winipcfg
+github.com/sagernet/sing-tun/internal/winsys
+github.com/sagernet/sing-tun/internal/wintun
+github.com/sagernet/sing-tun/internal/wintun/memmod
+github.com/sagernet/sing-tun/ping
+# github.com/sagernet/sing-usbip v0.0.0-20260817040617-28bd42667eca
+## explicit; go 1.25.0
+github.com/sagernet/sing-usbip
+github.com/sagernet/sing-usbip/driverassets
+github.com/sagernet/sing-usbip/internal/usbipvhci
+github.com/sagernet/sing-usbip/internal/vboxusb
+github.com/sagernet/sing-usbip/internal/wincfgmgr32
+github.com/sagernet/sing-usbip/internal/winsetupapi
+# github.com/sagernet/sing-vmess v0.2.9-0.20260929152519-9b95ab8c9478
+## explicit; go 1.20
+github.com/sagernet/sing-vmess
+github.com/sagernet/sing-vmess/packetaddr
+github.com/sagernet/sing-vmess/vless
+# github.com/sagernet/smux v1.5.50-sing-box-mod.1
+## explicit; go 1.18
+github.com/sagernet/smux
+# github.com/sagernet/ws v0.0.0-20231204124109-acfe8907c854
+## explicit; go 1.15
+github.com/sagernet/ws
+github.com/sagernet/ws/wsutil
+# github.com/sirupsen/logrus v1.10.2
+## explicit; go 1.23
+github.com/sirupsen/logrus
+# github.com/vishvananda/netlink v1.3.1
+## explicit; go 1.12
+github.com/vishvananda/netlink
+github.com/vishvananda/netlink/nl
+# github.com/vishvananda/netns v0.0.5
+## explicit; go 1.17
+github.com/vishvananda/netns
+# github.com/xtaci/smux v1.5.57
+## explicit; go 1.18
+github.com/xtaci/smux
+# github.com/xtls/reality v0.0.0-20260322125925-9234c772ba8f
+## explicit; go 1.24.0
+github.com/xtls/reality
+github.com/xtls/reality/fips140tls
+github.com/xtls/reality/hpke
+github.com/xtls/reality/tls12
+github.com/xtls/reality/tls13
+# github.com/xtls/xray-core v1.260327.0 => ./third_party/xray-core
+## explicit; go 1.26
+github.com/xtls/xray-core/app/commander
+github.com/xtls/xray-core/app/dispatcher
+github.com/xtls/xray-core/app/dns
+github.com/xtls/xray-core/app/dns/fakedns
+github.com/xtls/xray-core/app/log
+github.com/xtls/xray-core/app/log/command
+github.com/xtls/xray-core/app/metrics
+github.com/xtls/xray-core/app/observatory
+github.com/xtls/xray-core/app/observatory/burst
+github.com/xtls/xray-core/app/observatory/command
+github.com/xtls/xray-core/app/policy
+github.com/xtls/xray-core/app/proxyman
+github.com/xtls/xray-core/app/proxyman/command
+github.com/xtls/xray-core/app/proxyman/inbound
+github.com/xtls/xray-core/app/proxyman/outbound
+github.com/xtls/xray-core/app/reverse
+github.com/xtls/xray-core/app/router
+github.com/xtls/xray-core/app/router/command
+github.com/xtls/xray-core/app/stats
+github.com/xtls/xray-core/app/stats/command
+github.com/xtls/xray-core/app/version
+github.com/xtls/xray-core/common
+github.com/xtls/xray-core/common/antireplay
+github.com/xtls/xray-core/common/bitmask
+github.com/xtls/xray-core/common/buf
+github.com/xtls/xray-core/common/bytespool
+github.com/xtls/xray-core/common/cache
+github.com/xtls/xray-core/common/cmdarg
+github.com/xtls/xray-core/common/crypto
+github.com/xtls/xray-core/common/crypto/internal
+github.com/xtls/xray-core/common/ctx
+github.com/xtls/xray-core/common/dice
+github.com/xtls/xray-core/common/drain
+github.com/xtls/xray-core/common/errors
+github.com/xtls/xray-core/common/log
+github.com/xtls/xray-core/common/mux
+github.com/xtls/xray-core/common/net
+github.com/xtls/xray-core/common/net/cnc
+github.com/xtls/xray-core/common/ocsp
+github.com/xtls/xray-core/common/platform
+github.com/xtls/xray-core/common/platform/filesystem
+github.com/xtls/xray-core/common/protocol
+github.com/xtls/xray-core/common/protocol/bittorrent
+github.com/xtls/xray-core/common/protocol/dns
+github.com/xtls/xray-core/common/protocol/http
+github.com/xtls/xray-core/common/protocol/quic
+github.com/xtls/xray-core/common/protocol/tls
+github.com/xtls/xray-core/common/protocol/tls/cert
+github.com/xtls/xray-core/common/protocol/udp
+github.com/xtls/xray-core/common/retry
+github.com/xtls/xray-core/common/serial
+github.com/xtls/xray-core/common/session
+github.com/xtls/xray-core/common/signal
+github.com/xtls/xray-core/common/signal/done
+github.com/xtls/xray-core/common/signal/pubsub
+github.com/xtls/xray-core/common/signal/semaphore
+github.com/xtls/xray-core/common/singbridge
+github.com/xtls/xray-core/common/strmatcher
+github.com/xtls/xray-core/common/task
+github.com/xtls/xray-core/common/utils
+github.com/xtls/xray-core/common/uuid
+github.com/xtls/xray-core/common/xudp
+github.com/xtls/xray-core/core
+github.com/xtls/xray-core/features
+github.com/xtls/xray-core/features/dns
+github.com/xtls/xray-core/features/dns/localdns
+github.com/xtls/xray-core/features/extension
+github.com/xtls/xray-core/features/inbound
+github.com/xtls/xray-core/features/outbound
+github.com/xtls/xray-core/features/policy
+github.com/xtls/xray-core/features/routing
+github.com/xtls/xray-core/features/routing/dns
+github.com/xtls/xray-core/features/routing/session
+github.com/xtls/xray-core/features/stats
+github.com/xtls/xray-core/infra/conf
+github.com/xtls/xray-core/infra/conf/cfgcommon/duration
+github.com/xtls/xray-core/main/confloader
+github.com/xtls/xray-core/proxy
+github.com/xtls/xray-core/proxy/blackhole
+github.com/xtls/xray-core/proxy/dns
+github.com/xtls/xray-core/proxy/dokodemo
+github.com/xtls/xray-core/proxy/freedom
+github.com/xtls/xray-core/proxy/http
+github.com/xtls/xray-core/proxy/hysteria
+github.com/xtls/xray-core/proxy/hysteria/account
+github.com/xtls/xray-core/proxy/hysteria/ctx
+github.com/xtls/xray-core/proxy/loopback
+github.com/xtls/xray-core/proxy/shadowsocks
+github.com/xtls/xray-core/proxy/shadowsocks_2022
+github.com/xtls/xray-core/proxy/socks
+github.com/xtls/xray-core/proxy/trojan
+github.com/xtls/xray-core/proxy/tun
+github.com/xtls/xray-core/proxy/vless
+github.com/xtls/xray-core/proxy/vless/encoding
+github.com/xtls/xray-core/proxy/vless/encryption
+github.com/xtls/xray-core/proxy/vless/inbound
+github.com/xtls/xray-core/proxy/vless/outbound
+github.com/xtls/xray-core/proxy/vmess
+github.com/xtls/xray-core/proxy/vmess/aead
+github.com/xtls/xray-core/proxy/vmess/encoding
+github.com/xtls/xray-core/proxy/vmess/inbound
+github.com/xtls/xray-core/proxy/vmess/outbound
+github.com/xtls/xray-core/proxy/wireguard
+github.com/xtls/xray-core/proxy/wireguard/gvisortun
+github.com/xtls/xray-core/transport
+github.com/xtls/xray-core/transport/internet
+github.com/xtls/xray-core/transport/internet/browser_dialer
+github.com/xtls/xray-core/transport/internet/finalmask
+github.com/xtls/xray-core/transport/internet/finalmask/fragment
+github.com/xtls/xray-core/transport/internet/finalmask/header/custom
+github.com/xtls/xray-core/transport/internet/finalmask/header/dns
+github.com/xtls/xray-core/transport/internet/finalmask/header/dtls
+github.com/xtls/xray-core/transport/internet/finalmask/header/srtp
+github.com/xtls/xray-core/transport/internet/finalmask/header/utp
+github.com/xtls/xray-core/transport/internet/finalmask/header/wechat
+github.com/xtls/xray-core/transport/internet/finalmask/header/wireguard
+github.com/xtls/xray-core/transport/internet/finalmask/mkcp/aes128gcm
+github.com/xtls/xray-core/transport/internet/finalmask/mkcp/original
+github.com/xtls/xray-core/transport/internet/finalmask/noise
+github.com/xtls/xray-core/transport/internet/finalmask/salamander
+github.com/xtls/xray-core/transport/internet/finalmask/sudoku
+github.com/xtls/xray-core/transport/internet/finalmask/xdns
+github.com/xtls/xray-core/transport/internet/finalmask/xicmp
+github.com/xtls/xray-core/transport/internet/grpc
+github.com/xtls/xray-core/transport/internet/grpc/encoding
+github.com/xtls/xray-core/transport/internet/headers/http
+github.com/xtls/xray-core/transport/internet/headers/noop
+github.com/xtls/xray-core/transport/internet/httpupgrade
+github.com/xtls/xray-core/transport/internet/hysteria
+github.com/xtls/xray-core/transport/internet/hysteria/congestion
+github.com/xtls/xray-core/transport/internet/hysteria/congestion/bbr
+github.com/xtls/xray-core/transport/internet/hysteria/congestion/brutal
+github.com/xtls/xray-core/transport/internet/hysteria/congestion/common
+github.com/xtls/xray-core/transport/internet/hysteria/padding
+github.com/xtls/xray-core/transport/internet/hysteria/udphop
+github.com/xtls/xray-core/transport/internet/kcp
+github.com/xtls/xray-core/transport/internet/reality
+github.com/xtls/xray-core/transport/internet/splithttp
+github.com/xtls/xray-core/transport/internet/stat
+github.com/xtls/xray-core/transport/internet/tagged
+github.com/xtls/xray-core/transport/internet/tcp
+github.com/xtls/xray-core/transport/internet/tls
+github.com/xtls/xray-core/transport/internet/udp
+github.com/xtls/xray-core/transport/internet/websocket
+github.com/xtls/xray-core/transport/pipe
+# github.com/zeebo/blake3 v0.2.4
+## explicit; go 1.18
+github.com/zeebo/blake3
+github.com/zeebo/blake3/internal/alg
+github.com/zeebo/blake3/internal/alg/compress
+github.com/zeebo/blake3/internal/alg/compress/compress_pure
+github.com/zeebo/blake3/internal/alg/compress/compress_sse41
+github.com/zeebo/blake3/internal/alg/hash
+github.com/zeebo/blake3/internal/alg/hash/hash_avx2
+github.com/zeebo/blake3/internal/alg/hash/hash_pure
+github.com/zeebo/blake3/internal/consts
+github.com/zeebo/blake3/internal/utils
+# gitlab.com/yawning/chacha20.git v0.0.0-20230427033715-7877545b1b37
+## explicit; go 1.12
+gitlab.com/yawning/chacha20.git
+gitlab.com/yawning/chacha20.git/internal/api
+gitlab.com/yawning/chacha20.git/internal/hardware
+gitlab.com/yawning/chacha20.git/internal/ref
+# go.uber.org/multierr v1.11.0
+## explicit; go 1.19
+go.uber.org/multierr
+# go.uber.org/zap v1.27.1
+## explicit; go 1.19
+go.uber.org/zap
+go.uber.org/zap/buffer
+go.uber.org/zap/internal
+go.uber.org/zap/internal/bufferpool
+go.uber.org/zap/internal/color
+go.uber.org/zap/internal/exit
+go.uber.org/zap/internal/pool
+go.uber.org/zap/internal/stacktrace
+go.uber.org/zap/zapcore
+# go.uber.org/zap/exp v0.3.0
+## explicit; go 1.19
+go.uber.org/zap/exp/zapslog
+# go4.org/netipx v0.0.0-20231129151722-fdeea329fbba
+## explicit; go 1.18
+go4.org/netipx
+# golang.org/x/crypto v0.54.0
+## explicit; go 1.25.0
+golang.org/x/crypto/argon2
+golang.org/x/crypto/blake2b
+golang.org/x/crypto/blake2s
+golang.org/x/crypto/blowfish
+golang.org/x/crypto/cast5
+golang.org/x/crypto/chacha20
+golang.org/x/crypto/chacha20poly1305
+golang.org/x/crypto/cryptobyte
+golang.org/x/crypto/cryptobyte/asn1
+golang.org/x/crypto/curve25519
+golang.org/x/crypto/hkdf
+golang.org/x/crypto/internal/alias
+golang.org/x/crypto/internal/poly1305
+golang.org/x/crypto/ocsp
+golang.org/x/crypto/pbkdf2
+golang.org/x/crypto/poly1305
+golang.org/x/crypto/salsa20/salsa
+golang.org/x/crypto/sha3
+# golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f
+## explicit; go 1.25.0
+golang.org/x/exp/constraints
+golang.org/x/exp/slices
+# golang.org/x/mod v0.37.0
+## explicit; go 1.25.0
+golang.org/x/mod/semver
+# golang.org/x/net v0.57.0
+## explicit; go 1.25.0
+golang.org/x/net/bpf
+golang.org/x/net/dns/dnsmessage
+golang.org/x/net/http/httpguts
+golang.org/x/net/http2
+golang.org/x/net/http2/h2c
+golang.org/x/net/http2/hpack
+golang.org/x/net/icmp
+golang.org/x/net/idna
+golang.org/x/net/internal/httpcommon
+golang.org/x/net/internal/httpsfv
+golang.org/x/net/internal/iana
+golang.org/x/net/internal/socket
+golang.org/x/net/internal/timeseries
+golang.org/x/net/ipv4
+golang.org/x/net/ipv6
+golang.org/x/net/publicsuffix
+golang.org/x/net/route
+golang.org/x/net/trace
+# golang.org/x/sync v0.22.0
+## explicit; go 1.25.0
+golang.org/x/sync/errgroup
+golang.org/x/sync/semaphore
+golang.org/x/sync/singleflight
+# golang.org/x/sys v0.47.0
+## explicit; go 1.25.0
+golang.org/x/sys/cpu
+golang.org/x/sys/unix
+golang.org/x/sys/windows
+golang.org/x/sys/windows/registry
+# golang.org/x/text v0.40.0
+## explicit; go 1.25.0
+golang.org/x/text/internal/language
+golang.org/x/text/internal/language/compact
+golang.org/x/text/internal/tag
+golang.org/x/text/language
+golang.org/x/text/secure/bidirule
+golang.org/x/text/transform
+golang.org/x/text/unicode/bidi
+golang.org/x/text/unicode/norm
+# golang.org/x/time v0.15.0
+## explicit; go 1.25.0
+golang.org/x/time/rate
+# golang.org/x/tools v0.47.0
+## explicit; go 1.25.0
+golang.org/x/tools/go/ast/edge
+golang.org/x/tools/go/ast/inspector
+golang.org/x/tools/go/gcexportdata
+golang.org/x/tools/go/packages
+golang.org/x/tools/go/types/objectpath
+golang.org/x/tools/go/types/typeutil
+golang.org/x/tools/internal/aliases
+golang.org/x/tools/internal/event
+golang.org/x/tools/internal/event/core
+golang.org/x/tools/internal/event/keys
+golang.org/x/tools/internal/event/label
+golang.org/x/tools/internal/gcimporter
+golang.org/x/tools/internal/gocommand
+golang.org/x/tools/internal/packagesinternal
+golang.org/x/tools/internal/pkgbits
+golang.org/x/tools/internal/stdlib
+golang.org/x/tools/internal/typeparams
+golang.org/x/tools/internal/typesinternal
+golang.org/x/tools/internal/versions
+# golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2
+## explicit; go 1.17
+golang.zx2c4.com/wintun
+# golang.zx2c4.com/wireguard v0.0.0-20250521234502-f333402bd9cb
+## explicit; go 1.23.1
+golang.zx2c4.com/wireguard/conn
+golang.zx2c4.com/wireguard/conn/winrio
+golang.zx2c4.com/wireguard/device
+golang.zx2c4.com/wireguard/ipc
+golang.zx2c4.com/wireguard/ipc/namedpipe
+golang.zx2c4.com/wireguard/ratelimiter
+golang.zx2c4.com/wireguard/replay
+golang.zx2c4.com/wireguard/rwcancel
+golang.zx2c4.com/wireguard/tai64n
+golang.zx2c4.com/wireguard/tun
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217
+## explicit; go 1.24.0
+google.golang.org/genproto/googleapis/rpc/status
+# google.golang.org/grpc v1.79.3
+## explicit; go 1.24.0
+google.golang.org/grpc
+google.golang.org/grpc/attributes
+google.golang.org/grpc/backoff
+google.golang.org/grpc/balancer
+google.golang.org/grpc/balancer/base
+google.golang.org/grpc/balancer/endpointsharding
+google.golang.org/grpc/balancer/grpclb/state
+google.golang.org/grpc/balancer/pickfirst
+google.golang.org/grpc/balancer/pickfirst/internal
+google.golang.org/grpc/balancer/roundrobin
+google.golang.org/grpc/binarylog/grpc_binarylog_v1
+google.golang.org/grpc/channelz
+google.golang.org/grpc/codes
+google.golang.org/grpc/connectivity
+google.golang.org/grpc/credentials
+google.golang.org/grpc/credentials/insecure
+google.golang.org/grpc/encoding
+google.golang.org/grpc/encoding/internal
+google.golang.org/grpc/encoding/proto
+google.golang.org/grpc/experimental/stats
+google.golang.org/grpc/grpclog
+google.golang.org/grpc/grpclog/internal
+google.golang.org/grpc/internal
+google.golang.org/grpc/internal/backoff
+google.golang.org/grpc/internal/balancer/gracefulswitch
+google.golang.org/grpc/internal/balancer/weight
+google.golang.org/grpc/internal/balancerload
+google.golang.org/grpc/internal/binarylog
+google.golang.org/grpc/internal/buffer
+google.golang.org/grpc/internal/channelz
+google.golang.org/grpc/internal/credentials
+google.golang.org/grpc/internal/envconfig
+google.golang.org/grpc/internal/grpclog
+google.golang.org/grpc/internal/grpcsync
+google.golang.org/grpc/internal/grpcutil
+google.golang.org/grpc/internal/idle
+google.golang.org/grpc/internal/metadata
+google.golang.org/grpc/internal/pretty
+google.golang.org/grpc/internal/proxyattributes
+google.golang.org/grpc/internal/resolver
+google.golang.org/grpc/internal/resolver/delegatingresolver
+google.golang.org/grpc/internal/resolver/dns
+google.golang.org/grpc/internal/resolver/dns/internal
+google.golang.org/grpc/internal/resolver/passthrough
+google.golang.org/grpc/internal/resolver/unix
+google.golang.org/grpc/internal/serviceconfig
+google.golang.org/grpc/internal/stats
+google.golang.org/grpc/internal/status
+google.golang.org/grpc/internal/syscall
+google.golang.org/grpc/internal/transport
+google.golang.org/grpc/internal/transport/networktype
+google.golang.org/grpc/keepalive
+google.golang.org/grpc/mem
+google.golang.org/grpc/metadata
+google.golang.org/grpc/peer
+google.golang.org/grpc/reflection
+google.golang.org/grpc/reflection/grpc_reflection_v1
+google.golang.org/grpc/reflection/grpc_reflection_v1alpha
+google.golang.org/grpc/reflection/internal
+google.golang.org/grpc/resolver
+google.golang.org/grpc/resolver/dns
+google.golang.org/grpc/serviceconfig
+google.golang.org/grpc/stats
+google.golang.org/grpc/status
+google.golang.org/grpc/tap
+# google.golang.org/protobuf v1.36.11
+## explicit; go 1.23
+google.golang.org/protobuf/encoding/protojson
+google.golang.org/protobuf/encoding/prototext
+google.golang.org/protobuf/encoding/protowire
+google.golang.org/protobuf/internal/descfmt
+google.golang.org/protobuf/internal/descopts
+google.golang.org/protobuf/internal/detrand
+google.golang.org/protobuf/internal/editiondefaults
+google.golang.org/protobuf/internal/editionssupport
+google.golang.org/protobuf/internal/encoding/defval
+google.golang.org/protobuf/internal/encoding/json
+google.golang.org/protobuf/internal/encoding/messageset
+google.golang.org/protobuf/internal/encoding/tag
+google.golang.org/protobuf/internal/encoding/text
+google.golang.org/protobuf/internal/errors
+google.golang.org/protobuf/internal/filedesc
+google.golang.org/protobuf/internal/filetype
+google.golang.org/protobuf/internal/flags
+google.golang.org/protobuf/internal/genid
+google.golang.org/protobuf/internal/impl
+google.golang.org/protobuf/internal/order
+google.golang.org/protobuf/internal/pragma
+google.golang.org/protobuf/internal/protolazy
+google.golang.org/protobuf/internal/set
+google.golang.org/protobuf/internal/strs
+google.golang.org/protobuf/internal/version
+google.golang.org/protobuf/proto
+google.golang.org/protobuf/protoadapt
+google.golang.org/protobuf/reflect/protodesc
+google.golang.org/protobuf/reflect/protoreflect
+google.golang.org/protobuf/reflect/protoregistry
+google.golang.org/protobuf/runtime/protoiface
+google.golang.org/protobuf/runtime/protoimpl
+google.golang.org/protobuf/types/descriptorpb
+google.golang.org/protobuf/types/gofeaturespb
+google.golang.org/protobuf/types/known/anypb
+google.golang.org/protobuf/types/known/durationpb
+google.golang.org/protobuf/types/known/timestamppb
+# gopkg.in/yaml.v3 v3.0.1
+## explicit
+gopkg.in/yaml.v3
+# gvisor.dev/gvisor v0.0.0-20260122175437-89a5d21be8f0
+## explicit; go 1.25.5
+gvisor.dev/gvisor/pkg/atomicbitops
+gvisor.dev/gvisor/pkg/bits
+gvisor.dev/gvisor/pkg/buffer
+gvisor.dev/gvisor/pkg/context
+gvisor.dev/gvisor/pkg/cpuid
+gvisor.dev/gvisor/pkg/gohacks
+gvisor.dev/gvisor/pkg/goid
+gvisor.dev/gvisor/pkg/linewriter
+gvisor.dev/gvisor/pkg/log
+gvisor.dev/gvisor/pkg/rand
+gvisor.dev/gvisor/pkg/rawfile
+gvisor.dev/gvisor/pkg/refs
+gvisor.dev/gvisor/pkg/sleep
+gvisor.dev/gvisor/pkg/state
+gvisor.dev/gvisor/pkg/state/wire
+gvisor.dev/gvisor/pkg/sync
+gvisor.dev/gvisor/pkg/sync/locking
+gvisor.dev/gvisor/pkg/tcpip
+gvisor.dev/gvisor/pkg/tcpip/adapters/gonet
+gvisor.dev/gvisor/pkg/tcpip/checksum
+gvisor.dev/gvisor/pkg/tcpip/hash/jenkins
+gvisor.dev/gvisor/pkg/tcpip/header
+gvisor.dev/gvisor/pkg/tcpip/header/parse
+gvisor.dev/gvisor/pkg/tcpip/internal/tcp
+gvisor.dev/gvisor/pkg/tcpip/link/channel
+gvisor.dev/gvisor/pkg/tcpip/link/fdbased
+gvisor.dev/gvisor/pkg/tcpip/link/stopfd
+gvisor.dev/gvisor/pkg/tcpip/network/hash
+gvisor.dev/gvisor/pkg/tcpip/network/internal/fragmentation
+gvisor.dev/gvisor/pkg/tcpip/network/internal/ip
+gvisor.dev/gvisor/pkg/tcpip/network/internal/multicast
+gvisor.dev/gvisor/pkg/tcpip/network/ipv4
+gvisor.dev/gvisor/pkg/tcpip/network/ipv6
+gvisor.dev/gvisor/pkg/tcpip/ports
+gvisor.dev/gvisor/pkg/tcpip/seqnum
+gvisor.dev/gvisor/pkg/tcpip/stack
+gvisor.dev/gvisor/pkg/tcpip/stack/gro
+gvisor.dev/gvisor/pkg/tcpip/transport
+gvisor.dev/gvisor/pkg/tcpip/transport/icmp
+gvisor.dev/gvisor/pkg/tcpip/transport/internal/network
+gvisor.dev/gvisor/pkg/tcpip/transport/internal/noop
+gvisor.dev/gvisor/pkg/tcpip/transport/packet
+gvisor.dev/gvisor/pkg/tcpip/transport/raw
+gvisor.dev/gvisor/pkg/tcpip/transport/tcp
+gvisor.dev/gvisor/pkg/tcpip/transport/tcpconntrack
+gvisor.dev/gvisor/pkg/tcpip/transport/udp
+gvisor.dev/gvisor/pkg/waiter
+# lukechampine.com/blake3 v1.4.1
+## explicit; go 1.22
+lukechampine.com/blake3
+lukechampine.com/blake3/bao
+lukechampine.com/blake3/guts
+# github.com/xtls/xray-core => ./third_party/xray-core
+# github.com/sagernet/sing-box => ./third_party/sing-box

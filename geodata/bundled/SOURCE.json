@@ -1,0 +1,38 @@
+[
+  {
+    "file": "geosite.dat",
+    "url": "https://github.com/v2fly/domain-list-community/releases/download/20261020081451/dlc.dat",
+    "bytes": 2356428,
+    "sha256": "e687d2f31f16ddb759eb250187230354ab0542407fd786fbe9483f2302002671"
+  },
+  {
+    "file": "geoip.dat",
+    "url": "https://github.com/v2fly/geoip/releases/download/202610050438/geoip.dat",
+    "bytes": 23258601,
+    "sha256": "4ff4b2ec242a9e87b296ba27ddb85f8311e8d3e071eaebac5be9231c60e408dd"
+  },
+  {
+    "file": "domain-list-community-LICENSE",
+    "url": "https://raw.githubusercontent.com/v2fly/domain-list-community/20261020081451/LICENSE",
+    "bytes": 1067,
+    "sha256": "b9d84a22870d3f21c91a4c6e410c9cc51d00902f5233ad0c84011479244bf7d2"
+  },
+  {
+    "file": "geoip-LICENSE",
+    "url": "https://raw.githubusercontent.com/v2fly/geoip/202610050438/LICENSE",
+    "bytes": 20137,
+    "sha256": "5e436ff8ffbb77d8607220e9bce20c8915d860010feeb6c1ebef5a85688e9b39"
+  },
+  {
+    "file": "geoip-README.md",
+    "url": "https://raw.githubusercontent.com/v2fly/geoip/202610050438/README.md",
+    "bytes": 7636,
+    "sha256": "d0799db0e364386291dcaa6a79f1eeb90895a70cd30f37a4cb5cd5864cb16c52"
+  },
+  {
+    "file": "domain-list-community-README.md",
+    "url": "https://raw.githubusercontent.com/v2fly/domain-list-community/20261020081451/README.md",
+    "bytes": 8421,
+    "sha256": "fa5828bb946f23742bff971ed44057f9556eb0437fd38277e19314ff7d155197"
+  }
+]

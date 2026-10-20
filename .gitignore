@@ -1,0 +1,10 @@
+/bin/
+/dist/
+/ci-results/
+/release-notes.txt
+/state/
+__pycache__/
+*.pyc
+.env
+.env.*
+!*.example

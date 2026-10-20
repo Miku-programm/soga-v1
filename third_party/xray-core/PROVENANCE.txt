@@ -1,0 +1,42 @@
+Local fork of github.com/xtls/xray-core v1.260327.0
+Upstream: https://github.com/XTLS/Xray-core
+Tag commit: d2758a023cd7f4174a5a5fa4ff66e487d4342ba0
+Original Go module checksum: h1:g4TzxMwyPrxslZh6uD+FiG3lXKTrnNO+b4ky2OhogHE=
+Original go.mod checksum: h1:OXMlhBloFry8mw0KwWLWLd3RQyXJzEYsCGlgsX36h60=
+Copied from the task's verified module cache on 2026-10-21. No Git history
+was copied, the module cache was not modified, and upstream LICENSE
+(MPL-2.0) is retained. This is an upstream compatibility component, not
+recovered original Soga source.
+
+Local changes:
+- WaitReadCloser synchronizes response-body publication, cancellation and
+  ownership; late bodies are closed and blocked reads wake on cancellation.
+- Upload queue uses cancellation before waiting for writers, synchronizes
+  active-body handoff, serializes heap reads, and closes queued bodies once.
+  Closing a full queue now releases blocked producers instead of deadlocking.
+- uploadWriter records buffer lengths before ownership transfers to the pipe,
+  and releases still-unsubmitted buffers on failure. This removes a race with
+  the consumer clearing or releasing the already-transferred buffer.
+- DefaultDialerClient closed flag uses atomic.Bool across HTTP workers.
+- VLESS Vision inbound and outbound retain base pointers as unsafe.Pointer
+  and use unsafe.Add for field offsets. This preserves pointer provenance
+  under Go's checkptr instrumentation instead of converting through a stored
+  uintptr. No checkptr or race checks are disabled.
+- concurrency_regression_test.go exercises response publication, cancellation,
+  racing Set/Read/Close, queue cancellation, reader ownership, and partial
+  out-of-order packet reassembly.
+- TLS certificate reload workers clone shared source protobuf configuration;
+  certificate selection/publication is synchronized, and OCSP/reload updates
+  publish new certificate snapshots without mutating certificates already in
+  use by handshakes. A concurrent reload regression verifies both properties.
+- The upstream QUIC loopback test now waits on a completion channel instead
+  of an unsynchronized shared bool. This is a test-only race correction.
+
+Patch: LOCAL_CHANGES.patch (against the pristine tagged module).
+End-to-end tests are run separately by the reconstructed project's proxy
+package, including plain/encrypted XHTTP and Reality Vision loopback clients.
+The broader offline package checks exclude TestECHDial and TestECHDialFail,
+which require external Cloudflare/DNS service availability and are not local
+reconstruction acceptance tests.
+
+- Explicit configured legacy TLS suites also consult crypto/tls.InsecureCipherSuites, to support the supplied cipher-name/ID documentation; TLS defaults stay unchanged.

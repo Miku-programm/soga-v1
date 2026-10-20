@@ -1,0 +1,851 @@
+--- a/proxy/vless/inbound/inbound.go
++++ b/proxy/vless/inbound/inbound.go
+@@ -561,29 +561,29 @@
+ 				fallthrough // we will break Mux connections that contain TCP requests
+ 			case protocol.RequestCommandTCP:
+ 				var t reflect.Type
+-				var p uintptr
++				var p unsafe.Pointer
+ 				if commonConn, ok := connection.(*encryption.CommonConn); ok {
+ 					if _, ok := commonConn.Conn.(*encryption.XorConn); ok || !proxy.IsRAWTransportWithoutSecurity(iConn) {
+ 						inbound.CanSpliceCopy = 3 // full-random xorConn / non-RAW transport / another securityConn should not be penetrated
+ 					}
+ 					t = reflect.TypeOf(commonConn).Elem()
+-					p = uintptr(unsafe.Pointer(commonConn))
++					p = unsafe.Pointer(commonConn)
+ 				} else if tlsConn, ok := iConn.(*tls.Conn); ok {
+ 					if tlsConn.ConnectionState().Version != gotls.VersionTLS13 {
+ 						return errors.New(`failed to use `+requestAddons.Flow+`, found outer tls version `, tlsConn.ConnectionState().Version).AtWarning()
+ 					}
+ 					t = reflect.TypeOf(tlsConn.Conn).Elem()
+-					p = uintptr(unsafe.Pointer(tlsConn.Conn))
++					p = unsafe.Pointer(tlsConn.Conn)
+ 				} else if realityConn, ok := iConn.(*reality.Conn); ok {
+ 					t = reflect.TypeOf(realityConn.Conn).Elem()
+-					p = uintptr(unsafe.Pointer(realityConn.Conn))
++					p = unsafe.Pointer(realityConn.Conn)
+ 				} else {
+ 					return errors.New("XTLS only supports TLS and REALITY directly for now.").AtWarning()
+ 				}
+ 				i, _ := t.FieldByName("input")
+ 				r, _ := t.FieldByName("rawInput")
+-				input = (*bytes.Reader)(unsafe.Pointer(p + i.Offset))
+-				rawInput = (*bytes.Buffer)(unsafe.Pointer(p + r.Offset))
++				input = (*bytes.Reader)(unsafe.Add(p, i.Offset))
++				rawInput = (*bytes.Buffer)(unsafe.Add(p, r.Offset))
+ 			}
+ 		} else {
+ 			return errors.New("account " + account.ID.String() + " is not able to use the flow " + requestAddons.Flow).AtWarning()
+--- a/proxy/vless/outbound/outbound.go
++++ b/proxy/vless/outbound/outbound.go
+@@ -264,29 +264,29 @@
+ 			fallthrough // let server break Mux connections that contain TCP requests
+ 		case protocol.RequestCommandTCP, protocol.RequestCommandRvs:
+ 			var t reflect.Type
+-			var p uintptr
++			var p unsafe.Pointer
+ 			if commonConn, ok := conn.(*encryption.CommonConn); ok {
+ 				if _, ok := commonConn.Conn.(*encryption.XorConn); ok || !proxy.IsRAWTransportWithoutSecurity(iConn) {
+ 					ob.CanSpliceCopy = 3 // full-random xorConn / non-RAW transport / another securityConn should not be penetrated
+ 				}
+ 				t = reflect.TypeOf(commonConn).Elem()
+-				p = uintptr(unsafe.Pointer(commonConn))
++				p = unsafe.Pointer(commonConn)
+ 			} else if tlsConn, ok := iConn.(*tls.Conn); ok {
+ 				t = reflect.TypeOf(tlsConn.Conn).Elem()
+-				p = uintptr(unsafe.Pointer(tlsConn.Conn))
++				p = unsafe.Pointer(tlsConn.Conn)
+ 			} else if utlsConn, ok := iConn.(*tls.UConn); ok {
+ 				t = reflect.TypeOf(utlsConn.Conn).Elem()
+-				p = uintptr(unsafe.Pointer(utlsConn.Conn))
++				p = unsafe.Pointer(utlsConn.Conn)
+ 			} else if realityConn, ok := iConn.(*reality.UConn); ok {
+ 				t = reflect.TypeOf(realityConn.Conn).Elem()
+-				p = uintptr(unsafe.Pointer(realityConn.Conn))
++				p = unsafe.Pointer(realityConn.Conn)
+ 			} else {
+ 				return errors.New("XTLS only supports TLS and REALITY directly for now.").AtWarning()
+ 			}
+ 			i, _ := t.FieldByName("input")
+ 			r, _ := t.FieldByName("rawInput")
+-			input = (*bytes.Reader)(unsafe.Pointer(p + i.Offset))
+-			rawInput = (*bytes.Buffer)(unsafe.Pointer(p + r.Offset))
++			input = (*bytes.Reader)(unsafe.Add(p, i.Offset))
++			rawInput = (*bytes.Buffer)(unsafe.Add(p, r.Offset))
+ 		default:
+ 			panic("unknown VLESS request command")
+ 		}
+--- a/transport/internet/splithttp/client.go
++++ b/transport/internet/splithttp/client.go
+@@ -8,6 +8,7 @@
+ 	"net/http"
+ 	"net/http/httptrace"
+ 	"sync"
++	"sync/atomic"
+ 
+ 	"github.com/xtls/xray-core/common"
+ 	"github.com/xtls/xray-core/common/buf"
+@@ -31,7 +32,7 @@
+ type DefaultDialerClient struct {
+ 	transportConfig *Config
+ 	client          *http.Client
+-	closed          bool
++	closed          atomic.Bool
+ 	httpVersion     string
+ 	// pool of net.Conn, created using dialUploadConn
+ 	uploadRawPool  *sync.Pool
+@@ -39,7 +40,7 @@
+ }
+ 
+ func (c *DefaultDialerClient) IsClosed() bool {
+-	return c.closed
++	return c.closed.Load()
+ }
+ 
+ func (c *DefaultDialerClient) OpenStream(ctx context.Context, url string, sessionId string, body io.Reader, uploadOnly bool) (wrc io.ReadCloser, remoteAddr, localAddr net.Addr, err error) {
+@@ -67,7 +68,7 @@
+ 		resp, err := c.client.Do(req)
+ 		if err != nil {
+ 			if !uploadOnly { // stream-down is enough
+-				c.closed = true
++				c.closed.Store(true)
+ 				errors.LogInfoInner(ctx, err, "failed to "+method+" "+url)
+ 			}
+ 			gotConn.Close()
+@@ -101,7 +102,7 @@
+ 	if c.httpVersion != "1.1" {
+ 		resp, err := c.client.Do(req)
+ 		if err != nil {
+-			c.closed = true
++			c.closed.Store(true)
+ 			return err
+ 		}
+ 
+@@ -141,7 +142,7 @@
+ 				if h1UploadConn.UnreadedResponsesCount > 0 {
+ 					resp, err := http.ReadResponse(h1UploadConn.RespBufReader, req)
+ 					if err != nil {
+-						c.closed = true
++						c.closed.Store(true)
+ 						return fmt.Errorf("error while reading response: %s", err.Error())
+ 					}
+ 					io.Copy(io.Discard, resp.Body)
+@@ -170,39 +171,56 @@
+ 	return nil
+ }
+ 
++// WaitReadCloser publishes one response body and allows cancellation before it
++// arrives. The body must support concurrent Read and Close (as HTTP bodies do).
+ type WaitReadCloser struct {
+-	Wait chan struct{}
+-	io.ReadCloser
++	Wait   chan struct{}
++	mu     sync.Mutex
++	reader io.ReadCloser
++	ready  bool
++	closed bool
+ }
+ 
+ func (w *WaitReadCloser) Set(rc io.ReadCloser) {
+-	w.ReadCloser = rc
+-	defer func() {
+-		if recover() != nil {
++	w.mu.Lock()
++	if w.closed || w.ready {
++		w.mu.Unlock()
++		if rc != nil {
+ 			rc.Close()
+ 		}
+-	}()
++		return
++	}
++	w.reader = rc
++	w.ready = true
+ 	close(w.Wait)
++	w.mu.Unlock()
+ }
+ 
+ func (w *WaitReadCloser) Read(b []byte) (int, error) {
+-	if w.ReadCloser == nil {
+-		if <-w.Wait; w.ReadCloser == nil {
+-			return 0, io.ErrClosedPipe
+-		}
+-	}
+-	return w.ReadCloser.Read(b)
++	<-w.Wait
++	w.mu.Lock()
++	rc, closed := w.reader, w.closed
++	w.mu.Unlock()
++	if closed || rc == nil {
++		return 0, io.ErrClosedPipe
++	}
++	return rc.Read(b)
+ }
+ 
+ func (w *WaitReadCloser) Close() error {
+-	if w.ReadCloser != nil {
+-		return w.ReadCloser.Close()
+-	}
+-	defer func() {
+-		if recover() != nil && w.ReadCloser != nil {
+-			w.ReadCloser.Close()
+-		}
+-	}()
+-	close(w.Wait)
++	w.mu.Lock()
++	if w.closed {
++		w.mu.Unlock()
++		return nil
++	}
++	w.closed = true
++	if !w.ready {
++		close(w.Wait)
++	}
++	rc := w.reader
++	w.mu.Unlock()
++	if rc != nil {
++		return rc.Close()
++	}
+ 	return nil
+ }
+--- /dev/null
++++ b/transport/internet/splithttp/concurrency_regression_test.go
+@@ -0,0 +1,188 @@
++package splithttp
++
++import (
++	"bytes"
++	"io"
++	"sync"
++	"sync/atomic"
++	"testing"
++	"time"
++
++	"github.com/xtls/xray-core/common/buf"
++	"github.com/xtls/xray-core/transport/pipe"
++)
++
++type countedBody struct {
++	io.ReadCloser
++	closes atomic.Int32
++}
++
++func (b *countedBody) Close() error { b.closes.Add(1); return b.ReadCloser.Close() }
++func awaitResult[T any](t *testing.T, c <-chan T) T {
++	t.Helper()
++	select {
++	case r := <-c:
++		return r
++	case <-time.After(3 * time.Second):
++		t.Fatal("operation did not unblock")
++		var zero T
++		return zero
++	}
++}
++
++func TestWaitReadCloserPublishesBody(t *testing.T) {
++	for i := 0; i < 100; i++ {
++		w := &WaitReadCloser{Wait: make(chan struct{})}
++		got := make(chan string, 1)
++		go func() {
++			p, e := io.ReadAll(w)
++			if e != nil {
++				got <- "error: " + e.Error()
++				return
++			}
++			got <- string(p)
++		}()
++		body := &countedBody{ReadCloser: io.NopCloser(bytes.NewBufferString("complete response"))}
++		w.Set(body)
++		if s := awaitResult(t, got); s != "complete response" {
++			t.Fatal(s)
++		}
++		w.Close()
++		w.Close()
++		if body.closes.Load() != 1 {
++			t.Fatal("body not closed exactly once")
++		}
++	}
++}
++func TestWaitReadCloserCloseBeforeSet(t *testing.T) {
++	w := &WaitReadCloser{Wait: make(chan struct{})}
++	result := make(chan error, 1)
++	go func() { _, e := w.Read(make([]byte, 1)); result <- e }()
++	w.Close()
++	if e := awaitResult(t, result); e != io.ErrClosedPipe {
++		t.Fatal(e)
++	}
++	body := &countedBody{ReadCloser: io.NopCloser(bytes.NewReader(nil))}
++	w.Set(body)
++	if body.closes.Load() != 1 {
++		t.Fatal("late body leaked")
++	}
++}
++func TestWaitReadCloserSetCloseRace(t *testing.T) {
++	for i := 0; i < 100; i++ {
++		w := &WaitReadCloser{Wait: make(chan struct{})}
++		r, p := io.Pipe()
++		body := &countedBody{ReadCloser: r}
++		var wg sync.WaitGroup
++		wg.Add(3)
++		go func() { defer wg.Done(); w.Set(body) }()
++		go func() { defer wg.Done(); w.Close() }()
++		go func() { defer wg.Done(); w.Read(make([]byte, 1)) }()
++		done := make(chan bool, 1)
++		go func() { wg.Wait(); done <- true }()
++		awaitResult(t, done)
++		p.Close()
++		if body.closes.Load() != 1 {
++			t.Fatal("racing body not closed exactly once")
++		}
++	}
++}
++func TestUploadQueueOrderedPartialReads(t *testing.T) {
++	q := NewUploadQueue(4)
++	defer q.Close()
++	for _, p := range []Packet{{Seq: 2, Payload: []byte("ef")}, {Seq: 0, Payload: []byte("ab")}, {Seq: 1, Payload: []byte("cd")}} {
++		if e := q.Push(p); e != nil {
++			t.Fatal(e)
++		}
++	}
++	var got []byte
++	for len(got) < 6 {
++		b := make([]byte, 1)
++		n, e := q.Read(b)
++		if e != nil {
++			t.Fatal(e)
++		}
++		got = append(got, b[:n]...)
++	}
++	if string(got) != "abcdef" {
++		t.Fatal(string(got))
++	}
++}
++func TestUploadQueueCloseUnblocksFullPush(t *testing.T) {
++	q := NewUploadQueue(1)
++	q.Push(Packet{Seq: 0, Payload: []byte("a")})
++	pushed := make(chan error, 1)
++	go func() { pushed <- q.Push(Packet{Seq: 1}) }()
++	closed := make(chan error, 1)
++	go func() { closed <- q.Close() }()
++	awaitResult(t, closed)
++	if e := awaitResult(t, pushed); e == nil {
++		t.Fatal("push after cancellation succeeded")
++	}
++}
++func TestUploadQueueCloseUnblocksEmptyRead(t *testing.T) {
++	q := NewUploadQueue(1)
++	read := make(chan error, 1)
++	go func() { _, e := q.Read(make([]byte, 1)); read <- e }()
++	q.Close()
++	if e := awaitResult(t, read); e != io.EOF {
++		t.Fatal(e)
++	}
++}
++func TestUploadQueueReaderCloseRace(t *testing.T) {
++	for i := 0; i < 100; i++ {
++		q := NewUploadQueue(1)
++		r, p := io.Pipe()
++		body := &countedBody{ReadCloser: r}
++		if e := q.Push(Packet{Reader: body}); e != nil {
++			t.Fatal(e)
++		}
++		read := make(chan error, 1)
++		go func() { _, e := q.Read(make([]byte, 1)); read <- e }()
++		q.Close()
++		q.Close()
++		awaitResult(t, read)
++		p.Close()
++		if body.closes.Load() != 1 {
++			t.Fatalf("body closes: %d", body.closes.Load())
++		}
++	}
++}
++func TestUploadQueueClosesQueuedReader(t *testing.T) {
++	q := NewUploadQueue(1)
++	body := &countedBody{ReadCloser: io.NopCloser(bytes.NewReader(nil))}
++	q.Push(Packet{Reader: body})
++	q.Close()
++	if body.closes.Load() != 1 {
++		t.Fatal("queued body leaked")
++	}
++}
++
++func TestUploadWriterTransfersBufferOwnership(t *testing.T) {
++	reader, writer := pipe.New(pipe.WithSizeLimit(0))
++	w := uploadWriter{Writer: writer, maxLen: buf.Size}
++	result := make(chan int, 1)
++	go func() {
++		total := 0
++		for {
++			data, err := reader.ReadMultiBuffer()
++			if err != nil {
++				result <- total
++				return
++			}
++			total += int(data.Len())
++			buf.ReleaseMulti(data)
++		}
++	}()
++	payload := bytes.Repeat([]byte("x"), int(buf.Size)*3+17)
++	for i := 0; i < 500; i++ {
++		n, err := w.Write(payload)
++		if err != nil || n != len(payload) {
++			t.Fatalf("write %d: %d, %v", i, n, err)
++		}
++	}
++	writer.Close()
++	if got := awaitResult(t, result); got != len(payload)*500 {
++		t.Fatalf("received %d bytes", got)
++	}
++}
+--- a/transport/internet/splithttp/dialer.go
++++ b/transport/internet/splithttp/dialer.go
+@@ -606,12 +606,17 @@
+ 	common.Must2(buffer.Write(b))
+ 
+ 	var writed int
+-	for _, buff := range buffer.MultiBuffer {
++	for i, buff := range buffer.MultiBuffer {
++		// WriteMultiBuffer transfers ownership, including on error. A reader
++		// can consume/release buff before the call returns, so retain its
++		// length before handing it to the pipe.
++		n := int(buff.Len())
+ 		err := w.WriteMultiBuffer(buf.MultiBuffer{buff})
+ 		if err != nil {
++			buf.ReleaseMulti(buffer.MultiBuffer[i+1:])
+ 			return writed, err
+ 		}
+-		writed += int(buff.Len())
++		writed += n
+ 	}
+ 	return writed, nil
+ }
+--- a/transport/internet/splithttp/splithttp_test.go
++++ b/transport/internet/splithttp/splithttp_test.go
+@@ -245,7 +245,7 @@
+ 		},
+ 	}
+ 
+-	serverClosed := false
++	serverClosed := make(chan struct{})
+ 	listen, err := ListenXH(context.Background(), net.LocalHostIP, listenPort, streamSettings, func(conn stat.Connection) {
+ 		go func() {
+ 			defer conn.Close()
+@@ -261,7 +261,7 @@
+ 				common.Must2(conn.Write(b.Bytes()))
+ 			}
+ 
+-			serverClosed = true
++			close(serverClosed)
+ 		}()
+ 	})
+ 	common.Must(err)
+@@ -294,8 +294,9 @@
+ 	}
+ 
+ 	conn.Close()
+-	time.Sleep(100 * time.Millisecond)
+-	if !serverClosed {
++	select {
++	case <-serverClosed:
++	case <-time.After(time.Second):
+ 		t.Error("server did not get closed")
+ 	}
+ 
+--- a/transport/internet/splithttp/upload_queue.go
++++ b/transport/internet/splithttp/upload_queue.go
+@@ -6,7 +6,6 @@
+ import (
+ 	"container/heap"
+ 	"io"
+-	"runtime"
+ 	"sync"
+ 
+ 	"github.com/xtls/xray-core/common/errors"
+@@ -18,127 +17,175 @@
+ 	Seq     uint64
+ }
+ 
++// The read mutex owns heap/sequence state. State mutex only protects the active
++// body; Close must never wait for a potentially blocking Read while holding it.
+ type uploadQueue struct {
+ 	reader          io.ReadCloser
++	readerMutex     sync.Mutex
++	readMutex       sync.Mutex
+ 	nomore          bool
+ 	pushedPackets   chan Packet
+ 	writeCloseMutex sync.Mutex
++	done            chan struct{}
++	closeOnce       sync.Once
+ 	heap            uploadHeap
+ 	nextSeq         uint64
+-	closed          bool
+ 	maxPackets      int
+ }
+ 
+ func NewUploadQueue(maxPackets int) *uploadQueue {
+ 	return &uploadQueue{
+ 		pushedPackets: make(chan Packet, maxPackets),
++		done:          make(chan struct{}),
+ 		heap:          uploadHeap{},
+-		nextSeq:       0,
+-		closed:        false,
+ 		maxPackets:    maxPackets,
++	}
++}
++
++func (h *uploadQueue) isClosed() bool {
++	select {
++	case <-h.done:
++		return true
++	default:
++		return false
+ 	}
+ }
+ 
+ func (h *uploadQueue) Push(p Packet) error {
+ 	h.writeCloseMutex.Lock()
+ 	defer h.writeCloseMutex.Unlock()
+-
+-	if h.closed {
++	if h.isClosed() {
+ 		return errors.New("packet queue closed")
+ 	}
+ 	if h.nomore {
+ 		return errors.New("h.reader already exists")
+ 	}
+-	if p.Reader != nil {
+-		h.nomore = true
+-	}
+-	h.pushedPackets <- p
+-	return nil
++	select {
++	case <-h.done:
++		return errors.New("packet queue closed")
++	case h.pushedPackets <- p:
++		if p.Reader != nil {
++			h.nomore = true
++		}
++		return nil
++	}
+ }
+ 
+ func (h *uploadQueue) Close() error {
+-	h.writeCloseMutex.Lock()
+-	defer h.writeCloseMutex.Unlock()
+-
+-	if !h.closed {
+-		h.closed = true
+-		runtime.Gosched() // hope Read() gets the packet
+-	f:
++	var closeErr error
++	h.closeOnce.Do(func() {
++		// Cancel first so a Push blocked on a full channel can release its lock.
++		close(h.done)
++		h.writeCloseMutex.Lock()
++		var queued []io.ReadCloser
++	drain:
+ 		for {
+ 			select {
+ 			case p := <-h.pushedPackets:
+ 				if p.Reader != nil {
+-					h.reader = p.Reader
++					queued = append(queued, p.Reader)
+ 				}
+ 			default:
+-				break f
+-			}
+-		}
+-		close(h.pushedPackets)
+-	}
+-	if h.reader != nil {
+-		return h.reader.Close()
+-	}
+-	return nil
++				break drain
++			}
++		}
++		h.writeCloseMutex.Unlock()
++		h.readerMutex.Lock()
++		rc := h.reader
++		h.readerMutex.Unlock()
++		if rc != nil {
++			closeErr = rc.Close()
++		}
++		for _, rc := range queued {
++			if err := rc.Close(); closeErr == nil {
++				closeErr = err
++			}
++		}
++	})
++	return closeErr
++}
++
++// acceptReader transfers ownership exactly once, even when Close races with a
++// channel receive. A receiver that loses to Close must close its own body.
++func (h *uploadQueue) acceptReader(rc io.ReadCloser) bool {
++	h.readerMutex.Lock()
++	if h.isClosed() {
++		h.readerMutex.Unlock()
++		rc.Close()
++		return false
++	}
++	h.reader = rc
++	h.readerMutex.Unlock()
++	return true
++}
++
++func (h *uploadQueue) nextPacket() (Packet, bool) {
++	select {
++	case <-h.done:
++		return Packet{}, false
++	case p := <-h.pushedPackets:
++		return p, true
++	}
+ }
+ 
+ func (h *uploadQueue) Read(b []byte) (int, error) {
+-	if h.reader != nil {
+-		return h.reader.Read(b)
+-	}
+-
+-	if h.closed {
++	h.readMutex.Lock()
++	defer h.readMutex.Unlock()
++	if h.isClosed() {
+ 		return 0, io.EOF
+ 	}
+-
++	h.readerMutex.Lock()
++	rc := h.reader
++	h.readerMutex.Unlock()
++	if rc != nil {
++		return rc.Read(b)
++	}
+ 	if len(h.heap) == 0 {
+-		packet, more := <-h.pushedPackets
++		p, more := h.nextPacket()
+ 		if !more {
+ 			return 0, io.EOF
+ 		}
+-		if packet.Reader != nil {
+-			h.reader = packet.Reader
+-			return h.reader.Read(b)
+-		}
+-		heap.Push(&h.heap, packet)
+-	}
+-
++		if p.Reader != nil {
++			if !h.acceptReader(p.Reader) {
++				return 0, io.EOF
++			}
++			return p.Reader.Read(b)
++		}
++		heap.Push(&h.heap, p)
++	}
+ 	for len(h.heap) > 0 {
++		if h.isClosed() {
++			return 0, io.EOF
++		}
+ 		packet := heap.Pop(&h.heap).(Packet)
+-		n := 0
+-
+ 		if packet.Seq == h.nextSeq {
+-			copy(b, packet.Payload)
+-			n = min(len(b), len(packet.Payload))
+-
++			n := copy(b, packet.Payload)
+ 			if n < len(packet.Payload) {
+-				// partial read
+ 				packet.Payload = packet.Payload[n:]
+ 				heap.Push(&h.heap, packet)
+ 			} else {
+ 				h.nextSeq = packet.Seq + 1
+ 			}
+-
+ 			return n, nil
+ 		}
+-
+-		// misordered packet
+ 		if packet.Seq > h.nextSeq {
+ 			if len(h.heap) > h.maxPackets {
+-				// the "reassembly buffer" is too large, and we want to
+-				// constrain memory usage somehow. let's tear down the
+-				// connection, and hope the application retries.
+ 				return 0, errors.New("packet queue is too large")
+ 			}
+ 			heap.Push(&h.heap, packet)
+-			packet2, more := <-h.pushedPackets
++			p, more := h.nextPacket()
+ 			if !more {
+ 				return 0, io.EOF
+ 			}
+-			heap.Push(&h.heap, packet2)
+-		}
+-	}
+-
++			if p.Reader != nil {
++				if !h.acceptReader(p.Reader) {
++					return 0, io.EOF
++				}
++				return p.Reader.Read(b)
++			}
++			heap.Push(&h.heap, p)
++		}
++	}
+ 	return 0, nil
+ }
+ 
+--- a/transport/internet/tls/config.go
++++ b/transport/internet/tls/config.go
+@@ -19,9 +19,14 @@
+ 	"github.com/xtls/xray-core/common/platform/filesystem"
+ 	"github.com/xtls/xray-core/common/protocol/tls/cert"
+ 	"github.com/xtls/xray-core/transport/internet"
++	"google.golang.org/protobuf/proto"
+ )
+ 
+ var globalSessionCache = tls.NewLRUClientSessionCache(128)
++
++// Protect publication of certificates to GetCertificate callbacks. Published
++// certificate objects remain immutable for the lifetime of a TLS handshake.
++var certificateAccess sync.RWMutex
+ 
+ // ParseCertificate converts a cert.Certificate to Certificate.
+ func ParseCertificate(c *cert.Certificate) *Certificate {
+@@ -48,7 +53,10 @@
+ // BuildCertificates builds a list of TLS certificates from proto definition.
+ func (c *Config) BuildCertificates() []*tls.Certificate {
+ 	certs := make([]*tls.Certificate, 0, len(c.Certificate))
+-	for _, entry := range c.Certificate {
++	for _, source := range c.Certificate {
++		// Reload workers own their source bytes. The same Config may build
++		// independent TLS listeners, so it must not mutate shared proto input.
++		entry := proto.Clone(source).(*Certificate)
+ 		if entry.Usage != Certificate_ENCIPHERMENT {
+ 			continue
+ 		}
+@@ -66,13 +74,23 @@
+ 			return &keyPair
+ 		}
+ 		if keyPair := getX509KeyPair(); keyPair != nil {
++			certificateAccess.Lock()
+ 			certs = append(certs, keyPair)
++			certificateAccess.Unlock()
+ 		} else {
+ 			continue
+ 		}
+ 		index := len(certs) - 1
+ 		setupOcspTicker(entry, func(isReloaded, isOcspstapling bool) {
+-			cert := certs[index]
++			if !isReloaded && !isOcspstapling {
++				return
++			}
++			certificateAccess.RLock()
++			// Copy before changing OCSPStaple; an existing handshake may
++			// still be reading the previously published certificate.
++			snapshot := *certs[index]
++			certificateAccess.RUnlock()
++			cert := &snapshot
+ 			if isReloaded {
+ 				if newKeyPair := getX509KeyPair(); newKeyPair != nil {
+ 					cert = newKeyPair
+@@ -87,7 +105,9 @@
+ 					cert.OCSPStaple = newOCSPData
+ 				}
+ 			}
++			certificateAccess.Lock()
+ 			certs[index] = cert
++			certificateAccess.Unlock()
+ 		})
+ 	}
+ 	return certs
+@@ -245,6 +265,8 @@
+ 
+ func getNewGetCertificateFunc(certs []*tls.Certificate, rejectUnknownSNI bool) func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+ 	return func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
++		certificateAccess.RLock()
++		defer certificateAccess.RUnlock()
+ 		if len(certs) == 0 {
+ 			return nil, errNoCertificates
+ 		}
+@@ -448,7 +470,7 @@
+ 
+ 	if len(c.CipherSuites) > 0 {
+ 		id := make(map[string]uint16)
+-		for _, s := range tls.CipherSuites() {
++		for _, s := range append(tls.CipherSuites(), tls.InsecureCipherSuites()...) {
+ 			id[s.Name] = s.ID
+ 		}
+ 		for _, n := range strings.Split(c.CipherSuites, ":") {
+--- /dev/null
++++ b/transport/internet/tls/publication_regression_test.go
+@@ -0,0 +1,67 @@
++package tls
++
++import (
++	"bytes"
++	gotls "crypto/tls"
++	"os"
++	"path/filepath"
++	"sync"
++	"testing"
++	"time"
++
++	"github.com/xtls/xray-core/common/protocol/tls/cert"
++)
++
++func TestCertificateReloadPublishesImmutableSnapshots(t *testing.T) {
++	original, _ := cert.MustGenerate(nil, cert.CommonName("old.example"))
++	replacement, _ := cert.MustGenerate(nil, cert.CommonName("new.example"))
++	oldCert := ParseCertificate(original)
++	newCert := ParseCertificate(replacement)
++	dir := t.TempDir()
++	oldCert.CertificatePath = filepath.Join(dir, "cert.pem")
++	oldCert.KeyPath = filepath.Join(dir, "key.pem")
++	if e := os.WriteFile(oldCert.CertificatePath, newCert.Certificate, 0600); e != nil {
++		t.Fatal(e)
++	}
++	if e := os.WriteFile(oldCert.KeyPath, newCert.Key, 0600); e != nil {
++		t.Fatal(e)
++	}
++	beforeCert, beforeKey := bytes.Clone(oldCert.Certificate), bytes.Clone(oldCert.Key)
++	c := (&Config{Certificate: []*Certificate{oldCert}}).GetTLSConfig()
++	var wg sync.WaitGroup
++	for i := 0; i < 8; i++ {
++		wg.Add(1)
++		go func() {
++			defer wg.Done()
++			for j := 0; j < 1000; j++ {
++				got, e := c.GetCertificate(&gotls.ClientHelloInfo{})
++				if e != nil {
++					t.Error(e)
++					return
++				}
++				if got.Leaf.Subject.CommonName != "old.example" && got.Leaf.Subject.CommonName != "new.example" {
++					t.Error("corrupted certificate")
++					return
++				}
++			}
++		}()
++	}
++	deadline := time.Now().Add(3 * time.Second)
++	for {
++		got, e := c.GetCertificate(&gotls.ClientHelloInfo{})
++		if e != nil {
++			t.Fatal(e)
++		}
++		if got.Leaf.Subject.CommonName == "new.example" {
++			break
++		}
++		if time.Now().After(deadline) {
++			t.Fatal("reload was not published")
++		}
++		time.Sleep(time.Millisecond)
++	}
++	wg.Wait()
++	if !bytes.Equal(beforeCert, oldCert.Certificate) || !bytes.Equal(beforeKey, oldCert.Key) {
++		t.Fatal("reload mutated shared source Config")
++	}
++}

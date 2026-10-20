@@ -1,0 +1,50 @@
+本目录记录独立重建工程的本地验收，不代表原作者源码恢复或生产部署认证。
+
+验收范围
+
+regular-summary.json / regular-tests.jsonl：
+  根模块 go test ./...，CGO_ENABLED=0，使用任务内固定模块缓存；
+  GOPROXY=off、GOSUMDB=off，没有在测试时选择或下载新版本。
+race-summary.json / race-tests.jsonl：
+  根模块 go test -race -mod=vendor ./...，CGO_ENABLED=1；
+  测试使用本次随包 vendor，不关闭 race 或 checkptr。
+没有独立测试文件的辅助包单列为 packages_without_tests；
+测试用例因缺依赖而 Skip 会导致验收失败，不算通过。
+
+真实依赖
+
+两轮均使用临时 MariaDB 11.4.10、Redis 8.2.3、独立 Python SSR 客户端。
+数据库和 Redis 只绑定回环地址，测试数据为合成账号。
+regular-services.json / race-services.json 记录数据库启动、测试退出及停止结果。
+HTTP 面板协议使用本地 fixture 服务器；未连接用户的生产面板。
+
+在自己的测试环境复现
+
+1. 安装 Go 1.27.3，并确认 vendor/ 与 go.mod 匹配。
+2. 准备 redis-server、Python 3 和 testdata/ssr-reference/requirements.txt 的依赖。
+3. 准备专用临时 MySQL/MariaDB 实例及测试账号。数据库测试会创建和删除
+   随机命名的临时数据库；账号须有对应权限。
+4. 在工程根目录设置：
+     export REDIS_SERVER=/实际路径/redis-server
+     export SSR_REFERENCE_CLIENT="$PWD/testdata/ssr-reference/client.py"
+     export SOGA_TEST_MYSQL_DSN='测试用户:测试密码@tcp(127.0.0.1:测试端口)/?parseTime=true'
+     export GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off
+5. 执行：
+     CGO_ENABLED=0 go test -mod=vendor -p 2 -count=1 ./...
+     CGO_ENABLED=1 go test -mod=vendor -race -p 2 -count=1 ./...
+   race 需要宿主 C 编译器。未配置上述独立依赖时部分用例会明确 Skip；
+   这种结果不能代替交付时的完整验收。
+6. 构建及进程验收：
+     scripts/build.sh all
+     python3 scripts/smoke.py bin/soga-reconstructed-linux-amd64
+     python3 scripts/runtime_smoke.py bin/soga-reconstructed-linux-amd64
+
+交付边界
+
+源码支持 Linux amd64、arm64 构建；本次实际执行程序的架构为 amd64。
+Docker 文件已提供，但本环境没有完成真实 Docker build/run。
+未签发公共 CA 证书、未复现文档的长期压力测试、未验证公网环境。
+soga_panel_url/key 的自动 API 配置服务尚缺请求/响应契约。
+QUIC 隧道尚未建立可验证的原始传输链，配置会明确拒绝。
+逐篇文档和字段的分类见 文档覆盖说明.txt / docs-coverage.json。
+最终二进制哈希、已执行检查和这些边界汇总在 acceptance-summary.json。

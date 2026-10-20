@@ -1,0 +1,3 @@
+# Synthetic rule-list input
+domain:example.test # a local inline comment
+port:25

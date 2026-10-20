@@ -1,0 +1,263 @@
+--- upstream/client_option.go
++++ local/client_option.go
+@@ -1,6 +1,21 @@
+ package vmess
+ 
++import "github.com/gofrs/uuid/v5"
++
+ type ClientOption func(*Client)
++
++// ClientWithLegacyUUID permits interoperability testing of the historical
++// alterId=0 MD5 header, without changing its encryption or packet framing.
++func ClientWithLegacyUUID(id string) ClientOption {
++	return func(client *Client) {
++		user, err := uuid.FromString(id)
++		if err != nil {
++			user = uuid.NewV5(uuid.Nil, id)
++		}
++		client.alterId = 1
++		client.alterKey = [16]byte(user)
++	}
++}
+ 
+ func ClientWithGlobalPadding() ClientOption {
+ 	return func(client *Client) {
+--- upstream/service.go
++++ local/service.go
+@@ -13,6 +13,7 @@
+ 	"io"
+ 	"math"
+ 	"net"
++	"sync"
+ 	"time"
+ 	"unsafe"
+ 
+@@ -49,6 +50,10 @@
+ 	handler              Handler
+ 	time                 func() time.Time
+ 	disableHeaderProtect bool
++	authMode             string
++	reducedMemory        bool
++	authCache            AuthenticationCache
++	legacyAccess         sync.RWMutex
+ 	alterIds             map[U][][16]byte
+ 	alterIdUpdateTime    map[U]int64
+ 	alterIdMap           map[[16]byte]legacyUserEntry[U]
+@@ -91,9 +96,11 @@
+ 		if err != nil {
+ 			return err
+ 		}
+-		userIdCipherMap[user] = userIdCipher
+ 		alterId := alterIdList[i]
+-		if alterId > 0 {
++		if s.authMode == "aead" || (s.authMode != "md5" && alterId == 0) {
++			userIdCipherMap[user] = userIdCipher
++		}
++		if s.authMode != "aead" && alterId > 0 {
+ 			alterIds := make([][16]byte, 0, alterId)
+ 			currentId := userUUID
+ 			for j := 0; j < alterId; j++ {
+@@ -101,6 +108,9 @@
+ 				alterIds = append(alterIds, currentId)
+ 			}
+ 			userAlterIds[user] = alterIds
++		} else if s.authMode != "aead" {
++			// Documented compatibility: alterId=0 accepts UUID-based MD5.
++			userAlterIds[user] = [][16]byte{[16]byte(userUUID)}
+ 		}
+ 	}
+ 	s.userKey = userKeyMap
+@@ -141,18 +151,23 @@
+ }
+ 
+ func (s *Service[U]) generateLegacyKeys() {
++	s.legacyAccess.Lock()
++	defer s.legacyAccess.Unlock()
+ 	nowSec := s.time().Unix()
+-	endSec := nowSec + CacheDurationSeconds
++	window := int64(CacheDurationSeconds)
++	if s.reducedMemory {
++		window = 25
++	}
++	// Cover one 10-second refresh interval, then enforce the clock window
++	// separately at lookup. Rebuild the whole retained past window as well.
++	endSec := nowSec + window + 10
+ 	var hashValue [16]byte
+ 
+ 	userAlterIdMap := make(map[[16]byte]legacyUserEntry[U])
+ 	userAlterIdUpdateTime := make(map[U]int64)
+ 
+ 	for user, alterIds := range s.alterIds {
+-		beginSec := s.alterIdUpdateTime[user]
+-		if beginSec < nowSec-CacheDurationSeconds {
+-			beginSec = nowSec - CacheDurationSeconds
+-		}
++		beginSec := nowSec - window
+ 		for i, alterId := range alterIds {
+ 			idHash := hmac.New(md5.New, alterId[:])
+ 			for ts := beginSec; ts <= endSec; ts++ {
+@@ -198,34 +213,62 @@
+ 	var decodedId [16]byte
+ 	var user U
+ 	var found bool
+-	for currUser, userIdBlock := range s.userIdCipher {
++	authenticate := func(currUser U, userIdBlock cipher.Block) (bool, error) {
+ 		userIdBlock.Decrypt(decodedId[:], authId)
+ 		timestamp := int64(binary.BigEndian.Uint64(decodedId[:]))
+ 		checksum := binary.BigEndian.Uint32(decodedId[12:])
+ 		if crc32.ChecksumIEEE(decodedId[:12]) != checksum {
+-			continue
++			return false, nil
+ 		}
+ 		if math.Abs(math.Abs(float64(timestamp))-float64(time.Now().Unix())) > 120 {
+-			return ErrBadTimestamp
++			return false, ErrBadTimestamp
+ 		}
+ 		if !s.replayFilter.Check(decodedId[:]) {
+-			return ErrReplay
++			return false, ErrReplay
+ 		}
+ 		user = currUser
+-		found = true
+-		break
++		return true, nil
++	}
++	var cached U
++	var cachedPresent bool
++	if s.authCache != nil {
++		cached, cachedPresent = any(s.authCache.Candidate(source.Addr.String())).(U)
++		if block, ok := s.userIdCipher[cached]; cachedPresent && ok {
++			var err error
++			found, err = authenticate(cached, block)
++			if err != nil {
++				return err
++			}
++		}
++	}
++	if !found {
++		for currUser, userIdBlock := range s.userIdCipher {
++			if cachedPresent && currUser == cached {
++				continue
++			}
++			var err error
++			found, err = authenticate(currUser, userIdBlock)
++			if err != nil {
++				return err
++			}
++			if found {
++				break
++			}
++		}
+ 	}
+ 
+ 	var legacyProtocol bool
+ 	var legacyTimestamp uint64
+ 	if !found {
+ 		copy(decodedId[:], authId)
+-		if currUser, loaded := s.alterIdMap[decodedId]; loaded {
++		s.legacyAccess.RLock()
++		if currUser, loaded := s.alterIdMap[decodedId]; loaded && s.validLegacyTime(currUser.Time) {
+ 			found = true
+ 			legacyProtocol = true
+ 			user = currUser.User
+ 			legacyTimestamp = uint64(currUser.Time)
+ 		}
++		s.legacyAccess.RUnlock()
+ 	}
+ 	if !found {
+ 		return ErrBadRequest
+@@ -256,7 +299,12 @@
+ 		}
+ 	} else {
+ 		if requestBuffer.Len() < aeadMinHeaderLen {
+-			return ErrBadHeader
++			// Auto mode initially permits the shorter MD5 header. After AEAD
++			// identity is confirmed, collect the rest of its fixed header.
++			missing := aeadMinHeaderLen - requestBuffer.Len()
++			if _, err := io.ReadFull(conn, requestBuffer.Extend(missing)); err != nil {
++				return ErrBadHeader
++			}
+ 		}
+ 
+ 		reader = conn
+@@ -361,15 +409,52 @@
+ 
+ 	switch command {
+ 	case CommandTCP:
++		if s.authCache != nil {
++			if name, ok := any(user).(string); ok {
++				s.authCache.Remember(source.Addr.String(), name)
++			}
++		}
+ 		s.handler.NewConnectionEx(ctx, &serverConn{rawConn}, source, destination, onClose)
+ 	case CommandUDP:
++		if s.authCache != nil {
++			if name, ok := any(user).(string); ok {
++				s.authCache.Remember(source.Addr.String(), name)
++			}
++		}
+ 		s.handler.NewPacketConnectionEx(ctx, &serverPacketConn{rawConn, destination}, source, destination, onClose)
+ 	case CommandMux:
++		if s.authCache != nil {
++			if name, ok := any(user).(string); ok {
++				s.authCache.Remember(source.Addr.String(), name)
++			}
++		}
+ 		return HandleMuxConnection(ctx, &serverConn{rawConn}, source, s.handler)
+ 	default:
+ 		return E.New("unknown command: ", command)
+ 	}
+ 	return nil
++}
++
++// IsLegacyAuthID recognizes an already generated, time-valid MD5 identity.
++// Used only to preserve documented MD5 access while an AEAD source is blocked.
++func (s *Service[U]) IsLegacyAuthID(header []byte) bool {
++	if len(header) < 16 {
++		return false
++	}
++	var id [16]byte
++	copy(id[:], header)
++	s.legacyAccess.RLock()
++	defer s.legacyAccess.RUnlock()
++	entry, ok := s.alterIdMap[id]
++	return ok && s.validLegacyTime(entry.Time)
++}
++func (s *Service[U]) validLegacyTime(ts int64) bool {
++	window := int64(CacheDurationSeconds)
++	if s.reducedMemory {
++		window = 25
++	}
++	delta := ts - s.time().Unix()
++	return delta >= -window && delta <= window
+ }
+ 
+ var _ N.EarlyWriter = (*rawServerConn)(nil)
+--- upstream/service_option.go
++++ local/service_option.go
+@@ -1,6 +1,25 @@
+ package vmess
+ 
+ type ServiceOption func(service *Service[string])
++
++// ServiceWithReducedMemory uses the documented 25-second MD5 clock window.
++func ServiceWithReducedMemory(enabled bool) ServiceOption {
++	return func(service *Service[string]) { service.reducedMemory = enabled }
++}
++
++type AuthenticationCache interface {
++	Candidate(string) string
++	Remember(string, string)
++}
++
++func ServiceWithAuthenticationCache(cache AuthenticationCache) ServiceOption {
++	return func(service *Service[string]) { service.authCache = cache }
++}
++
++// ServiceWithAuthMode is a reconstruction extension; caller validates the mode.
++func ServiceWithAuthMode(mode string) ServiceOption {
++	return func(service *Service[string]) { service.authMode = mode }
++}
+ 
+ func ServiceWithTimeFunc(timeFunc TimeFunc) ServiceOption {
+ 	return func(service *Service[string]) {

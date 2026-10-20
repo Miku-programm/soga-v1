@@ -1,0 +1,361 @@
+文档覆盖说明（2026-10-21）
+
+本工程是独立兼容重建，不是原作者源码。附档中的命令仅作为功能证据，没有因此执行原安装脚本、修改系统参数或运行原二进制。
+本索引逐篇登记54份Markdown的标题、SHA256、章节、实现组、测试入口和边界；逐字段列出实际调用位置与分类。字段存在、一次Build成功或测试函数名称本身均不算功能验收。
+
+配置计数：主配置表139个唯一名称，9个标注废弃，130个非废弃。137个名称对应157个RTTI字段；另20个只在元数据发现。表中DNS_xxx是动态命名模式，log_file已废弃且不在RTTI中，不能用139与157简单相减推断缺失。
+111个显式default标签按二进制保留。4个文档写“无”但元数据为0的字段：node_id、anytls_fallback_port、trojan_remote_port、v2ray_fallback_port；不是隐藏的业务验收。
+
+类别说明：effective_implementation为已有实际消费路径；compatibility_alias为迁移/别名；replacement_semantics为明确替代行为；original_authorization_not_applicable为原商业授权不适用；deprecated_noop为保留/未知文本但不产生运行效果；implemented_transport_subset只说明已列明传输；documented_contract_unrecovered是实际未完成功能，不得把显式拒绝写成兼容实现。
+原授权soga_key不调用原授权服务；soga_panel_key/soga_panel_url是独立API配置服务，静态调查已完成但自动同步HTTP契约仍未取得，非空时启动报错。tls_prefer_server_cipher_suites受现代Go限制无效；log_file改用log_file_dir。force_vmess_aead与旧Redis配置有真实迁移，不能误称无操作。文档废弃tfo仍提供显式socket设置。
+
+需要继续明确的文档要求/验证边界：
+- pass-tunnel：已恢复TCP/TLS/WS/WS-TLS+smux v1/v2、TCP/UDP帧及PROXY；独立Python peer、真实业务回环和边界race分开记录。QUIC明确拒绝：原工厂有名称分支，但NewListener先开TCP且QUIC wrapper原样返回listener，未建立可用QUIC wire，见tunnel/wire-evidence.json及tunnel-netlisten-ghidra。未取得原pass已发布客户端互测；不把边界写成后台仍在恢复。
+- tunnel-business-layering：4个真实VLESS组合常规通过0.442秒，race重复3轮通过2.750秒：外WS-TLS+smux→内部TLS/WS、TLS/gRPC、加密旧H2两种PROXY配置；验证TCP、1/128/4096字节UDP、UUID错误拒绝、来源/计量、缺外强制PROXY头拒绝及内PROXY可选。SDK客户端组合及重建隧道peer，非原pass发行版互测。
+- mieru-transport：原文第9行明确目前仅支持TCP传输。TCP内的UDP associate业务已实现，不等于底层UDP传输；新SDK允许UDP底层属于重建扩展。原Mieru构造器也向NewListener传tcp。8个外层传输/mux组合及静默内PROXY回归已通过19.096秒，含真实来源、计量和撤销后监听关闭。证据见tunnel-review/protocol-registrations.json及mieru-factory-review.json。
+- encrypted-h2：新增sing-box旧H2前端与Xray真实加密VLESS codec；4模式TCP/UDP、错误凭据/策略拒绝、计量/来源/peer配额，-race重复3次PASS3.555秒；证据见protocol/h2-encrypted。
+- tls-suite-selection：冒号/逗号/hex和显式旧套件已补齐，VMess/Trojan/AnyTLS真实TLS协商PASS；TLS1.3排序与废弃prefer开关不可设置。
+- mieru-socket-options：官方StreamListenerFactory已接TFO/MPTCP并通过选项下TCP/UDP回环；尚不等同于多接口网络的真实MPTCP协商验收。
+- geo-drop-in：已补配置文件目录自动发现geosite.dat/geoip.dat，显式参数优先；none/site-only/ip-only/both真实数据加载、损坏不回退和stat错误测试PASS0.375秒。目录替换为本工程配置目录，不读取原/etc/soga。
+- panel-api-config-service：静态调查已核对模式日志、全text和配置表消费者，仍未取得自动上报/加载的HTTP契约。官方公开文档站401且离线快照未含该分区，不能断言不存在或废弃。显式非空soga_panel_*在启动联网前报错（无网络/不泄密测试通过），可改用普通面板直接配置；这是实际未完成功能，非商业授权。详见panelconfig/README.txt。
+- large-load-benchmarks：未按10000用户/3000连接长压复现；不将单元或回环结果表述为原性能达到。
+- docker：代码/部署文件已提供，当前没有Docker运行器，因此未真正build/run镜像。
+- acme-production：真实acme.sh参数/本地文件验证已测试，但没有CA/DNS凭据，未申请公共证书。
+
+常见输入语义复核：
+- db-idle-unit：db_max_idle_time单位为分钟
+- dns-units-fallback：缓存分钟；逗号分隔服务器，按序失败回退；本地规则优先于默认/系统DNS；旧空规则组不匹配
+- intervals：同步/上报秒，随机抖动±range并避免非正间隔；远程DNS/routes一分钟
+- geo-interval：Geo更新间隔小时；显式/自动发现自定义文件优先且不被远程更新覆盖
+- cache-unit：IP用户缓存TTL小时、持久化仅存候选身份并重新验证密码
+- transport-idle：TCP/UDP配置分钟；TCP 0不超时、UDP要求大于0；已认证应用载荷重置
+- dynamic-window：UTC+8、逗号多窗口、单段不可跨24点、均速触发及秒计过期、白名单排除
+- redis-migration：显式新redis_ip_limit_*整体优先；旧redis_enable=true才迁移；断线退回本地
+- tls-separators：套件支持文档冒号/hex及额外逗号；ALPN为逗号切片；TLS1.3排序/Go废弃prefer无效
+- rule-precedence：白名单优先；port逗号单值/区间；DNS/routes/审计共用规则匹配；本地文件下次同步更新
+- routes-branches：protocol与rules且；node_id规则可直接命中；无匹配拒绝；redirect port0保留目标端口；分族listen显式优先
+- logs-branches：本地访问日志按本地时区整点、运行日志按天；保留0不删除；ClickHouse禁用本地保留，8123/8443默认端口，批量/每秒，失败丢当前批次
+- threshold-unit：在线及流量阈值按KB×1024；在线按本周期，流量以持久待确认累计统计；ACK后清除
+- ss-obfs-mode：HTTP strict/path/host实际检查；TLS无path，strict_path按relaxed；真实客户端验证
+- ssr-carriers：is_multi_user 1混淆/2协议；普通与承载用户分离；soga_port覆盖实际端口，相同有效端口最后记录生效；混淆UDP无用户归属
+- mieru-transport：原文仅TCP底层，TCP上的UDP associate业务与UDP底层传输分开；factory保存PROXY真实peer并由SDK Stop关闭
+- tunnel-framing：AEAD头/体独立nonce、ReadFull短读、UDP短buffer丢当前余部保留下包、篡改/回放拒绝；Close终止等待握手和mux streams
+
+逐篇映射：
+README.md [navigation]
+  实现组：不属于运行代码
+  边界：离线文档目录；不是运行功能，无需执行其中命令。
+anytls/xboard-anytls.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、tls
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+anytls/xiaov2board-anytls.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、tls
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+buy/community-edition-and-enterprise-edition.md [original_commercial]
+  实现组：不属于运行代码
+  边界：原产品商业/社区版差异、授权人数等不适用于独立工程；没有绕过原授权。
+buy/func-custom-and-tec-support.md [original_commercial]
+  实现组：不属于运行代码
+  边界：原作者付费定制/支持服务，不是可从二进制恢复的运行功能。
+buy/get-license-code.md [original_commercial]
+  实现组：不属于运行代码
+  边界：原商业授权购买与激活不复制。
+docker/docker-tutorial.md [implementation_unverified_environment]
+  实现组：config、deployment
+  边界：提供独立Dockerfile/Compose，不拉取原vaxilu镜像；当前环境未真实Docker build/run。
+hysteria/ppanel-hysteria.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、tls
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+hysteria/xboard-hysteria.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、tls
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+hysteria/xiaov2board-hysteria.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、tls
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+index.md [capability_index]
+  实现组：protocol、h2_encrypted、ssr、source_ip、tunnel、limits、dynamic、redis、rules、dns、routes、tls、sync
+  边界：原独立内核/极致性能声明不迁移到重建工程；加密H2和pass隧道必须分别核对。
+mieru/xboard-mieru.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、tunnel
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。 本页明确原soga仅支持TCP传输；UDP associate业务仍在TCP上传输。重建SDK另支持UDP底层传输是额外扩展，不反推原版已支持。
+other/block-list-config.md [implemented]
+  实现组：rules、geo
+other/dns-config.md [implemented]
+  实现组：dns、geo
+other/dy-limit.md [implemented_with_boundaries]
+  实现组：dynamic、limits
+other/forward-get-real-ip.md [implemented_transport_subset]
+  实现组：source_ip、tunnel
+  边界：方式一普通PROXY转发已覆盖；方式二pass隧道已恢复TCP/TLS/WS/WS-TLS+smux和PROXY路径，QUIC线协议未建立且明确拒绝；不能把已恢复路径写成全部pass版本兼容。
+other/limit-ip-and-device-num.md [implemented_with_boundaries]
+  实现组：redis、limits
+other/optimize_kernel.md [host_operations]
+  实现组：不属于运行代码
+  边界：sysctl/BBR/系统调优是部署建议；文档不作为执行指令，没有修改宿主内核参数。
+other/routes-config.md [implemented_with_boundaries]
+  实现组：routes、rules、geo
+other/soga-multi-instance.md [replacement]
+  实现组：config、deployment
+  边界：独立命令命名/目录；环境读取以serve模式和-with-env选项为准。
+other/ss-aead.md [implemented_with_boundaries]
+  实现组：auth_cache、protocol
+other/tls-cipher-suites.md [implemented_with_boundaries]
+  实现组：tls
+  边界：冒号/逗号/hex ID解析及显式旧套件真实TLS协商已测；TLS1.3优先级不受Go配置控制。
+other/troubleshoot.md [operations]
+  实现组：logging、deployment
+  边界：日志/等级/实例命令有替代实现，付费支持链接属于原作者服务。
+other/vmess-aead.md [implemented_with_boundaries]
+  实现组：auth_cache、protocol
+other/white-list.md [implemented]
+  实现组：rules、geo
+soga/soga-config.md [configuration_index]
+  实现组：config、panel、panel_config_service、mysql、protocol、h2_encrypted、ssr、source_ip、tunnel、tls、limits、dynamic、redis、auth_cache、rules、dns、routes、geo、sniff、logging、sync、monitor、deployment、update、socket
+  边界：逐字段状态见configuration；139唯一表项=130非废弃+9废弃。
+soga/soga-v1.md [implemented_with_fixture]
+  实现组：panel、protocol、sync
+  边界：8个文档endpoint覆盖fixture；独立面板未生产部署。
+soga-完整文档.md [aggregate]
+  实现组：不属于运行代码
+  边界：合订版重复52个页面内容，单独登记hash，不重复累加功能验收。
+ss/ppanel-ss.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、auth_cache
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+ss/sspanel-ss-password-single-port.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、auth_cache、mysql、ssr
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+ss/v2board-ss.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、auth_cache
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+ss/whmcs-ss.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、auth_cache、mysql
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+ss/xboard-ss.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、auth_cache
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+ssr/proxypanel-ssr.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、ssr
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+ssr/sspanel-ssr-multi-port.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、ssr、mysql
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+ssr/sspanel-ssr-single-port.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、ssr、mysql
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+ssr/whmcs-ssr.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、ssr、mysql
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+test/memory_test.md [benchmark_not_reproduced]
+  实现组：protocol、auth_cache
+  边界：10000用户及10分钟内存基准未按原环境重跑，不宣称达到表中性能。
+test/vmess_test.md [benchmark_not_reproduced]
+  实现组：protocol
+  边界：10000用户、3000连接、30分钟CPU/内存测试未重跑；已有小规模真实协议测试不能替代该压测。
+trojan/ppanel-trojan.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、tls
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+trojan/proxypanel-trojan.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、tls
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+trojan/sspanel-trojan.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、tls、mysql
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+trojan/v2board-trojan.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、tls
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+trojan/whmcs-trojan.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、tls、mysql
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+trojan/xboard-trojan.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、tls
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+v2ray/ppanel-v2ray.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、auth_cache
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+v2ray/proxypanel-v2ray.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、auth_cache
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+v2ray/sspanel-v2ray.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、auth_cache、mysql
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+v2ray/v2board-v2ray.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、auth_cache
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+v2ray/whmcs-v2ray.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、auth_cache、mysql
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+v2ray/xboard-v2ray.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、auth_cache
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+vless/ppanel-vless.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、tls、h2_encrypted
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+vless/xboard-vless.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、tls、h2_encrypted
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+vless/xiaov2board-vless.md [implemented_with_fixture_and_protocol_tests]
+  实现组：panel、protocol、deployment、tls、h2_encrypted
+  边界：面板页面操作/截图及NTP安装属于用户部署；接口fixture与真实协议回环分开验证，未宣称该生产面板端到端互通。
+
+配置逐项状态：
+access_log_clickhouse_addr [effective_implementation] → logging；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+access_log_clickhouse_auto_create [effective_implementation] → logging；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+access_log_clickhouse_batch_size [effective_implementation] → logging；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+access_log_clickhouse_database [effective_implementation] → logging；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+access_log_clickhouse_password [effective_implementation] → logging；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+access_log_clickhouse_table [effective_implementation] → logging；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+access_log_clickhouse_user [effective_implementation] → logging；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+access_log_dir [effective_implementation] → logging；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+access_log_enable [effective_implementation] → logging；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+access_log_mode [effective_implementation] → logging；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+access_log_retention_hours [effective_implementation] → logging；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+anytls_fallback_addr [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+anytls_fallback_port [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+api [effective_implementation] → panel；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+auto_out_ip [effective_implementation] → socket；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+auto_update [replacement_semantics] → update；使用本工程HTTPS发行manifest及哈希，不使用原产品更新服务；需配置发行源。
+ban_private_ip [effective_implementation] → rules；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+block_list_url [effective_implementation] → rules；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+block_list_white_user_id [effective_implementation] → rules；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+cert_domain [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+cert_file [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+cert_key_length [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+cert_mode [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+check_interval [effective_implementation] → sync；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+conn_limit_expiry [compatibility_alias] → redis；旧/替代字段经明确优先级迁移至现行功能，不是无操作字段。 Redis键空间和Lua是独立实现，不兼容原版名额存储。
+db_host [effective_implementation] → mysql；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+db_max_conn [effective_implementation] → mysql；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+db_max_idle_conn [effective_implementation] → mysql；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+db_max_idle_time [effective_implementation] → mysql；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+db_name [effective_implementation] → mysql；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+db_password [effective_implementation] → mysql；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+db_port [effective_implementation] → mysql；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+db_user [effective_implementation] → mysql；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+default_dns [effective_implementation] → dns；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+detect_packet [effective_implementation] → sniff；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+detect_packet_max_len [effective_implementation] → sniff；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+dns_cache_time [effective_implementation] → dns；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+dns_config_url [effective_implementation] → dns；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+dns_provider [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+dns_strategy [effective_implementation] → dns；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+domain_sniff [effective_implementation] → sniff；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+dy_limit_duration [effective_implementation] → dynamic；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+dy_limit_enable [effective_implementation] → dynamic；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+dy_limit_speed [effective_implementation] → dynamic；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+dy_limit_time [effective_implementation] → dynamic；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+dy_limit_trigger_speed [effective_implementation] → dynamic；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+dy_limit_trigger_time [effective_implementation] → dynamic；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+dy_limit_white_user_id [effective_implementation] → dynamic；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+forbidden_bit_torrent [effective_implementation] → rules；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+forbidden_ports [effective_implementation] → rules；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+force_close_ssl [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+force_proxy_protocol [effective_implementation] → source_ip；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+force_vmess_aead [compatibility_alias] → protocol；旧/替代字段经明确优先级迁移至现行功能，不是无操作字段。
+geo_ip_url [effective_implementation] → geo；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+geo_site_url [effective_implementation] → geo；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+geo_update_enable [effective_implementation] → geo；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+geo_update_interval [effective_implementation] → geo；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+ip_user_cache_save_dir [effective_implementation] → auth_cache；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+ip_user_cache_save_enable [effective_implementation] → auth_cache；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+ip_user_cache_time [effective_implementation] → auth_cache；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+key_file [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+listen [effective_implementation] → socket；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+log_file_dir [effective_implementation] → logging；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+log_file_retention_days [effective_implementation] → logging；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+log_level [effective_implementation] → logging；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+mieru_force_user_hint [effective_implementation] → protocol；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+mptcp [effective_implementation] → socket；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+mu_regex [effective_implementation] → ssr；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+mu_suffix [effective_implementation] → ssr；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+node_id [effective_implementation] → sync；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+node_speed_limit [effective_implementation] → limits；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+pprof_addr [effective_implementation] → monitor；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+pprof_enable [effective_implementation] → monitor；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+pprof_port [effective_implementation] → monitor；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+prometheus_addr [effective_implementation] → monitor；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+prometheus_enable [effective_implementation] → monitor；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+prometheus_port [effective_implementation] → monitor；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+proxy_protocol [effective_implementation] → source_ip；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+random_interval_range [effective_implementation] → sync；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+redis_addr [compatibility_alias] → redis；旧/替代字段经明确优先级迁移至现行功能，不是无操作字段。 Redis键空间和Lua是独立实现，不兼容原版名额存储。
+redis_db [compatibility_alias] → redis；旧/替代字段经明确优先级迁移至现行功能，不是无操作字段。 Redis键空间和Lua是独立实现，不兼容原版名额存储。
+redis_enable [compatibility_alias] → redis；旧/替代字段经明确优先级迁移至现行功能，不是无操作字段。 Redis键空间和Lua是独立实现，不兼容原版名额存储。
+redis_ip_limit_addr [effective_implementation] → redis；组级行为测试及接线证据；不是每种取值/全部平台均已验收。 Redis键空间和Lua是独立实现，不兼容原版名额存储。
+redis_ip_limit_db [effective_implementation] → redis；组级行为测试及接线证据；不是每种取值/全部平台均已验收。 Redis键空间和Lua是独立实现，不兼容原版名额存储。
+redis_ip_limit_enable [effective_implementation] → redis；组级行为测试及接线证据；不是每种取值/全部平台均已验收。 Redis键空间和Lua是独立实现，不兼容原版名额存储。
+redis_ip_limit_expiry [effective_implementation] → redis；组级行为测试及接线证据；不是每种取值/全部平台均已验收。 Redis键空间和Lua是独立实现，不兼容原版名额存储。
+redis_ip_limit_password [effective_implementation] → redis；组级行为测试及接线证据；不是每种取值/全部平台均已验收。 Redis键空间和Lua是独立实现，不兼容原版名额存储。
+redis_ip_limit_tls [effective_implementation] → redis；组级行为测试及接线证据；不是每种取值/全部平台均已验收。 Redis键空间和Lua是独立实现，不兼容原版名额存储。
+redis_password [compatibility_alias] → redis；旧/替代字段经明确优先级迁移至现行功能，不是无操作字段。 Redis键空间和Lua是独立实现，不兼容原版名额存储。
+redis_tls [compatibility_alias] → redis；旧/替代字段经明确优先级迁移至现行功能，不是无操作字段。 Redis键空间和Lua是独立实现，不兼容原版名额存储。
+routes_url [effective_implementation] → routes；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+server_type [effective_implementation] → protocol；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+sniff_redirect [effective_implementation] → sniff；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+soga_key [original_authorization_not_applicable] → 独立边界；原商业授权不适用于独立工程，不调用或绕过原授权。
+soga_panel_key [documented_contract_unrecovered] → panel_config_service；首页API信息自动上报/加载契约未取得；已核对样本全text/config消费者与模式日志，不等同不存在。显式非空时联网/监听前报错，指引直接配置普通面板；非商业授权，不算功能完成。
+soga_panel_url [documented_contract_unrecovered] → panel_config_service；首页API信息自动上报/加载契约未取得；已核对样本全text/config消费者与模式日志，不等同不存在。显式非空时联网/监听前报错，指引直接配置普通面板；非商业授权，不算功能完成。
+ss_invalid_access_count [effective_implementation] → auth_cache；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+ss_invalid_access_duration [effective_implementation] → auth_cache；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+ss_invalid_access_enable [effective_implementation] → auth_cache；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+ss_invalid_access_forbidden_time [effective_implementation] → auth_cache；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+ss_obfs_mode [effective_implementation] → protocol；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+ss_obfs_udp [effective_implementation] → ssr；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+ssr_cid_limit [effective_implementation] → ssr；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+sub_type [effective_implementation] → panel；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+submit_alive_ip_min_traffic [effective_implementation] → sync；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+submit_interval [effective_implementation] → sync；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+submit_real_ip [effective_implementation] → limits；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+submit_traffic_min_traffic [effective_implementation] → sync；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+tcp_timeout [effective_implementation] → socket；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+tfo [effective_deprecated_option] → socket；文档废弃但实现显式socket设置；平台/网络支持仍决定实际生效。
+tls_alpn [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+tls_cipher_suites [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+tls_max_version [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+tls_min_version [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+tls_prefer_server_cipher_suites [deprecated_noop] → tls；现代Go忽略此首选顺序开关；字段保留但无运行时效果，不能宣称已实现套件优先级。
+trojan_remote_addr [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+trojan_remote_port [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+tunnel_enable [implemented_transport_subset] → tunnel；主配置表未列，但中转文档提到隧道入站；TCP/TLS/WS/WS-TLS+smux、PROXY、密码/算法/路径已有运行实现和测试；QUIC名字可见但已恢复链只开TCP、未建立可用wire，故明确拒绝；不将字段存在等同全传输完成。
+tunnel_method [implemented_transport_subset] → tunnel；主配置表未列，但中转文档提到隧道入站；TCP/TLS/WS/WS-TLS+smux、PROXY、密码/算法/路径已有运行实现和测试；QUIC名字可见但已恢复链只开TCP、未建立可用wire，故明确拒绝；不将字段存在等同全传输完成。
+tunnel_mux [implemented_transport_subset] → tunnel；主配置表未列，但中转文档提到隧道入站；TCP/TLS/WS/WS-TLS+smux、PROXY、密码/算法/路径已有运行实现和测试；QUIC名字可见但已恢复链只开TCP、未建立可用wire，故明确拒绝；不将字段存在等同全传输完成。
+tunnel_password [implemented_transport_subset] → tunnel；主配置表未列，但中转文档提到隧道入站；TCP/TLS/WS/WS-TLS+smux、PROXY、密码/算法/路径已有运行实现和测试；QUIC名字可见但已恢复链只开TCP、未建立可用wire，故明确拒绝；不将字段存在等同全传输完成。
+tunnel_type [implemented_transport_subset] → tunnel；主配置表未列，但中转文档提到隧道入站；TCP/TLS/WS/WS-TLS+smux、PROXY、密码/算法/路径已有运行实现和测试；QUIC名字可见但已恢复链只开TCP、未建立可用wire，故明确拒绝；不将字段存在等同全传输完成。
+tunnel_ws_path [implemented_transport_subset] → tunnel；主配置表未列，但中转文档提到隧道入站；TCP/TLS/WS/WS-TLS+smux、PROXY、密码/算法/路径已有运行实现和测试；QUIC名字可见但已恢复链只开TCP、未建立可用wire，故明确拒绝；不将字段存在等同全传输完成。
+type [effective_implementation] → panel；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+udp_proxy_protocol [effective_implementation] → source_ip；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+udp_timeout [effective_implementation] → socket；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+user_conn_limit [effective_implementation] → limits；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+user_ip_limit_cidr_prefix_v4 [effective_implementation] → limits；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+user_ip_limit_cidr_prefix_v6 [effective_implementation] → limits；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+user_speed_limit [effective_implementation] → limits；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+user_tcp_limit [effective_implementation] → limits；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+v2ray_fallback_addr [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+v2ray_fallback_port [effective_implementation] → tls；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+v2ray_reduce_memory [replacement_semantics] → protocol；实际MD5表由251→61项且时间窗±120→±25秒；是可测重建实现，不声称原优化数据结构。
+vmess_aead_invalid_access_count [effective_implementation] → auth_cache；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+vmess_aead_invalid_access_duration [effective_implementation] → auth_cache；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+vmess_aead_invalid_access_enable [effective_implementation] → auth_cache；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+vmess_aead_invalid_access_forbidden_time [effective_implementation] → auth_cache；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+vmess_auth_mode [effective_implementation] → protocol；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+vmess_fallback_addr [compatibility_alias] → tls；旧/替代字段经明确优先级迁移至现行功能，不是无操作字段。
+vmess_fallback_port [compatibility_alias] → tls；旧/替代字段经明确优先级迁移至现行功能，不是无操作字段。
+vmess_reduce_memory [replacement_semantics] → protocol；实际MD5表由251→61项且时间窗±120→±25秒；是可测重建实现，不声称原优化数据结构。
+webapi_key [effective_implementation] → panel；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+webapi_mukey [compatibility_alias] → panel；旧/替代字段经明确优先级迁移至现行功能，不是无操作字段。
+webapi_url [effective_implementation] → panel；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+white_list_url [effective_implementation] → rules；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+whmcs_alter_id [effective_implementation] → panel；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+whmcs_method [effective_implementation] → panel；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+whmcs_net [effective_implementation] → panel；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+whmcs_obfs [effective_implementation] → panel；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+whmcs_password [effective_implementation] → panel；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+whmcs_port [effective_implementation] → panel；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+whmcs_protocol [effective_implementation] → panel；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+whmcs_rate [effective_implementation] → panel；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+whmcs_service_name [effective_implementation] → panel；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+whmcs_tls [effective_implementation] → panel；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+whmcs_ws_path [effective_implementation] → panel；组级行为测试及接线证据；不是每种取值/全部平台均已验收。
+DNS_xxx [dynamic_pattern] → tls；动态DNS_*环境变量命名模式，不是单个RTTI字段；去前缀后传acme.sh。
+log_file [deprecated_noop] → logging；文档已废弃且不在157 RTTI字段中；Load保留未知键但runtime不消费，须使用log_file_dir。
+
+详细源码行、测试函数名、文档hash、默认值与静态tag证据见docs-coverage.json。所有结论范围以测试实际运行日志为准，不声称生产面板互通、真实公共CA签发、全部客户端等价或原性能复现。

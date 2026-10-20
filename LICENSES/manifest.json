@@ -1,0 +1,3191 @@
+{
+  "schema": 1,
+  "description": "Byte-preserving third-party legal files and source metadata, mirrored by original source path. Presence checks are an inventory, not a legal compatibility opinion.",
+  "source_scopes": [
+    "vendor",
+    "third_party",
+    "certificates/bundled",
+    "geodata/bundled",
+    "testdata/ssr-reference",
+    "proxy"
+  ],
+  "go_mod_sha256": "a913ed818cc4405c75fe9fdf318204dd495f43d8ec0bd88360c7a727c4bf17f8",
+  "go_sum_sha256": "15d9bc72d012647cab989b802437b8dfc471b882bb3ed06fcefed64f8c43658e",
+  "vendor_modules_sha256": "28c372ed0f4501fa4663b49a10f7c9adb0e1830a5a37d84bb8c04dd64f9a01b3",
+  "go_standard_library": {
+    "version": "go1.27.3",
+    "license_directory": "go-standard-library/go1.27.3",
+    "upstream": "https://go.dev/",
+    "note": "Go standard library and bundled legal notices; this is not a copy of the Go toolchain. Some included subcomponents may be inactive in the selected build."
+  },
+  "counts": {
+    "files": 170,
+    "legal_texts": 146,
+    "vendored_modules": 97,
+    "modules_with_packages": 97,
+    "modules_missing_root_legal_file": 0
+  },
+  "files": [
+    {
+      "path": "certificates/bundled/LICENSE.md",
+      "source": "certificates/bundled/LICENSE.md",
+      "kind": "legal-text",
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "path": "certificates/bundled/SOURCE.json",
+      "source": "certificates/bundled/SOURCE.json",
+      "kind": "provenance",
+      "bytes": 27202,
+      "sha256": "c25bc3c0a18b4e3a62e67ea3f955c3b30e280c431891ee34dc544ea604d05f89"
+    },
+    {
+      "path": "geodata/bundled/ATTRIBUTION.txt",
+      "source": "geodata/bundled/ATTRIBUTION.txt",
+      "kind": "legal-text",
+      "bytes": 419,
+      "sha256": "845310892dd4484c08441e6f74223de5808bfe59a9ae0a8c804bfcb878762cc4"
+    },
+    {
+      "path": "geodata/bundled/SOURCE.json",
+      "source": "geodata/bundled/SOURCE.json",
+      "kind": "provenance",
+      "bytes": 1421,
+      "sha256": "6010b0a46a89e881dfb0e7fa8fd1212f299a62adab2971a9496c4566812fc52e"
+    },
+    {
+      "path": "geodata/bundled/domain-list-community-LICENSE",
+      "source": "geodata/bundled/domain-list-community-LICENSE",
+      "kind": "legal-text",
+      "bytes": 1067,
+      "sha256": "b9d84a22870d3f21c91a4c6e410c9cc51d00902f5233ad0c84011479244bf7d2"
+    },
+    {
+      "path": "geodata/bundled/domain-list-community-README.md",
+      "source": "geodata/bundled/domain-list-community-README.md",
+      "kind": "data-attribution-context",
+      "bytes": 8421,
+      "sha256": "fa5828bb946f23742bff971ed44057f9556eb0437fd38277e19314ff7d155197"
+    },
+    {
+      "path": "geodata/bundled/geoip-LICENSE",
+      "source": "geodata/bundled/geoip-LICENSE",
+      "kind": "legal-text",
+      "bytes": 20137,
+      "sha256": "5e436ff8ffbb77d8607220e9bce20c8915d860010feeb6c1ebef5a85688e9b39"
+    },
+    {
+      "path": "geodata/bundled/geoip-README.md",
+      "source": "geodata/bundled/geoip-README.md",
+      "kind": "data-attribution-context",
+      "bytes": 7636,
+      "sha256": "d0799db0e364386291dcaa6a79f1eeb90895a70cd30f37a4cb5cd5864cb16c52"
+    },
+    {
+      "path": "go-standard-library/go1.27.3/LICENSE",
+      "source": "Go go1.27.3/LICENSE",
+      "kind": "go-standard-library-legal-text",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "go-standard-library/go1.27.3/PATENTS",
+      "source": "Go go1.27.3/PATENTS",
+      "kind": "go-standard-library-legal-text",
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    {
+      "path": "go-standard-library/go1.27.3/src/crypto/internal/boring/LICENSE",
+      "source": "Go go1.27.3/src/crypto/internal/boring/LICENSE",
+      "kind": "go-standard-library-legal-text",
+      "bytes": 9714,
+      "sha256": "56210f826b8f0fbac3160dfe55c97f4019eb6cdda3963b5a0eab8a8bdb62360e"
+    },
+    {
+      "path": "go-standard-library/go1.27.3/src/vendor/golang.org/x/crypto/LICENSE",
+      "source": "Go go1.27.3/src/vendor/golang.org/x/crypto/LICENSE",
+      "kind": "go-standard-library-legal-text",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "go-standard-library/go1.27.3/src/vendor/golang.org/x/crypto/PATENTS",
+      "source": "Go go1.27.3/src/vendor/golang.org/x/crypto/PATENTS",
+      "kind": "go-standard-library-legal-text",
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    {
+      "path": "go-standard-library/go1.27.3/src/vendor/golang.org/x/net/LICENSE",
+      "source": "Go go1.27.3/src/vendor/golang.org/x/net/LICENSE",
+      "kind": "go-standard-library-legal-text",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "go-standard-library/go1.27.3/src/vendor/golang.org/x/net/PATENTS",
+      "source": "Go go1.27.3/src/vendor/golang.org/x/net/PATENTS",
+      "kind": "go-standard-library-legal-text",
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    {
+      "path": "go-standard-library/go1.27.3/src/vendor/golang.org/x/sys/LICENSE",
+      "source": "Go go1.27.3/src/vendor/golang.org/x/sys/LICENSE",
+      "kind": "go-standard-library-legal-text",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "go-standard-library/go1.27.3/src/vendor/golang.org/x/sys/PATENTS",
+      "source": "Go go1.27.3/src/vendor/golang.org/x/sys/PATENTS",
+      "kind": "go-standard-library-legal-text",
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    {
+      "path": "go-standard-library/go1.27.3/src/vendor/golang.org/x/text/LICENSE",
+      "source": "Go go1.27.3/src/vendor/golang.org/x/text/LICENSE",
+      "kind": "go-standard-library-legal-text",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "go-standard-library/go1.27.3/src/vendor/golang.org/x/text/PATENTS",
+      "source": "Go go1.27.3/src/vendor/golang.org/x/text/PATENTS",
+      "kind": "go-standard-library-legal-text",
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    {
+      "path": "proxy/LICENSES.txt",
+      "source": "proxy/LICENSES.txt",
+      "kind": "legal-text",
+      "bytes": 1221,
+      "sha256": "44cb6a3f8364ac9ea12a26f2729146c9d5f6bbc0dfbb45361c98905859c59eff"
+    },
+    {
+      "path": "proxy/PROVENANCE.txt",
+      "source": "proxy/PROVENANCE.txt",
+      "kind": "provenance",
+      "bytes": 2880,
+      "sha256": "db706fc9d889d707f8fd5367f4617c6a61795446350086cbe5c17285f6523bb5"
+    },
+    {
+      "path": "proxy/internal/shadowaeadcompat/LICENSE",
+      "source": "proxy/internal/shadowaeadcompat/LICENSE",
+      "kind": "legal-text",
+      "bytes": 674,
+      "sha256": "2f02b7486bcfa90d115c71a20437f3906b6fd5bef81c5dc0efd341399e89d0fd"
+    },
+    {
+      "path": "proxy/internal/shadowaeadcompat/PROVENANCE.json",
+      "source": "proxy/internal/shadowaeadcompat/PROVENANCE.json",
+      "kind": "provenance",
+      "bytes": 1559,
+      "sha256": "a6d8301921bbbe783492a9689444fd318d0601c68917a74903286b831e5f94ce"
+    },
+    {
+      "path": "proxy/internal/vmesscompat/LICENSE",
+      "source": "proxy/internal/vmesscompat/LICENSE",
+      "kind": "legal-text",
+      "bytes": 674,
+      "sha256": "2f02b7486bcfa90d115c71a20437f3906b6fd5bef81c5dc0efd341399e89d0fd"
+    },
+    {
+      "path": "proxy/internal/vmesscompat/PROVENANCE.json",
+      "source": "proxy/internal/vmesscompat/PROVENANCE.json",
+      "kind": "provenance",
+      "bytes": 4401,
+      "sha256": "a12f970c2b5ef6443154fd1786ae985057aa58f24b472b3f3412628d503854f0"
+    },
+    {
+      "path": "proxy/simpleobfs/LICENSE",
+      "source": "proxy/simpleobfs/LICENSE",
+      "kind": "legal-text",
+      "bytes": 32473,
+      "sha256": "8c75a9231db8906865e29706ed63aad18fd918c92c15dbefbb13c25fe42850b4"
+    },
+    {
+      "path": "proxy/ssrcore/internal/vnet/LICENSE",
+      "source": "proxy/ssrcore/internal/vnet/LICENSE",
+      "kind": "legal-text",
+      "bytes": 35111,
+      "sha256": "d2b0cd072af07e55b26501bfcca5a69d173d8bd2ed1442501304c6f966aec51b"
+    },
+    {
+      "path": "proxy/ssrcore/internal/vnet/SOURCE.json",
+      "source": "proxy/ssrcore/internal/vnet/SOURCE.json",
+      "kind": "provenance",
+      "bytes": 22552,
+      "sha256": "b4cc332e643299108185a106066767ced4946e470e9dd48f77176669cce051f5"
+    },
+    {
+      "path": "testdata/ssr-reference/LICENSE",
+      "source": "testdata/ssr-reference/LICENSE",
+      "kind": "legal-text",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "testdata/ssr-reference/SOURCE.json",
+      "source": "testdata/ssr-reference/SOURCE.json",
+      "kind": "provenance",
+      "bytes": 448,
+      "sha256": "cec0f7686b51c63be3832cac7d56be379d83913c91a18933a8ddf2fcb1fd542a"
+    },
+    {
+      "path": "third_party/sing-box/LICENSE",
+      "source": "third_party/sing-box/LICENSE",
+      "kind": "legal-text",
+      "bytes": 791,
+      "sha256": "650d5e3b99a446fb38e820fa87a49562e0c79eab868fff58618ac487a58e554c"
+    },
+    {
+      "path": "third_party/sing-box/PROVENANCE.txt",
+      "source": "third_party/sing-box/PROVENANCE.txt",
+      "kind": "provenance",
+      "bytes": 421,
+      "sha256": "2234b3e92e75e600a95fdd916173177f32b82f5042531614026a791ef1e22a9b"
+    },
+    {
+      "path": "third_party/sing-box/common/ja3/LICENSE",
+      "source": "third_party/sing-box/common/ja3/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1515,
+      "sha256": "31cbb9419e5fbd3fe353eb5b5efb2667d5969f42e44f976e8c0b3a28893b3c09"
+    },
+    {
+      "path": "third_party/sing-box/common/windivert/assets/LICENSE.txt",
+      "source": "third_party/sing-box/common/windivert/assets/LICENSE.txt",
+      "kind": "legal-text",
+      "bytes": 61349,
+      "sha256": "14a0cb5214d536e4fdae6aa3f5696f981eeda106cd026e9794bba489ee79d628"
+    },
+    {
+      "path": "third_party/xray-core/LICENSE",
+      "source": "third_party/xray-core/LICENSE",
+      "kind": "legal-text",
+      "bytes": 16725,
+      "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+    },
+    {
+      "path": "third_party/xray-core/PROVENANCE.txt",
+      "source": "third_party/xray-core/PROVENANCE.txt",
+      "kind": "provenance",
+      "bytes": 2736,
+      "sha256": "dc2b9872c4907ef1d13a34c7b1d76f5822155a1c73961bb049300aaece9307a6"
+    },
+    {
+      "path": "vendor/filippo.io/edwards25519/LICENSE",
+      "source": "vendor/filippo.io/edwards25519/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1479,
+      "sha256": "2d36597f7117c38b006835ae7f537487207d8ec407aa9d9980794b2030cbc067"
+    },
+    {
+      "path": "vendor/github.com/ajg/form/LICENSE",
+      "source": "vendor/github.com/ajg/form/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1481,
+      "sha256": "a66b5c17a29c5b28713fc55662593eb22fab1332d0060bdae5ff8c890e821c67"
+    },
+    {
+      "path": "vendor/github.com/andybalholm/brotli/LICENSE",
+      "source": "vendor/github.com/andybalholm/brotli/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1084,
+      "sha256": "3d180008e36922a4e8daec11c34c7af264fed5962d07924aea928c38e8663c94"
+    },
+    {
+      "path": "vendor/github.com/anytls/sing-anytls/LICENSE",
+      "source": "vendor/github.com/anytls/sing-anytls/LICENSE",
+      "kind": "legal-text",
+      "bytes": 673,
+      "sha256": "df8e304aaa400c40a02bb48836a6172ee9ffb3666a5b28088d7201cf1a8b740e"
+    },
+    {
+      "path": "vendor/github.com/apernet/quic-go/LICENSE",
+      "source": "vendor/github.com/apernet/quic-go/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1091,
+      "sha256": "77d0b7b53e8abb84cf4dd3f9945a7fdf27044240d2e8023966a721a9a46fe96e"
+    },
+    {
+      "path": "vendor/github.com/caddyserver/certmagic/LICENSE.txt",
+      "source": "vendor/github.com/caddyserver/certmagic/LICENSE.txt",
+      "kind": "legal-text",
+      "bytes": 11357,
+      "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1"
+    },
+    {
+      "path": "vendor/github.com/caddyserver/zerossl/LICENSE",
+      "source": "vendor/github.com/caddyserver/zerossl/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1068,
+      "sha256": "1ef7b0f3816510e2c4727a6e45b770ddb5ab123d73074e7f0b424767db0f9f7b"
+    },
+    {
+      "path": "vendor/github.com/cloudflare/circl/LICENSE",
+      "source": "vendor/github.com/cloudflare/circl/LICENSE",
+      "kind": "legal-text",
+      "bytes": 3028,
+      "sha256": "b0da1764fe4d13d610b695536fc3f2ebc362482d053a1cd258e36975bc6b97a7"
+    },
+    {
+      "path": "vendor/github.com/database64128/netx-go/LICENSE",
+      "source": "vendor/github.com/database64128/netx-go/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "vendor/github.com/database64128/tfo-go/v2/LICENSE",
+      "source": "vendor/github.com/database64128/tfo-go/v2/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1070,
+      "sha256": "092daaeb0ef37d1e9870febdaa8e2e19f263128bf4351f811bd5181d0f4a1081"
+    },
+    {
+      "path": "vendor/github.com/enfein/mieru/v3/LICENSE",
+      "source": "vendor/github.com/enfein/mieru/v3/LICENSE",
+      "kind": "legal-text",
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "path": "vendor/github.com/enfein/mieru/v3/pkg/log/LICENSE",
+      "source": "vendor/github.com/enfein/mieru/v3/pkg/log/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1082,
+      "sha256": "51a0c9ec7f8b7634181b8d4c03e5b5d204ac21d6e72f46c313973424664b2e6b"
+    },
+    {
+      "path": "vendor/github.com/enfein/mieru/v3/pkg/socks5/LICENSE",
+      "source": "vendor/github.com/enfein/mieru/v3/pkg/socks5/LICENSE",
+      "kind": "legal-text",
+      "bytes": 2454,
+      "sha256": "1827290f11d53a54d744cd21550fc18a2562cbdafd3056476b15f239e7254ecb"
+    },
+    {
+      "path": "vendor/github.com/florianl/go-nfqueue/v2/LICENSE",
+      "source": "vendor/github.com/florianl/go-nfqueue/v2/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1108,
+      "sha256": "5425254065e61bfe5f0b686aebe1132b4a1596e0e14ede729cfc52cc3e187af6"
+    },
+    {
+      "path": "vendor/github.com/fsnotify/fsnotify/LICENSE",
+      "source": "vendor/github.com/fsnotify/fsnotify/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1531,
+      "sha256": "2dfbe6d2b5eb18b55148f3805d88648a09e0d17e38428123259afb08c8996e37"
+    },
+    {
+      "path": "vendor/github.com/go-chi/chi/v5/LICENSE",
+      "source": "vendor/github.com/go-chi/chi/v5/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1123,
+      "sha256": "a2d51b7515acfaff2f7a88688650f2fc4fd99561383e72bba2305e3db59a1647"
+    },
+    {
+      "path": "vendor/github.com/go-chi/render/LICENSE",
+      "source": "vendor/github.com/go-chi/render/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1098,
+      "sha256": "98e196bb920eee8b82b0ee2001d609b2cfe57cb83ee1d15f315f327e5599d6df"
+    },
+    {
+      "path": "vendor/github.com/go-ole/go-ole/LICENSE",
+      "source": "vendor/github.com/go-ole/go-ole/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1119,
+      "sha256": "d883dbca28769ff23dd4368a8edb7ad9f9f23a8f86adde2875c6e41a828aac62"
+    },
+    {
+      "path": "vendor/github.com/go-sql-driver/mysql/AUTHORS",
+      "source": "vendor/github.com/go-sql-driver/mysql/AUTHORS",
+      "kind": "legal-text",
+      "bytes": 5557,
+      "sha256": "ccb046784741000e0704273e837d4a3c310cb52d357adc09d47f93c06e46d6ed"
+    },
+    {
+      "path": "vendor/github.com/go-sql-driver/mysql/LICENSE",
+      "source": "vendor/github.com/go-sql-driver/mysql/LICENSE",
+      "kind": "legal-text",
+      "bytes": 16726,
+      "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
+    },
+    {
+      "path": "vendor/github.com/gobwas/httphead/LICENSE",
+      "source": "vendor/github.com/gobwas/httphead/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1082,
+      "sha256": "7d168561ad5212bf5b3023d55cba37c9594eb011ba74445d99f82055be662589"
+    },
+    {
+      "path": "vendor/github.com/gobwas/pool/LICENSE",
+      "source": "vendor/github.com/gobwas/pool/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1106,
+      "sha256": "bcc745631c0144db2c601650c55d108172c80d601cf2346c71594a0bc32f6f1c"
+    },
+    {
+      "path": "vendor/github.com/godbus/dbus/v5/LICENSE",
+      "source": "vendor/github.com/godbus/dbus/v5/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1328,
+      "sha256": "e4646a82a976369d7ae8f6ed5c11d35dc0af18433a8ccc24c85b459ad8b95128"
+    },
+    {
+      "path": "vendor/github.com/gofrs/uuid/v5/LICENSE",
+      "source": "vendor/github.com/gofrs/uuid/v5/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1082,
+      "sha256": "92a328e1d5f3269b42e2ce32b4494eafdb3132f204a911c5c95cf3d8465490e4"
+    },
+    {
+      "path": "vendor/github.com/google/btree/LICENSE",
+      "source": "vendor/github.com/google/btree/LICENSE",
+      "kind": "legal-text",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "vendor/github.com/google/go-cmp/LICENSE",
+      "source": "vendor/github.com/google/go-cmp/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1479,
+      "sha256": "17b5d209ba8f9684257ecfcff87df6ceda6194143a8fbd074f29727cff6f0c40"
+    },
+    {
+      "path": "vendor/github.com/google/gopacket/AUTHORS",
+      "source": "vendor/github.com/google/gopacket/AUTHORS",
+      "kind": "legal-text",
+      "bytes": 1743,
+      "sha256": "c8cd51d98409d0010e52e8281315bb7e88109e8c88c224748fa359e7a07ea48a"
+    },
+    {
+      "path": "vendor/github.com/google/gopacket/LICENSE",
+      "source": "vendor/github.com/google/gopacket/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1555,
+      "sha256": "8025b28cd71e0a486b173d4a29a05478c003d197a907f99b61a05e181e90b92d"
+    },
+    {
+      "path": "vendor/github.com/gorilla/websocket/AUTHORS",
+      "source": "vendor/github.com/gorilla/websocket/AUTHORS",
+      "kind": "legal-text",
+      "bytes": 234,
+      "sha256": "fdebefabdd93d9701887ac1fa4df716322f71651000442cfd947325648a06675"
+    },
+    {
+      "path": "vendor/github.com/gorilla/websocket/LICENSE",
+      "source": "vendor/github.com/gorilla/websocket/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1312,
+      "sha256": "2be1b548b0387ca8948e1bb9434e709126904d15f622cc2d0d8e7f186e4d122d"
+    },
+    {
+      "path": "vendor/github.com/hashicorp/yamux/LICENSE",
+      "source": "vendor/github.com/hashicorp/yamux/LICENSE",
+      "kind": "legal-text",
+      "bytes": 15956,
+      "sha256": "ba36895caa0717b51eacc64ad50ef0b399482e1b82b93cfcdd065307409b3d9d"
+    },
+    {
+      "path": "vendor/github.com/huin/goupnp/LICENSE",
+      "source": "vendor/github.com/huin/goupnp/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1321,
+      "sha256": "440688406aeb546bad566031c8a01531a01a683166f7010380fcc0f68d830311"
+    },
+    {
+      "path": "vendor/github.com/jackpal/go-nat-pmp/LICENSE",
+      "source": "vendor/github.com/jackpal/go-nat-pmp/LICENSE",
+      "kind": "legal-text",
+      "bytes": 591,
+      "sha256": "1596ea320a3d9e5180576b2c6dd28aa34b9edcef27693fcd0474e24bda3fdcab"
+    },
+    {
+      "path": "vendor/github.com/jsimonetti/rtnetlink/LICENSE.md",
+      "source": "vendor/github.com/jsimonetti/rtnetlink/LICENSE.md",
+      "kind": "legal-text",
+      "bytes": 1085,
+      "sha256": "1f61baf667aacf74c2d17abcfc0ba6e9267265460a508629307c08020dcae39c"
+    },
+    {
+      "path": "vendor/github.com/juju/ratelimit/LICENSE",
+      "source": "vendor/github.com/juju/ratelimit/LICENSE",
+      "kind": "legal-text",
+      "bytes": 9025,
+      "sha256": "a92f49abd3f15a3523b022a9b74fb885b53c228f8244c817add3a835427b10d9"
+    },
+    {
+      "path": "vendor/github.com/klauspost/compress/LICENSE",
+      "source": "vendor/github.com/klauspost/compress/LICENSE",
+      "kind": "legal-text",
+      "bytes": 16733,
+      "sha256": "0d9e582ee4bff57bf1189c9e514e6da7ce277f9cd3bc2d488b22fbb39a6d87cf"
+    },
+    {
+      "path": "vendor/github.com/klauspost/compress/internal/snapref/LICENSE",
+      "source": "vendor/github.com/klauspost/compress/internal/snapref/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1486,
+      "sha256": "f69f157b0be75da373605dbc8bbf142e8924ee82d8f44f11bcaf351335bf98cf"
+    },
+    {
+      "path": "vendor/github.com/klauspost/compress/zstd/internal/xxhash/LICENSE.txt",
+      "source": "vendor/github.com/klauspost/compress/zstd/internal/xxhash/LICENSE.txt",
+      "kind": "legal-text",
+      "bytes": 1068,
+      "sha256": "f566a9f97bacdaf00d9f21dd991e81dc11201c4e016c86b470799429a1c9a79c"
+    },
+    {
+      "path": "vendor/github.com/klauspost/cpuid/v2/LICENSE",
+      "source": "vendor/github.com/klauspost/cpuid/v2/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1078,
+      "sha256": "5d966570d7a442d4e969892860a914e542c97f262c873baee8f0aa48e1f40212"
+    },
+    {
+      "path": "vendor/github.com/koron/go-ssdp/LICENSE",
+      "source": "vendor/github.com/koron/go-ssdp/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1105,
+      "sha256": "19bf6375dd79e92e109f5f2603f824a14056d051a5f9ef77ea02c573668fd0d1"
+    },
+    {
+      "path": "vendor/github.com/libdns/acmedns/LICENSE",
+      "source": "vendor/github.com/libdns/acmedns/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1061,
+      "sha256": "3be396ae13cbab58db6c282da20fef911e30cd14a596d749d41f57ea720b0d17"
+    },
+    {
+      "path": "vendor/github.com/libdns/alidns/LICENSE",
+      "source": "vendor/github.com/libdns/alidns/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1062,
+      "sha256": "065daa5aa741362f0ca598d8be206f0df0eeea8373aea1c23f430164d6f7e1ca"
+    },
+    {
+      "path": "vendor/github.com/libdns/cloudflare/LICENSE",
+      "source": "vendor/github.com/libdns/cloudflare/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1069,
+      "sha256": "e75b5c81dc881b74f84c306c2d0b7db1affbe78d9c0feb5722eb432fd534bea5"
+    },
+    {
+      "path": "vendor/github.com/libdns/libdns/LICENSE",
+      "source": "vendor/github.com/libdns/libdns/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1069,
+      "sha256": "e75b5c81dc881b74f84c306c2d0b7db1affbe78d9c0feb5722eb432fd534bea5"
+    },
+    {
+      "path": "vendor/github.com/libp2p/go-nat/LICENSE",
+      "source": "vendor/github.com/libp2p/go-nat/LICENSE",
+      "kind": "legal-text",
+      "bytes": 10273,
+      "sha256": "73ba74dfaa520b49a401b5d21459a8523a146f3b7518a833eea5efa85130bf68"
+    },
+    {
+      "path": "vendor/github.com/libp2p/go-netroute/LICENSE",
+      "source": "vendor/github.com/libp2p/go-netroute/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1607,
+      "sha256": "84a049e0389f2118af2538e74523a7f76967f94bbfc93e43688cd4dfd4b89e95"
+    },
+    {
+      "path": "vendor/github.com/logrusorgru/aurora/AUTHORS.md",
+      "source": "vendor/github.com/logrusorgru/aurora/AUTHORS.md",
+      "kind": "legal-text",
+      "bytes": 149,
+      "sha256": "48a22df9057e6647a537efd88394eec612da2083554855a7187b3f6d387a7c64"
+    },
+    {
+      "path": "vendor/github.com/logrusorgru/aurora/LICENSE",
+      "source": "vendor/github.com/logrusorgru/aurora/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1211,
+      "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+    },
+    {
+      "path": "vendor/github.com/mdlayher/netlink/LICENSE.md",
+      "source": "vendor/github.com/mdlayher/netlink/LICENSE.md",
+      "kind": "legal-text",
+      "bytes": 1075,
+      "sha256": "756eb71e459f59a9d187b8f6d09181157f8a5fb2b1d30ca359e1d7f35f91cb9d"
+    },
+    {
+      "path": "vendor/github.com/mdlayher/socket/LICENSE.md",
+      "source": "vendor/github.com/mdlayher/socket/LICENSE.md",
+      "kind": "legal-text",
+      "bytes": 1070,
+      "sha256": "7ac20f598f63dfd35c7c6c3844073af0bebfa436cfe58b91af9ac17cd727ea42"
+    },
+    {
+      "path": "vendor/github.com/metacubex/utls/CONTRIBUTORS_GUIDE.md",
+      "source": "vendor/github.com/metacubex/utls/CONTRIBUTORS_GUIDE.md",
+      "kind": "legal-text",
+      "bytes": 3549,
+      "sha256": "24fd2a40958b78f7780962d8fd514bfd59d613ee89f0388901d11e5b9de6a3e5"
+    },
+    {
+      "path": "vendor/github.com/metacubex/utls/LICENSE",
+      "source": "vendor/github.com/metacubex/utls/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1479,
+      "sha256": "2d36597f7117c38b006835ae7f537487207d8ec407aa9d9980794b2030cbc067"
+    },
+    {
+      "path": "vendor/github.com/metacubex/utls/dicttls/LICENSE",
+      "source": "vendor/github.com/metacubex/utls/dicttls/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1498,
+      "sha256": "ac089a3cb515b32ba1c8c2b401646527f55815a9022013693d515f2e2e4fb6ec"
+    },
+    {
+      "path": "vendor/github.com/mholt/acmez/v3/LICENSE",
+      "source": "vendor/github.com/mholt/acmez/v3/LICENSE",
+      "kind": "legal-text",
+      "bytes": 11357,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    {
+      "path": "vendor/github.com/miekg/dns/AUTHORS",
+      "source": "vendor/github.com/miekg/dns/AUTHORS",
+      "kind": "legal-text",
+      "bytes": 27,
+      "sha256": "74a7b790488334d8a15bb0349ef1ceed3d4bb107f1c175460d5049217f0b5b89"
+    },
+    {
+      "path": "vendor/github.com/miekg/dns/CONTRIBUTORS",
+      "source": "vendor/github.com/miekg/dns/CONTRIBUTORS",
+      "kind": "legal-text",
+      "bytes": 150,
+      "sha256": "1a2373574fbd2a2700c2dec917421f9fdab15e2ccbb9608edd6bfbb3ea0ec724"
+    },
+    {
+      "path": "vendor/github.com/miekg/dns/COPYRIGHT",
+      "source": "vendor/github.com/miekg/dns/COPYRIGHT",
+      "kind": "legal-text",
+      "bytes": 512,
+      "sha256": "66550c0ad5ca7ec1e08683e5f872cc45c741f311eee3b8ee484206ecbf9c740d"
+    },
+    {
+      "path": "vendor/github.com/miekg/dns/LICENSE",
+      "source": "vendor/github.com/miekg/dns/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1568,
+      "sha256": "f200ff9bad73385db2ed81e23ee2c1fe069eb5776e17fae4ee85ad0a9e1361a5"
+    },
+    {
+      "path": "vendor/github.com/pelletier/go-toml/v2/LICENSE",
+      "source": "vendor/github.com/pelletier/go-toml/v2/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1101,
+      "sha256": "26844e4b53c5adec04e557fd7dfef281cc0205a7d355626b1c68b778b99e9e7b"
+    },
+    {
+      "path": "vendor/github.com/pires/go-proxyproto/LICENSE",
+      "source": "vendor/github.com/pires/go-proxyproto/LICENSE",
+      "kind": "legal-text",
+      "bytes": 11341,
+      "sha256": "666f1951be1d543e744818d232bb311a4a310fd1d344288642c796fca39af3c7"
+    },
+    {
+      "path": "vendor/github.com/quic-go/qpack/LICENSE.md",
+      "source": "vendor/github.com/quic-go/qpack/LICENSE.md",
+      "kind": "legal-text",
+      "bytes": 1054,
+      "sha256": "1b6a897efd39b20b3cdce8cd306160d115dbded39d855ceeffe21dc11e4d53df"
+    },
+    {
+      "path": "vendor/github.com/refraction-networking/utls/CONTRIBUTORS_GUIDE.md",
+      "source": "vendor/github.com/refraction-networking/utls/CONTRIBUTORS_GUIDE.md",
+      "kind": "legal-text",
+      "bytes": 3549,
+      "sha256": "24fd2a40958b78f7780962d8fd514bfd59d613ee89f0388901d11e5b9de6a3e5"
+    },
+    {
+      "path": "vendor/github.com/refraction-networking/utls/LICENSE",
+      "source": "vendor/github.com/refraction-networking/utls/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1479,
+      "sha256": "2d36597f7117c38b006835ae7f537487207d8ec407aa9d9980794b2030cbc067"
+    },
+    {
+      "path": "vendor/github.com/refraction-networking/utls/dicttls/LICENSE",
+      "source": "vendor/github.com/refraction-networking/utls/dicttls/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1498,
+      "sha256": "ac089a3cb515b32ba1c8c2b401646527f55815a9022013693d515f2e2e4fb6ec"
+    },
+    {
+      "path": "vendor/github.com/robfig/cron/v3/LICENSE",
+      "source": "vendor/github.com/robfig/cron/v3/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1092,
+      "sha256": "8f650581478707182f3306d9a86676d4e03e2d4edc868344378cf4d6fe6c927a"
+    },
+    {
+      "path": "vendor/github.com/sagernet/bbolt/LICENSE",
+      "source": "vendor/github.com/sagernet/bbolt/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1078,
+      "sha256": "c15d721c37e277a11584547de6d618541501f7aa10c4e32a945a4f9ff36cb0f6"
+    },
+    {
+      "path": "vendor/github.com/sagernet/fswatch/LICENSE",
+      "source": "vendor/github.com/sagernet/fswatch/LICENSE",
+      "kind": "legal-text",
+      "bytes": 674,
+      "sha256": "2f02b7486bcfa90d115c71a20437f3906b6fd5bef81c5dc0efd341399e89d0fd"
+    },
+    {
+      "path": "vendor/github.com/sagernet/gvisor/AUTHORS",
+      "source": "vendor/github.com/sagernet/gvisor/AUTHORS",
+      "kind": "legal-text",
+      "bytes": 365,
+      "sha256": "16818597d03ff1b20e9a5e6eeedb3108acde75ec30c3edba534892b1a66b1e71"
+    },
+    {
+      "path": "vendor/github.com/sagernet/gvisor/LICENSE",
+      "source": "vendor/github.com/sagernet/gvisor/LICENSE",
+      "kind": "legal-text",
+      "bytes": 14110,
+      "sha256": "0fbab5c58efbdf6d31e8085214f2dd821659c03d73cff3ed2b08e98826ea1cd9"
+    },
+    {
+      "path": "vendor/github.com/sagernet/netlink/LICENSE",
+      "source": "vendor/github.com/sagernet/netlink/LICENSE",
+      "kind": "legal-text",
+      "bytes": 10796,
+      "sha256": "04cf148229e562c643203d1ee8c43aae2022e5130e95ceb8ba8357a27c1a9abe"
+    },
+    {
+      "path": "vendor/github.com/sagernet/nftables/LICENSE",
+      "source": "vendor/github.com/sagernet/nftables/LICENSE",
+      "kind": "legal-text",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "vendor/github.com/sagernet/quic-go/LICENSE",
+      "source": "vendor/github.com/sagernet/quic-go/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1091,
+      "sha256": "77d0b7b53e8abb84cf4dd3f9945a7fdf27044240d2e8023966a721a9a46fe96e"
+    },
+    {
+      "path": "vendor/github.com/sagernet/sing-box/LICENSE",
+      "source": "vendor/github.com/sagernet/sing-box/LICENSE",
+      "kind": "legal-text",
+      "bytes": 791,
+      "sha256": "650d5e3b99a446fb38e820fa87a49562e0c79eab868fff58618ac487a58e554c"
+    },
+    {
+      "path": "vendor/github.com/sagernet/sing-box/PROVENANCE.txt",
+      "source": "vendor/github.com/sagernet/sing-box/PROVENANCE.txt",
+      "kind": "provenance",
+      "bytes": 421,
+      "sha256": "2234b3e92e75e600a95fdd916173177f32b82f5042531614026a791ef1e22a9b"
+    },
+    {
+      "path": "vendor/github.com/sagernet/sing-box/common/ja3/LICENSE",
+      "source": "vendor/github.com/sagernet/sing-box/common/ja3/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1515,
+      "sha256": "31cbb9419e5fbd3fe353eb5b5efb2667d5969f42e44f976e8c0b3a28893b3c09"
+    },
+    {
+      "path": "vendor/github.com/sagernet/sing-mux/LICENSE",
+      "source": "vendor/github.com/sagernet/sing-mux/LICENSE",
+      "kind": "legal-text",
+      "bytes": 674,
+      "sha256": "2f02b7486bcfa90d115c71a20437f3906b6fd5bef81c5dc0efd341399e89d0fd"
+    },
+    {
+      "path": "vendor/github.com/sagernet/sing-quic/LICENSE",
+      "source": "vendor/github.com/sagernet/sing-quic/LICENSE",
+      "kind": "legal-text",
+      "bytes": 674,
+      "sha256": "2f02b7486bcfa90d115c71a20437f3906b6fd5bef81c5dc0efd341399e89d0fd"
+    },
+    {
+      "path": "vendor/github.com/sagernet/sing-shadowsocks/LICENSE",
+      "source": "vendor/github.com/sagernet/sing-shadowsocks/LICENSE",
+      "kind": "legal-text",
+      "bytes": 674,
+      "sha256": "2f02b7486bcfa90d115c71a20437f3906b6fd5bef81c5dc0efd341399e89d0fd"
+    },
+    {
+      "path": "vendor/github.com/sagernet/sing-shadowsocks2/LICENSE",
+      "source": "vendor/github.com/sagernet/sing-shadowsocks2/LICENSE",
+      "kind": "legal-text",
+      "bytes": 674,
+      "sha256": "2f02b7486bcfa90d115c71a20437f3906b6fd5bef81c5dc0efd341399e89d0fd"
+    },
+    {
+      "path": "vendor/github.com/sagernet/sing-snell/LICENSE",
+      "source": "vendor/github.com/sagernet/sing-snell/LICENSE",
+      "kind": "legal-text",
+      "bytes": 674,
+      "sha256": "2f02b7486bcfa90d115c71a20437f3906b6fd5bef81c5dc0efd341399e89d0fd"
+    },
+    {
+      "path": "vendor/github.com/sagernet/sing-tun/LICENSE",
+      "source": "vendor/github.com/sagernet/sing-tun/LICENSE",
+      "kind": "legal-text",
+      "bytes": 674,
+      "sha256": "2f02b7486bcfa90d115c71a20437f3906b6fd5bef81c5dc0efd341399e89d0fd"
+    },
+    {
+      "path": "vendor/github.com/sagernet/sing-usbip/LICENSE",
+      "source": "vendor/github.com/sagernet/sing-usbip/LICENSE",
+      "kind": "legal-text",
+      "bytes": 674,
+      "sha256": "2f02b7486bcfa90d115c71a20437f3906b6fd5bef81c5dc0efd341399e89d0fd"
+    },
+    {
+      "path": "vendor/github.com/sagernet/sing-vmess/LICENSE",
+      "source": "vendor/github.com/sagernet/sing-vmess/LICENSE",
+      "kind": "legal-text",
+      "bytes": 674,
+      "sha256": "2f02b7486bcfa90d115c71a20437f3906b6fd5bef81c5dc0efd341399e89d0fd"
+    },
+    {
+      "path": "vendor/github.com/sagernet/sing/LICENSE",
+      "source": "vendor/github.com/sagernet/sing/LICENSE",
+      "kind": "legal-text",
+      "bytes": 674,
+      "sha256": "2f02b7486bcfa90d115c71a20437f3906b6fd5bef81c5dc0efd341399e89d0fd"
+    },
+    {
+      "path": "vendor/github.com/sagernet/sing/contrab/freelru/LICENSE",
+      "source": "vendor/github.com/sagernet/sing/contrab/freelru/LICENSE",
+      "kind": "legal-text",
+      "bytes": 11357,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    {
+      "path": "vendor/github.com/sagernet/sing/contrab/freelru/NOTICE",
+      "source": "vendor/github.com/sagernet/sing/contrab/freelru/NOTICE",
+      "kind": "legal-text",
+      "bytes": 49,
+      "sha256": "0ff9ab6ed7706295e43814a14122085ea139755d065f0ad835317403d4043b00"
+    },
+    {
+      "path": "vendor/github.com/sagernet/smux/LICENSE",
+      "source": "vendor/github.com/sagernet/smux/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1067,
+      "sha256": "4d853d6e64790ccada70727c25334c50529b25ce57048129aaf6f8b0f2208516"
+    },
+    {
+      "path": "vendor/github.com/sagernet/ws/LICENSE",
+      "source": "vendor/github.com/sagernet/ws/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1106,
+      "sha256": "db823214b3ef18274418accda3812faac38a1545b8bd589aeb613a849b949c7a"
+    },
+    {
+      "path": "vendor/github.com/sirupsen/logrus/LICENSE",
+      "source": "vendor/github.com/sirupsen/logrus/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1082,
+      "sha256": "51a0c9ec7f8b7634181b8d4c03e5b5d204ac21d6e72f46c313973424664b2e6b"
+    },
+    {
+      "path": "vendor/github.com/vishvananda/netlink/LICENSE",
+      "source": "vendor/github.com/vishvananda/netlink/LICENSE",
+      "kind": "legal-text",
+      "bytes": 10796,
+      "sha256": "04cf148229e562c643203d1ee8c43aae2022e5130e95ceb8ba8357a27c1a9abe"
+    },
+    {
+      "path": "vendor/github.com/vishvananda/netns/LICENSE",
+      "source": "vendor/github.com/vishvananda/netns/LICENSE",
+      "kind": "legal-text",
+      "bytes": 10796,
+      "sha256": "04cf148229e562c643203d1ee8c43aae2022e5130e95ceb8ba8357a27c1a9abe"
+    },
+    {
+      "path": "vendor/github.com/xtaci/smux/LICENSE",
+      "source": "vendor/github.com/xtaci/smux/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1067,
+      "sha256": "4d853d6e64790ccada70727c25334c50529b25ce57048129aaf6f8b0f2208516"
+    },
+    {
+      "path": "vendor/github.com/xtls/reality/LICENSE",
+      "source": "vendor/github.com/xtls/reality/LICENSE",
+      "kind": "legal-text",
+      "bytes": 16772,
+      "sha256": "7c1bcfe5b0a8009ffae73984bad8e3b5f6bc562f67d6d67bafb600a3b8c08c5e"
+    },
+    {
+      "path": "vendor/github.com/xtls/reality/LICENSE-Go",
+      "source": "vendor/github.com/xtls/reality/LICENSE-Go",
+      "kind": "legal-text",
+      "bytes": 1479,
+      "sha256": "2d36597f7117c38b006835ae7f537487207d8ec407aa9d9980794b2030cbc067"
+    },
+    {
+      "path": "vendor/github.com/xtls/xray-core/LICENSE",
+      "source": "vendor/github.com/xtls/xray-core/LICENSE",
+      "kind": "legal-text",
+      "bytes": 16725,
+      "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+    },
+    {
+      "path": "vendor/github.com/zeebo/blake3/LICENSE",
+      "source": "vendor/github.com/zeebo/blake3/LICENSE",
+      "kind": "legal-text",
+      "bytes": 7189,
+      "sha256": "0589f544f68ffc436e6e21efec2cf7cc2dbb2ac09ce6cb8a8cdb75ab74489716"
+    },
+    {
+      "path": "vendor/gitlab.com/yawning/chacha20.git/LICENSE",
+      "source": "vendor/gitlab.com/yawning/chacha20.git/LICENSE",
+      "kind": "legal-text",
+      "bytes": 34520,
+      "sha256": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6"
+    },
+    {
+      "path": "vendor/go.uber.org/multierr/LICENSE.txt",
+      "source": "vendor/go.uber.org/multierr/LICENSE.txt",
+      "kind": "legal-text",
+      "bytes": 1072,
+      "sha256": "dcdabe03bef2382a130640d1c3a4cd5ec42aba1035095c38272fde694eb72405"
+    },
+    {
+      "path": "vendor/go.uber.org/zap/LICENSE",
+      "source": "vendor/go.uber.org/zap/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1072,
+      "sha256": "c2b97b3281be272711909076c8402499b4b5a3216196af47a25b1d3674d86152"
+    },
+    {
+      "path": "vendor/go.uber.org/zap/exp/LICENSE",
+      "source": "vendor/go.uber.org/zap/exp/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1072,
+      "sha256": "c2b97b3281be272711909076c8402499b4b5a3216196af47a25b1d3674d86152"
+    },
+    {
+      "path": "vendor/go4.org/netipx/AUTHORS",
+      "source": "vendor/go4.org/netipx/AUTHORS",
+      "kind": "legal-text",
+      "bytes": 120,
+      "sha256": "7868b053d41a7d213354d2c0417ca82c3a045d7cf5f9c2e3bb749b3882c52136"
+    },
+    {
+      "path": "vendor/go4.org/netipx/LICENSE",
+      "source": "vendor/go4.org/netipx/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1487,
+      "sha256": "1bfc4f32f4ec8ca8fce54bd2d97784f003786753a69a78ca74ffae1574037fb9"
+    },
+    {
+      "path": "vendor/golang.org/x/crypto/LICENSE",
+      "source": "vendor/golang.org/x/crypto/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "vendor/golang.org/x/crypto/PATENTS",
+      "source": "vendor/golang.org/x/crypto/PATENTS",
+      "kind": "legal-text",
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    {
+      "path": "vendor/golang.org/x/exp/LICENSE",
+      "source": "vendor/golang.org/x/exp/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "vendor/golang.org/x/exp/PATENTS",
+      "source": "vendor/golang.org/x/exp/PATENTS",
+      "kind": "legal-text",
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    {
+      "path": "vendor/golang.org/x/mod/LICENSE",
+      "source": "vendor/golang.org/x/mod/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "vendor/golang.org/x/mod/PATENTS",
+      "source": "vendor/golang.org/x/mod/PATENTS",
+      "kind": "legal-text",
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    {
+      "path": "vendor/golang.org/x/net/LICENSE",
+      "source": "vendor/golang.org/x/net/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "vendor/golang.org/x/net/PATENTS",
+      "source": "vendor/golang.org/x/net/PATENTS",
+      "kind": "legal-text",
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    {
+      "path": "vendor/golang.org/x/sync/LICENSE",
+      "source": "vendor/golang.org/x/sync/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "vendor/golang.org/x/sync/PATENTS",
+      "source": "vendor/golang.org/x/sync/PATENTS",
+      "kind": "legal-text",
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    {
+      "path": "vendor/golang.org/x/sys/LICENSE",
+      "source": "vendor/golang.org/x/sys/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "vendor/golang.org/x/sys/PATENTS",
+      "source": "vendor/golang.org/x/sys/PATENTS",
+      "kind": "legal-text",
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    {
+      "path": "vendor/golang.org/x/text/LICENSE",
+      "source": "vendor/golang.org/x/text/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "vendor/golang.org/x/text/PATENTS",
+      "source": "vendor/golang.org/x/text/PATENTS",
+      "kind": "legal-text",
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    {
+      "path": "vendor/golang.org/x/time/LICENSE",
+      "source": "vendor/golang.org/x/time/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "vendor/golang.org/x/time/PATENTS",
+      "source": "vendor/golang.org/x/time/PATENTS",
+      "kind": "legal-text",
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    {
+      "path": "vendor/golang.org/x/tools/LICENSE",
+      "source": "vendor/golang.org/x/tools/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "vendor/golang.org/x/tools/PATENTS",
+      "source": "vendor/golang.org/x/tools/PATENTS",
+      "kind": "legal-text",
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    {
+      "path": "vendor/golang.zx2c4.com/wintun/LICENSE",
+      "source": "vendor/golang.zx2c4.com/wintun/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1023,
+      "sha256": "91276db973f25602d1aa43491f59cbc84cb88e6f151e1d0cc82a755563ce0195"
+    },
+    {
+      "path": "vendor/golang.zx2c4.com/wireguard/LICENSE",
+      "source": "vendor/golang.zx2c4.com/wireguard/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1023,
+      "sha256": "91276db973f25602d1aa43491f59cbc84cb88e6f151e1d0cc82a755563ce0195"
+    },
+    {
+      "path": "vendor/google.golang.org/genproto/googleapis/rpc/LICENSE",
+      "source": "vendor/google.golang.org/genproto/googleapis/rpc/LICENSE",
+      "kind": "legal-text",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "vendor/google.golang.org/grpc/AUTHORS",
+      "source": "vendor/google.golang.org/grpc/AUTHORS",
+      "kind": "legal-text",
+      "bytes": 12,
+      "sha256": "627c695f80fdac6412d66e6ad4160a4acb41923ca7ee3fd7e112e105f0ff46b9"
+    },
+    {
+      "path": "vendor/google.golang.org/grpc/LICENSE",
+      "source": "vendor/google.golang.org/grpc/LICENSE",
+      "kind": "legal-text",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "vendor/google.golang.org/grpc/NOTICE.txt",
+      "source": "vendor/google.golang.org/grpc/NOTICE.txt",
+      "kind": "legal-text",
+      "bytes": 554,
+      "sha256": "693ff28ec216d5112ac1bbfe64ef539005867d1c7bd427b57d579683293b947f"
+    },
+    {
+      "path": "vendor/google.golang.org/protobuf/LICENSE",
+      "source": "vendor/google.golang.org/protobuf/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1479,
+      "sha256": "4835612df0098ca95f8e7d9e3bffcb02358d435dbb38057c844c99d7f725eb20"
+    },
+    {
+      "path": "vendor/google.golang.org/protobuf/PATENTS",
+      "source": "vendor/google.golang.org/protobuf/PATENTS",
+      "kind": "legal-text",
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    {
+      "path": "vendor/gopkg.in/yaml.v3/LICENSE",
+      "source": "vendor/gopkg.in/yaml.v3/LICENSE",
+      "kind": "legal-text",
+      "bytes": 2151,
+      "sha256": "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+    },
+    {
+      "path": "vendor/gopkg.in/yaml.v3/NOTICE",
+      "source": "vendor/gopkg.in/yaml.v3/NOTICE",
+      "kind": "legal-text",
+      "bytes": 560,
+      "sha256": "f6c2dd3a67b576eafb89b80200b8b1627230bf3821a0c14cb99a22ac19107d00"
+    },
+    {
+      "path": "vendor/gvisor.dev/gvisor/AUTHORS",
+      "source": "vendor/gvisor.dev/gvisor/AUTHORS",
+      "kind": "legal-text",
+      "bytes": 365,
+      "sha256": "16818597d03ff1b20e9a5e6eeedb3108acde75ec30c3edba534892b1a66b1e71"
+    },
+    {
+      "path": "vendor/gvisor.dev/gvisor/LICENSE",
+      "source": "vendor/gvisor.dev/gvisor/LICENSE",
+      "kind": "legal-text",
+      "bytes": 14110,
+      "sha256": "0fbab5c58efbdf6d31e8085214f2dd821659c03d73cff3ed2b08e98826ea1cd9"
+    },
+    {
+      "path": "vendor/lukechampine.com/blake3/LICENSE",
+      "source": "vendor/lukechampine.com/blake3/LICENSE",
+      "kind": "legal-text",
+      "bytes": 1080,
+      "sha256": "7a576402565d51f9c0c7ee5a639aa91d49ed1a54c21a8d0b56f0d25e72d8b2f1"
+    },
+    {
+      "path": "vendor/modules.txt",
+      "source": "vendor/modules.txt",
+      "kind": "module-index",
+      "bytes": 41435,
+      "sha256": "28c372ed0f4501fa4663b49a10f7c9adb0e1830a5a37d84bb8c04dd64f9a01b3"
+    }
+  ],
+  "modules": [
+    {
+      "module": "filippo.io/edwards25519",
+      "version": "v1.2.0",
+      "packages": [
+        "filippo.io/edwards25519",
+        "filippo.io/edwards25519/field"
+      ],
+      "root_legal_files": [
+        "vendor/filippo.io/edwards25519/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/ajg/form",
+      "version": "v1.5.1",
+      "packages": [
+        "github.com/ajg/form"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/ajg/form/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/andybalholm/brotli",
+      "version": "v1.1.0",
+      "packages": [
+        "github.com/andybalholm/brotli",
+        "github.com/andybalholm/brotli/matchfinder"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/andybalholm/brotli/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/anytls/sing-anytls",
+      "version": "v0.0.11",
+      "packages": [
+        "github.com/anytls/sing-anytls",
+        "github.com/anytls/sing-anytls/padding",
+        "github.com/anytls/sing-anytls/pipe",
+        "github.com/anytls/sing-anytls/session",
+        "github.com/anytls/sing-anytls/skiplist",
+        "github.com/anytls/sing-anytls/util"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/anytls/sing-anytls/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/apernet/quic-go",
+      "version": "v0.59.1-0.20260217092621-db4786c77a22",
+      "packages": [
+        "github.com/apernet/quic-go",
+        "github.com/apernet/quic-go/congestion",
+        "github.com/apernet/quic-go/http3",
+        "github.com/apernet/quic-go/http3/qlog",
+        "github.com/apernet/quic-go/internal/ackhandler",
+        "github.com/apernet/quic-go/internal/congestion",
+        "github.com/apernet/quic-go/internal/flowcontrol",
+        "github.com/apernet/quic-go/internal/handshake",
+        "github.com/apernet/quic-go/internal/monotime",
+        "github.com/apernet/quic-go/internal/protocol",
+        "github.com/apernet/quic-go/internal/qerr",
+        "github.com/apernet/quic-go/internal/utils",
+        "github.com/apernet/quic-go/internal/utils/linkedlist",
+        "github.com/apernet/quic-go/internal/utils/ringbuffer",
+        "github.com/apernet/quic-go/internal/utils/tree",
+        "github.com/apernet/quic-go/internal/wire",
+        "github.com/apernet/quic-go/monotime",
+        "github.com/apernet/quic-go/qlog",
+        "github.com/apernet/quic-go/qlogwriter",
+        "github.com/apernet/quic-go/qlogwriter/jsontext",
+        "github.com/apernet/quic-go/quicvarint"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/apernet/quic-go/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/caddyserver/certmagic",
+      "version": "v0.25.3-0.20260421143802-60d9d8b415d6",
+      "packages": [
+        "github.com/caddyserver/certmagic",
+        "github.com/caddyserver/certmagic/internal/atomicfile"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/caddyserver/certmagic/LICENSE.txt"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/caddyserver/zerossl",
+      "version": "v0.1.5",
+      "packages": [
+        "github.com/caddyserver/zerossl"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/caddyserver/zerossl/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/cloudflare/circl",
+      "version": "v1.6.3",
+      "packages": [
+        "github.com/cloudflare/circl/internal/sha3",
+        "github.com/cloudflare/circl/sign",
+        "github.com/cloudflare/circl/sign/internal/dilithium",
+        "github.com/cloudflare/circl/sign/internal/dilithium/params",
+        "github.com/cloudflare/circl/sign/mldsa/mldsa65",
+        "github.com/cloudflare/circl/sign/mldsa/mldsa65/internal",
+        "github.com/cloudflare/circl/simd/keccakf1600"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/cloudflare/circl/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/database64128/netx-go",
+      "version": "v0.1.1",
+      "packages": [
+        "github.com/database64128/netx-go"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/database64128/netx-go/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/database64128/tfo-go/v2",
+      "version": "v2.3.2",
+      "packages": [
+        "github.com/database64128/tfo-go/v2"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/database64128/tfo-go/v2/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/enfein/mieru/v3",
+      "version": "v3.38.1",
+      "packages": [
+        "github.com/enfein/mieru/v3/apis/client",
+        "github.com/enfein/mieru/v3/apis/common",
+        "github.com/enfein/mieru/v3/apis/constant",
+        "github.com/enfein/mieru/v3/apis/internal",
+        "github.com/enfein/mieru/v3/apis/model",
+        "github.com/enfein/mieru/v3/apis/server",
+        "github.com/enfein/mieru/v3/apis/trafficpattern",
+        "github.com/enfein/mieru/v3/pkg/appctl/appctlcommon",
+        "github.com/enfein/mieru/v3/pkg/appctl/appctlpb",
+        "github.com/enfein/mieru/v3/pkg/cipher",
+        "github.com/enfein/mieru/v3/pkg/common",
+        "github.com/enfein/mieru/v3/pkg/congestion",
+        "github.com/enfein/mieru/v3/pkg/egress",
+        "github.com/enfein/mieru/v3/pkg/log",
+        "github.com/enfein/mieru/v3/pkg/mathext",
+        "github.com/enfein/mieru/v3/pkg/metrics",
+        "github.com/enfein/mieru/v3/pkg/metrics/metricspb",
+        "github.com/enfein/mieru/v3/pkg/protocol",
+        "github.com/enfein/mieru/v3/pkg/protocol/serveruser",
+        "github.com/enfein/mieru/v3/pkg/replay",
+        "github.com/enfein/mieru/v3/pkg/rng",
+        "github.com/enfein/mieru/v3/pkg/sockopts",
+        "github.com/enfein/mieru/v3/pkg/socks5",
+        "github.com/enfein/mieru/v3/pkg/stderror",
+        "github.com/enfein/mieru/v3/pkg/version"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/enfein/mieru/v3/LICENSE"
+      ],
+      "nested_legal_files": [
+        "vendor/github.com/enfein/mieru/v3/pkg/log/LICENSE",
+        "vendor/github.com/enfein/mieru/v3/pkg/socks5/LICENSE"
+      ],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/florianl/go-nfqueue/v2",
+      "version": "v2.1.0",
+      "packages": [
+        "github.com/florianl/go-nfqueue/v2",
+        "github.com/florianl/go-nfqueue/v2/internal/unix"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/florianl/go-nfqueue/v2/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/fsnotify/fsnotify",
+      "version": "v1.9.0",
+      "packages": [
+        "github.com/fsnotify/fsnotify",
+        "github.com/fsnotify/fsnotify/internal"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/fsnotify/fsnotify/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/go-chi/chi/v5",
+      "version": "v5.2.5",
+      "packages": [
+        "github.com/go-chi/chi/v5",
+        "github.com/go-chi/chi/v5/middleware"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/go-chi/chi/v5/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/go-chi/render",
+      "version": "v1.0.3",
+      "packages": [
+        "github.com/go-chi/render"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/go-chi/render/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/go-ole/go-ole",
+      "version": "v1.3.0",
+      "packages": [
+        "github.com/go-ole/go-ole",
+        "github.com/go-ole/go-ole/oleutil"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/go-ole/go-ole/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/go-sql-driver/mysql",
+      "version": "v1.10.1",
+      "packages": [
+        "github.com/go-sql-driver/mysql"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/go-sql-driver/mysql/AUTHORS",
+        "vendor/github.com/go-sql-driver/mysql/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/gobwas/httphead",
+      "version": "v0.1.0",
+      "packages": [
+        "github.com/gobwas/httphead"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/gobwas/httphead/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/gobwas/pool",
+      "version": "v0.2.1",
+      "packages": [
+        "github.com/gobwas/pool",
+        "github.com/gobwas/pool/internal/pmath",
+        "github.com/gobwas/pool/pbufio",
+        "github.com/gobwas/pool/pbytes"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/gobwas/pool/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/godbus/dbus/v5",
+      "version": "v5.2.2",
+      "packages": [
+        "github.com/godbus/dbus/v5"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/godbus/dbus/v5/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/gofrs/uuid/v5",
+      "version": "v5.5.1",
+      "packages": [
+        "github.com/gofrs/uuid/v5"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/gofrs/uuid/v5/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/google/btree",
+      "version": "v1.1.3",
+      "packages": [
+        "github.com/google/btree"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/google/btree/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/google/go-cmp",
+      "version": "v0.7.0",
+      "packages": [
+        "github.com/google/go-cmp/cmp",
+        "github.com/google/go-cmp/cmp/internal/diff",
+        "github.com/google/go-cmp/cmp/internal/flags",
+        "github.com/google/go-cmp/cmp/internal/function",
+        "github.com/google/go-cmp/cmp/internal/value"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/google/go-cmp/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/google/gopacket",
+      "version": "v1.1.19",
+      "packages": [
+        "github.com/google/gopacket/routing"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/google/gopacket/AUTHORS",
+        "vendor/github.com/google/gopacket/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/gorilla/websocket",
+      "version": "v1.5.3",
+      "packages": [
+        "github.com/gorilla/websocket"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/gorilla/websocket/AUTHORS",
+        "vendor/github.com/gorilla/websocket/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/hashicorp/yamux",
+      "version": "v0.1.2",
+      "packages": [
+        "github.com/hashicorp/yamux"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/hashicorp/yamux/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/huin/goupnp",
+      "version": "v1.3.0",
+      "packages": [
+        "github.com/huin/goupnp",
+        "github.com/huin/goupnp/dcps/internetgateway1",
+        "github.com/huin/goupnp/dcps/internetgateway2",
+        "github.com/huin/goupnp/httpu",
+        "github.com/huin/goupnp/scpd",
+        "github.com/huin/goupnp/soap",
+        "github.com/huin/goupnp/ssdp"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/huin/goupnp/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/jackpal/go-nat-pmp",
+      "version": "v1.0.2",
+      "packages": [
+        "github.com/jackpal/go-nat-pmp"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/jackpal/go-nat-pmp/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/jsimonetti/rtnetlink",
+      "version": "v1.4.1",
+      "packages": [
+        "github.com/jsimonetti/rtnetlink",
+        "github.com/jsimonetti/rtnetlink/internal/unix"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/jsimonetti/rtnetlink/LICENSE.md"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/juju/ratelimit",
+      "version": "v1.0.2",
+      "packages": [
+        "github.com/juju/ratelimit"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/juju/ratelimit/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/klauspost/compress",
+      "version": "v1.19.1",
+      "packages": [
+        "github.com/klauspost/compress",
+        "github.com/klauspost/compress/fse",
+        "github.com/klauspost/compress/huff0",
+        "github.com/klauspost/compress/internal/cpuinfo",
+        "github.com/klauspost/compress/internal/le",
+        "github.com/klauspost/compress/internal/snapref",
+        "github.com/klauspost/compress/zstd",
+        "github.com/klauspost/compress/zstd/internal/xxhash"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/klauspost/compress/LICENSE"
+      ],
+      "nested_legal_files": [
+        "vendor/github.com/klauspost/compress/internal/snapref/LICENSE",
+        "vendor/github.com/klauspost/compress/zstd/internal/xxhash/LICENSE.txt"
+      ],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/klauspost/cpuid/v2",
+      "version": "v2.3.0",
+      "packages": [
+        "github.com/klauspost/cpuid/v2"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/klauspost/cpuid/v2/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/koron/go-ssdp",
+      "version": "v0.0.4",
+      "packages": [
+        "github.com/koron/go-ssdp",
+        "github.com/koron/go-ssdp/internal/multicast",
+        "github.com/koron/go-ssdp/internal/ssdplog"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/koron/go-ssdp/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/libdns/acmedns",
+      "version": "v0.5.0",
+      "packages": [
+        "github.com/libdns/acmedns"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/libdns/acmedns/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/libdns/alidns",
+      "version": "v1.0.6",
+      "packages": [
+        "github.com/libdns/alidns"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/libdns/alidns/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/libdns/cloudflare",
+      "version": "v0.2.2",
+      "packages": [
+        "github.com/libdns/cloudflare"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/libdns/cloudflare/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/libdns/libdns",
+      "version": "v1.1.1",
+      "packages": [
+        "github.com/libdns/libdns"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/libdns/libdns/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/libp2p/go-nat",
+      "version": "v1.0.1-0.20250821073202-01afc089f138",
+      "packages": [
+        "github.com/libp2p/go-nat"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/libp2p/go-nat/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/libp2p/go-netroute",
+      "version": "v0.2.1",
+      "packages": [
+        "github.com/libp2p/go-netroute"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/libp2p/go-netroute/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/logrusorgru/aurora",
+      "version": "v2.0.3+incompatible",
+      "packages": [
+        "github.com/logrusorgru/aurora"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/logrusorgru/aurora/AUTHORS.md",
+        "vendor/github.com/logrusorgru/aurora/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/mdlayher/netlink",
+      "version": "v1.11.2",
+      "packages": [
+        "github.com/mdlayher/netlink",
+        "github.com/mdlayher/netlink/nlenc",
+        "github.com/mdlayher/netlink/nltest"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/mdlayher/netlink/LICENSE.md"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/mdlayher/socket",
+      "version": "v0.6.0",
+      "packages": [
+        "github.com/mdlayher/socket"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/mdlayher/socket/LICENSE.md"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/metacubex/utls",
+      "version": "v1.8.7",
+      "packages": [
+        "github.com/metacubex/utls",
+        "github.com/metacubex/utls/dicttls",
+        "github.com/metacubex/utls/internal/boring",
+        "github.com/metacubex/utls/internal/byteorder",
+        "github.com/metacubex/utls/internal/cpu",
+        "github.com/metacubex/utls/internal/fips140tls",
+        "github.com/metacubex/utls/internal/helper",
+        "github.com/metacubex/utls/internal/hkdf",
+        "github.com/metacubex/utls/internal/hpke",
+        "github.com/metacubex/utls/internal/mlkem",
+        "github.com/metacubex/utls/internal/quicvarint",
+        "github.com/metacubex/utls/internal/quicvarint/protocol",
+        "github.com/metacubex/utls/internal/ratelimit",
+        "github.com/metacubex/utls/internal/tls12",
+        "github.com/metacubex/utls/internal/tls13"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/metacubex/utls/CONTRIBUTORS_GUIDE.md",
+        "vendor/github.com/metacubex/utls/LICENSE"
+      ],
+      "nested_legal_files": [
+        "vendor/github.com/metacubex/utls/dicttls/LICENSE"
+      ],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/mholt/acmez/v3",
+      "version": "v3.1.6",
+      "packages": [
+        "github.com/mholt/acmez/v3",
+        "github.com/mholt/acmez/v3/acme"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/mholt/acmez/v3/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/miekg/dns",
+      "version": "v1.1.72",
+      "packages": [
+        "github.com/miekg/dns"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/miekg/dns/AUTHORS",
+        "vendor/github.com/miekg/dns/CONTRIBUTORS",
+        "vendor/github.com/miekg/dns/COPYRIGHT",
+        "vendor/github.com/miekg/dns/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/pelletier/go-toml/v2",
+      "version": "v2.2.4",
+      "packages": [
+        "github.com/pelletier/go-toml/v2",
+        "github.com/pelletier/go-toml/v2/internal/characters",
+        "github.com/pelletier/go-toml/v2/internal/danger",
+        "github.com/pelletier/go-toml/v2/internal/tracker",
+        "github.com/pelletier/go-toml/v2/unstable"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/pelletier/go-toml/v2/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/pires/go-proxyproto",
+      "version": "v0.11.0",
+      "packages": [
+        "github.com/pires/go-proxyproto"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/pires/go-proxyproto/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/quic-go/qpack",
+      "version": "v0.6.0",
+      "packages": [
+        "github.com/quic-go/qpack"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/quic-go/qpack/LICENSE.md"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/refraction-networking/utls",
+      "version": "v1.8.3-0.20260301010127-aa6edf4b11af",
+      "packages": [
+        "github.com/refraction-networking/utls",
+        "github.com/refraction-networking/utls/dicttls",
+        "github.com/refraction-networking/utls/internal/boring",
+        "github.com/refraction-networking/utls/internal/byteorder",
+        "github.com/refraction-networking/utls/internal/fips140tls",
+        "github.com/refraction-networking/utls/internal/helper",
+        "github.com/refraction-networking/utls/internal/hkdf",
+        "github.com/refraction-networking/utls/internal/hpke",
+        "github.com/refraction-networking/utls/internal/quicvarint",
+        "github.com/refraction-networking/utls/internal/quicvarint/protocol",
+        "github.com/refraction-networking/utls/internal/tls12",
+        "github.com/refraction-networking/utls/internal/tls13"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/refraction-networking/utls/CONTRIBUTORS_GUIDE.md",
+        "vendor/github.com/refraction-networking/utls/LICENSE"
+      ],
+      "nested_legal_files": [
+        "vendor/github.com/refraction-networking/utls/dicttls/LICENSE"
+      ],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/robfig/cron/v3",
+      "version": "v3.0.1",
+      "packages": [
+        "github.com/robfig/cron/v3"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/robfig/cron/v3/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/bbolt",
+      "version": "v0.0.0-20260915102804-500ee1e84832",
+      "packages": [
+        "github.com/sagernet/bbolt",
+        "github.com/sagernet/bbolt/errors",
+        "github.com/sagernet/bbolt/internal/common",
+        "github.com/sagernet/bbolt/internal/freelist"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/bbolt/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/fswatch",
+      "version": "v0.1.2",
+      "packages": [
+        "github.com/sagernet/fswatch"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/fswatch/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/gvisor",
+      "version": "v0.0.0-20260727.0-sing-box-mod.1",
+      "packages": [
+        "github.com/sagernet/gvisor/pkg/atomicbitops",
+        "github.com/sagernet/gvisor/pkg/bits",
+        "github.com/sagernet/gvisor/pkg/buffer",
+        "github.com/sagernet/gvisor/pkg/context",
+        "github.com/sagernet/gvisor/pkg/cpuid",
+        "github.com/sagernet/gvisor/pkg/gohacks",
+        "github.com/sagernet/gvisor/pkg/goid",
+        "github.com/sagernet/gvisor/pkg/linewriter",
+        "github.com/sagernet/gvisor/pkg/log",
+        "github.com/sagernet/gvisor/pkg/rand",
+        "github.com/sagernet/gvisor/pkg/rawfile",
+        "github.com/sagernet/gvisor/pkg/refs",
+        "github.com/sagernet/gvisor/pkg/sleep",
+        "github.com/sagernet/gvisor/pkg/state",
+        "github.com/sagernet/gvisor/pkg/state/wire",
+        "github.com/sagernet/gvisor/pkg/sync",
+        "github.com/sagernet/gvisor/pkg/sync/locking",
+        "github.com/sagernet/gvisor/pkg/tcpip",
+        "github.com/sagernet/gvisor/pkg/tcpip/adapters/gonet",
+        "github.com/sagernet/gvisor/pkg/tcpip/checksum",
+        "github.com/sagernet/gvisor/pkg/tcpip/hash/jenkins",
+        "github.com/sagernet/gvisor/pkg/tcpip/header",
+        "github.com/sagernet/gvisor/pkg/tcpip/header/parse",
+        "github.com/sagernet/gvisor/pkg/tcpip/internal/tcp",
+        "github.com/sagernet/gvisor/pkg/tcpip/link/channel",
+        "github.com/sagernet/gvisor/pkg/tcpip/link/fdbased",
+        "github.com/sagernet/gvisor/pkg/tcpip/link/qdisc",
+        "github.com/sagernet/gvisor/pkg/tcpip/link/qdisc/fifo",
+        "github.com/sagernet/gvisor/pkg/tcpip/link/stopfd",
+        "github.com/sagernet/gvisor/pkg/tcpip/network/hash",
+        "github.com/sagernet/gvisor/pkg/tcpip/network/internal/fragmentation",
+        "github.com/sagernet/gvisor/pkg/tcpip/network/internal/ip",
+        "github.com/sagernet/gvisor/pkg/tcpip/network/internal/multicast",
+        "github.com/sagernet/gvisor/pkg/tcpip/network/ipv4",
+        "github.com/sagernet/gvisor/pkg/tcpip/network/ipv6",
+        "github.com/sagernet/gvisor/pkg/tcpip/ports",
+        "github.com/sagernet/gvisor/pkg/tcpip/seqnum",
+        "github.com/sagernet/gvisor/pkg/tcpip/stack",
+        "github.com/sagernet/gvisor/pkg/tcpip/stack/gro",
+        "github.com/sagernet/gvisor/pkg/tcpip/transport",
+        "github.com/sagernet/gvisor/pkg/tcpip/transport/icmp",
+        "github.com/sagernet/gvisor/pkg/tcpip/transport/internal/network",
+        "github.com/sagernet/gvisor/pkg/tcpip/transport/internal/noop",
+        "github.com/sagernet/gvisor/pkg/tcpip/transport/packet",
+        "github.com/sagernet/gvisor/pkg/tcpip/transport/raw",
+        "github.com/sagernet/gvisor/pkg/tcpip/transport/tcp",
+        "github.com/sagernet/gvisor/pkg/tcpip/transport/tcpconntrack",
+        "github.com/sagernet/gvisor/pkg/tcpip/transport/udp",
+        "github.com/sagernet/gvisor/pkg/waiter"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/gvisor/AUTHORS",
+        "vendor/github.com/sagernet/gvisor/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/netlink",
+      "version": "v0.0.0-20260814022025-64455d367bbf",
+      "packages": [
+        "github.com/sagernet/netlink",
+        "github.com/sagernet/netlink/nl"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/netlink/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/nftables",
+      "version": "v0.3.0-mod.4",
+      "packages": [
+        "github.com/sagernet/nftables",
+        "github.com/sagernet/nftables/alignedbuff",
+        "github.com/sagernet/nftables/binaryutil",
+        "github.com/sagernet/nftables/expr",
+        "github.com/sagernet/nftables/internal/parseexprfunc",
+        "github.com/sagernet/nftables/userdata",
+        "github.com/sagernet/nftables/xt"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/nftables/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/quic-go",
+      "version": "v0.61.0-sing-box-mod.9",
+      "packages": [
+        "github.com/sagernet/quic-go",
+        "github.com/sagernet/quic-go/congestion",
+        "github.com/sagernet/quic-go/http3",
+        "github.com/sagernet/quic-go/http3/qlog",
+        "github.com/sagernet/quic-go/internal/ackhandler",
+        "github.com/sagernet/quic-go/internal/congestion",
+        "github.com/sagernet/quic-go/internal/handshake",
+        "github.com/sagernet/quic-go/internal/monotime",
+        "github.com/sagernet/quic-go/internal/protocol",
+        "github.com/sagernet/quic-go/internal/qerr",
+        "github.com/sagernet/quic-go/internal/utils",
+        "github.com/sagernet/quic-go/internal/utils/linkedlist",
+        "github.com/sagernet/quic-go/internal/utils/ringbuffer",
+        "github.com/sagernet/quic-go/internal/utils/tree",
+        "github.com/sagernet/quic-go/internal/wire",
+        "github.com/sagernet/quic-go/monotime",
+        "github.com/sagernet/quic-go/qlog",
+        "github.com/sagernet/quic-go/qlogwriter",
+        "github.com/sagernet/quic-go/qlogwriter/jsontext",
+        "github.com/sagernet/quic-go/quicvarint"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/quic-go/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/sing",
+      "version": "v0.9.7-0.20260929150544-0ad23b637bd4",
+      "packages": [
+        "github.com/sagernet/sing/common",
+        "github.com/sagernet/sing/common/abx",
+        "github.com/sagernet/sing/common/abx/internal",
+        "github.com/sagernet/sing/common/atomic",
+        "github.com/sagernet/sing/common/auth",
+        "github.com/sagernet/sing/common/baderror",
+        "github.com/sagernet/sing/common/batch",
+        "github.com/sagernet/sing/common/binary",
+        "github.com/sagernet/sing/common/buf",
+        "github.com/sagernet/sing/common/bufio",
+        "github.com/sagernet/sing/common/bufio/deadline",
+        "github.com/sagernet/sing/common/byteformats",
+        "github.com/sagernet/sing/common/cache",
+        "github.com/sagernet/sing/common/canceler",
+        "github.com/sagernet/sing/common/cleanup",
+        "github.com/sagernet/sing/common/control",
+        "github.com/sagernet/sing/common/debug",
+        "github.com/sagernet/sing/common/domain",
+        "github.com/sagernet/sing/common/exceptions",
+        "github.com/sagernet/sing/common/format",
+        "github.com/sagernet/sing/common/json",
+        "github.com/sagernet/sing/common/json/badjson",
+        "github.com/sagernet/sing/common/json/badoption",
+        "github.com/sagernet/sing/common/json/badoption/internal/my_time",
+        "github.com/sagernet/sing/common/json/internal/contextjson",
+        "github.com/sagernet/sing/common/logger",
+        "github.com/sagernet/sing/common/memory",
+        "github.com/sagernet/sing/common/metadata",
+        "github.com/sagernet/sing/common/network",
+        "github.com/sagernet/sing/common/ntp",
+        "github.com/sagernet/sing/common/observable",
+        "github.com/sagernet/sing/common/pipe",
+        "github.com/sagernet/sing/common/random",
+        "github.com/sagernet/sing/common/ranges",
+        "github.com/sagernet/sing/common/replay",
+        "github.com/sagernet/sing/common/rw",
+        "github.com/sagernet/sing/common/shell",
+        "github.com/sagernet/sing/common/task",
+        "github.com/sagernet/sing/common/tls",
+        "github.com/sagernet/sing/common/udpnat",
+        "github.com/sagernet/sing/common/udpnat2",
+        "github.com/sagernet/sing/common/uot",
+        "github.com/sagernet/sing/common/varbin",
+        "github.com/sagernet/sing/common/windnsapi",
+        "github.com/sagernet/sing/common/wininet",
+        "github.com/sagernet/sing/common/winiphlpapi",
+        "github.com/sagernet/sing/common/winpowrprof",
+        "github.com/sagernet/sing/common/winwlanapi",
+        "github.com/sagernet/sing/common/x/collections",
+        "github.com/sagernet/sing/common/x/constraints",
+        "github.com/sagernet/sing/common/x/linkedhashmap",
+        "github.com/sagernet/sing/common/x/list",
+        "github.com/sagernet/sing/contrab/freelru",
+        "github.com/sagernet/sing/contrab/maphash",
+        "github.com/sagernet/sing/protocol/http",
+        "github.com/sagernet/sing/protocol/socks",
+        "github.com/sagernet/sing/protocol/socks/socks4",
+        "github.com/sagernet/sing/protocol/socks/socks5",
+        "github.com/sagernet/sing/service",
+        "github.com/sagernet/sing/service/filemanager",
+        "github.com/sagernet/sing/service/pause"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/sing/LICENSE"
+      ],
+      "nested_legal_files": [
+        "vendor/github.com/sagernet/sing/contrab/freelru/LICENSE",
+        "vendor/github.com/sagernet/sing/contrab/freelru/NOTICE"
+      ],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/sing-box",
+      "version": "v1.14.3",
+      "packages": [
+        "github.com/sagernet/sing-box",
+        "github.com/sagernet/sing-box/adapter",
+        "github.com/sagernet/sing-box/adapter/certificate",
+        "github.com/sagernet/sing-box/adapter/endpoint",
+        "github.com/sagernet/sing-box/adapter/inbound",
+        "github.com/sagernet/sing-box/adapter/outbound",
+        "github.com/sagernet/sing-box/adapter/service",
+        "github.com/sagernet/sing-box/common/badtls",
+        "github.com/sagernet/sing-box/common/badversion",
+        "github.com/sagernet/sing-box/common/certificate",
+        "github.com/sagernet/sing-box/common/compatible",
+        "github.com/sagernet/sing-box/common/dialer",
+        "github.com/sagernet/sing-box/common/httpclient",
+        "github.com/sagernet/sing-box/common/ja3",
+        "github.com/sagernet/sing-box/common/jni",
+        "github.com/sagernet/sing-box/common/ktls",
+        "github.com/sagernet/sing-box/common/listener",
+        "github.com/sagernet/sing-box/common/mux",
+        "github.com/sagernet/sing-box/common/netns",
+        "github.com/sagernet/sing-box/common/process",
+        "github.com/sagernet/sing-box/common/proxybridge",
+        "github.com/sagernet/sing-box/common/redir",
+        "github.com/sagernet/sing-box/common/schannel",
+        "github.com/sagernet/sing-box/common/settings",
+        "github.com/sagernet/sing-box/common/sniff",
+        "github.com/sagernet/sing-box/common/sniff/internal/qtls",
+        "github.com/sagernet/sing-box/common/srs",
+        "github.com/sagernet/sing-box/common/taskmonitor",
+        "github.com/sagernet/sing-box/common/tls",
+        "github.com/sagernet/sing-box/common/tlsfragment",
+        "github.com/sagernet/sing-box/common/tlsspoof",
+        "github.com/sagernet/sing-box/common/trafficcontrol",
+        "github.com/sagernet/sing-box/common/uot",
+        "github.com/sagernet/sing-box/common/urltest",
+        "github.com/sagernet/sing-box/common/windivert",
+        "github.com/sagernet/sing-box/common/winmutex",
+        "github.com/sagernet/sing-box/constant",
+        "github.com/sagernet/sing-box/constant/goos",
+        "github.com/sagernet/sing-box/dns",
+        "github.com/sagernet/sing-box/dns/transport",
+        "github.com/sagernet/sing-box/dns/transport/hosts",
+        "github.com/sagernet/sing-box/dns/transport/local",
+        "github.com/sagernet/sing-box/dns/transport/local/systemconfig",
+        "github.com/sagernet/sing-box/dns/transport/mdns",
+        "github.com/sagernet/sing-box/experimental",
+        "github.com/sagernet/sing-box/experimental/cachefile",
+        "github.com/sagernet/sing-box/experimental/clashmode",
+        "github.com/sagernet/sing-box/experimental/deprecated",
+        "github.com/sagernet/sing-box/experimental/locale",
+        "github.com/sagernet/sing-box/log",
+        "github.com/sagernet/sing-box/option",
+        "github.com/sagernet/sing-box/protocol/anytls",
+        "github.com/sagernet/sing-box/protocol/direct",
+        "github.com/sagernet/sing-box/protocol/dns",
+        "github.com/sagernet/sing-box/protocol/http",
+        "github.com/sagernet/sing-box/protocol/hysteria",
+        "github.com/sagernet/sing-box/protocol/hysteria2",
+        "github.com/sagernet/sing-box/protocol/shadowsocks",
+        "github.com/sagernet/sing-box/protocol/socks",
+        "github.com/sagernet/sing-box/protocol/trojan",
+        "github.com/sagernet/sing-box/protocol/vless",
+        "github.com/sagernet/sing-box/protocol/vmess",
+        "github.com/sagernet/sing-box/route",
+        "github.com/sagernet/sing-box/route/rule",
+        "github.com/sagernet/sing-box/schema",
+        "github.com/sagernet/sing-box/service/powerreport",
+        "github.com/sagernet/sing-box/transport/simple-obfs",
+        "github.com/sagernet/sing-box/transport/sip003",
+        "github.com/sagernet/sing-box/transport/trojan",
+        "github.com/sagernet/sing-box/transport/v2ray",
+        "github.com/sagernet/sing-box/transport/v2raygrpc",
+        "github.com/sagernet/sing-box/transport/v2raygrpc/credentials",
+        "github.com/sagernet/sing-box/transport/v2raygrpclite",
+        "github.com/sagernet/sing-box/transport/v2rayhttp",
+        "github.com/sagernet/sing-box/transport/v2rayhttpupgrade",
+        "github.com/sagernet/sing-box/transport/v2raywebsocket"
+      ],
+      "replacement": "./third_party/sing-box",
+      "root_legal_files": [
+        "vendor/github.com/sagernet/sing-box/LICENSE"
+      ],
+      "nested_legal_files": [
+        "vendor/github.com/sagernet/sing-box/common/ja3/LICENSE"
+      ],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/sing-mux",
+      "version": "v0.3.10-0.20260929204512-caf09fe32475",
+      "packages": [
+        "github.com/sagernet/sing-mux"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/sing-mux/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/sing-quic",
+      "version": "v0.7.2-0.20261002084117-75c3ac4fa12b",
+      "packages": [
+        "github.com/sagernet/sing-quic",
+        "github.com/sagernet/sing-quic/congestion_meta2",
+        "github.com/sagernet/sing-quic/hysteria",
+        "github.com/sagernet/sing-quic/hysteria/congestion",
+        "github.com/sagernet/sing-quic/hysteria2",
+        "github.com/sagernet/sing-quic/hysteria2/internal/protocol",
+        "github.com/sagernet/sing-quic/hysteria2/internal/stun",
+        "github.com/sagernet/sing-quic/hysteria2/realm"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/sing-quic/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/sing-shadowsocks",
+      "version": "v0.2.9-0.20260929204512-65740e0f0e3e",
+      "packages": [
+        "github.com/sagernet/sing-shadowsocks",
+        "github.com/sagernet/sing-shadowsocks/shadowaead",
+        "github.com/sagernet/sing-shadowsocks/shadowaead_2022"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/sing-shadowsocks/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/sing-shadowsocks2",
+      "version": "v0.2.2-0.20260929152114-a69d1086332b",
+      "packages": [
+        "github.com/sagernet/sing-shadowsocks2",
+        "github.com/sagernet/sing-shadowsocks2/cipher",
+        "github.com/sagernet/sing-shadowsocks2/internal/legacykey",
+        "github.com/sagernet/sing-shadowsocks2/internal/shadowio",
+        "github.com/sagernet/sing-shadowsocks2/shadowaead",
+        "github.com/sagernet/sing-shadowsocks2/shadowaead_2022",
+        "github.com/sagernet/sing-shadowsocks2/shadowstream"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/sing-shadowsocks2/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/sing-snell",
+      "version": "v0.0.0-20260904135315-bc5a12ac736f",
+      "packages": [
+        "github.com/sagernet/sing-snell"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/sing-snell/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/sing-tun",
+      "version": "v0.9.7-0.20261009020158-bca4bf029237",
+      "packages": [
+        "github.com/sagernet/sing-tun",
+        "github.com/sagernet/sing-tun/dnsinfo",
+        "github.com/sagernet/sing-tun/gtcpip",
+        "github.com/sagernet/sing-tun/gtcpip/checksum",
+        "github.com/sagernet/sing-tun/gtcpip/header",
+        "github.com/sagernet/sing-tun/gtcpip/seqnum",
+        "github.com/sagernet/sing-tun/internal/fdbased_darwin",
+        "github.com/sagernet/sing-tun/internal/rawfile_darwin",
+        "github.com/sagernet/sing-tun/internal/stopfd_darwin",
+        "github.com/sagernet/sing-tun/internal/tschecksum",
+        "github.com/sagernet/sing-tun/internal/winfw",
+        "github.com/sagernet/sing-tun/internal/winipcfg",
+        "github.com/sagernet/sing-tun/internal/winsys",
+        "github.com/sagernet/sing-tun/internal/wintun",
+        "github.com/sagernet/sing-tun/internal/wintun/memmod",
+        "github.com/sagernet/sing-tun/ping"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/sing-tun/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/sing-usbip",
+      "version": "v0.0.0-20260817040617-28bd42667eca",
+      "packages": [
+        "github.com/sagernet/sing-usbip",
+        "github.com/sagernet/sing-usbip/driverassets",
+        "github.com/sagernet/sing-usbip/internal/usbipvhci",
+        "github.com/sagernet/sing-usbip/internal/vboxusb",
+        "github.com/sagernet/sing-usbip/internal/wincfgmgr32",
+        "github.com/sagernet/sing-usbip/internal/winsetupapi"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/sing-usbip/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/sing-vmess",
+      "version": "v0.2.9-0.20260929152519-9b95ab8c9478",
+      "packages": [
+        "github.com/sagernet/sing-vmess",
+        "github.com/sagernet/sing-vmess/packetaddr",
+        "github.com/sagernet/sing-vmess/vless"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/sing-vmess/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/smux",
+      "version": "v1.5.50-sing-box-mod.1",
+      "packages": [
+        "github.com/sagernet/smux"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/smux/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sagernet/ws",
+      "version": "v0.0.0-20231204124109-acfe8907c854",
+      "packages": [
+        "github.com/sagernet/ws",
+        "github.com/sagernet/ws/wsutil"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sagernet/ws/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/sirupsen/logrus",
+      "version": "v1.10.2",
+      "packages": [
+        "github.com/sirupsen/logrus"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/sirupsen/logrus/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/vishvananda/netlink",
+      "version": "v1.3.1",
+      "packages": [
+        "github.com/vishvananda/netlink",
+        "github.com/vishvananda/netlink/nl"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/vishvananda/netlink/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/vishvananda/netns",
+      "version": "v0.0.5",
+      "packages": [
+        "github.com/vishvananda/netns"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/vishvananda/netns/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/xtaci/smux",
+      "version": "v1.5.57",
+      "packages": [
+        "github.com/xtaci/smux"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/xtaci/smux/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/xtls/reality",
+      "version": "v0.0.0-20260322125925-9234c772ba8f",
+      "packages": [
+        "github.com/xtls/reality",
+        "github.com/xtls/reality/fips140tls",
+        "github.com/xtls/reality/hpke",
+        "github.com/xtls/reality/tls12",
+        "github.com/xtls/reality/tls13"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/xtls/reality/LICENSE",
+        "vendor/github.com/xtls/reality/LICENSE-Go"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/xtls/xray-core",
+      "version": "v1.260327.0",
+      "packages": [
+        "github.com/xtls/xray-core/app/commander",
+        "github.com/xtls/xray-core/app/dispatcher",
+        "github.com/xtls/xray-core/app/dns",
+        "github.com/xtls/xray-core/app/dns/fakedns",
+        "github.com/xtls/xray-core/app/log",
+        "github.com/xtls/xray-core/app/log/command",
+        "github.com/xtls/xray-core/app/metrics",
+        "github.com/xtls/xray-core/app/observatory",
+        "github.com/xtls/xray-core/app/observatory/burst",
+        "github.com/xtls/xray-core/app/observatory/command",
+        "github.com/xtls/xray-core/app/policy",
+        "github.com/xtls/xray-core/app/proxyman",
+        "github.com/xtls/xray-core/app/proxyman/command",
+        "github.com/xtls/xray-core/app/proxyman/inbound",
+        "github.com/xtls/xray-core/app/proxyman/outbound",
+        "github.com/xtls/xray-core/app/reverse",
+        "github.com/xtls/xray-core/app/router",
+        "github.com/xtls/xray-core/app/router/command",
+        "github.com/xtls/xray-core/app/stats",
+        "github.com/xtls/xray-core/app/stats/command",
+        "github.com/xtls/xray-core/app/version",
+        "github.com/xtls/xray-core/common",
+        "github.com/xtls/xray-core/common/antireplay",
+        "github.com/xtls/xray-core/common/bitmask",
+        "github.com/xtls/xray-core/common/buf",
+        "github.com/xtls/xray-core/common/bytespool",
+        "github.com/xtls/xray-core/common/cache",
+        "github.com/xtls/xray-core/common/cmdarg",
+        "github.com/xtls/xray-core/common/crypto",
+        "github.com/xtls/xray-core/common/crypto/internal",
+        "github.com/xtls/xray-core/common/ctx",
+        "github.com/xtls/xray-core/common/dice",
+        "github.com/xtls/xray-core/common/drain",
+        "github.com/xtls/xray-core/common/errors",
+        "github.com/xtls/xray-core/common/log",
+        "github.com/xtls/xray-core/common/mux",
+        "github.com/xtls/xray-core/common/net",
+        "github.com/xtls/xray-core/common/net/cnc",
+        "github.com/xtls/xray-core/common/ocsp",
+        "github.com/xtls/xray-core/common/platform",
+        "github.com/xtls/xray-core/common/platform/filesystem",
+        "github.com/xtls/xray-core/common/protocol",
+        "github.com/xtls/xray-core/common/protocol/bittorrent",
+        "github.com/xtls/xray-core/common/protocol/dns",
+        "github.com/xtls/xray-core/common/protocol/http",
+        "github.com/xtls/xray-core/common/protocol/quic",
+        "github.com/xtls/xray-core/common/protocol/tls",
+        "github.com/xtls/xray-core/common/protocol/tls/cert",
+        "github.com/xtls/xray-core/common/protocol/udp",
+        "github.com/xtls/xray-core/common/retry",
+        "github.com/xtls/xray-core/common/serial",
+        "github.com/xtls/xray-core/common/session",
+        "github.com/xtls/xray-core/common/signal",
+        "github.com/xtls/xray-core/common/signal/done",
+        "github.com/xtls/xray-core/common/signal/pubsub",
+        "github.com/xtls/xray-core/common/signal/semaphore",
+        "github.com/xtls/xray-core/common/singbridge",
+        "github.com/xtls/xray-core/common/strmatcher",
+        "github.com/xtls/xray-core/common/task",
+        "github.com/xtls/xray-core/common/utils",
+        "github.com/xtls/xray-core/common/uuid",
+        "github.com/xtls/xray-core/common/xudp",
+        "github.com/xtls/xray-core/core",
+        "github.com/xtls/xray-core/features",
+        "github.com/xtls/xray-core/features/dns",
+        "github.com/xtls/xray-core/features/dns/localdns",
+        "github.com/xtls/xray-core/features/extension",
+        "github.com/xtls/xray-core/features/inbound",
+        "github.com/xtls/xray-core/features/outbound",
+        "github.com/xtls/xray-core/features/policy",
+        "github.com/xtls/xray-core/features/routing",
+        "github.com/xtls/xray-core/features/routing/dns",
+        "github.com/xtls/xray-core/features/routing/session",
+        "github.com/xtls/xray-core/features/stats",
+        "github.com/xtls/xray-core/infra/conf",
+        "github.com/xtls/xray-core/infra/conf/cfgcommon/duration",
+        "github.com/xtls/xray-core/main/confloader",
+        "github.com/xtls/xray-core/proxy",
+        "github.com/xtls/xray-core/proxy/blackhole",
+        "github.com/xtls/xray-core/proxy/dns",
+        "github.com/xtls/xray-core/proxy/dokodemo",
+        "github.com/xtls/xray-core/proxy/freedom",
+        "github.com/xtls/xray-core/proxy/http",
+        "github.com/xtls/xray-core/proxy/hysteria",
+        "github.com/xtls/xray-core/proxy/hysteria/account",
+        "github.com/xtls/xray-core/proxy/hysteria/ctx",
+        "github.com/xtls/xray-core/proxy/loopback",
+        "github.com/xtls/xray-core/proxy/shadowsocks",
+        "github.com/xtls/xray-core/proxy/shadowsocks_2022",
+        "github.com/xtls/xray-core/proxy/socks",
+        "github.com/xtls/xray-core/proxy/trojan",
+        "github.com/xtls/xray-core/proxy/tun",
+        "github.com/xtls/xray-core/proxy/vless",
+        "github.com/xtls/xray-core/proxy/vless/encoding",
+        "github.com/xtls/xray-core/proxy/vless/encryption",
+        "github.com/xtls/xray-core/proxy/vless/inbound",
+        "github.com/xtls/xray-core/proxy/vless/outbound",
+        "github.com/xtls/xray-core/proxy/vmess",
+        "github.com/xtls/xray-core/proxy/vmess/aead",
+        "github.com/xtls/xray-core/proxy/vmess/encoding",
+        "github.com/xtls/xray-core/proxy/vmess/inbound",
+        "github.com/xtls/xray-core/proxy/vmess/outbound",
+        "github.com/xtls/xray-core/proxy/wireguard",
+        "github.com/xtls/xray-core/proxy/wireguard/gvisortun",
+        "github.com/xtls/xray-core/transport",
+        "github.com/xtls/xray-core/transport/internet",
+        "github.com/xtls/xray-core/transport/internet/browser_dialer",
+        "github.com/xtls/xray-core/transport/internet/finalmask",
+        "github.com/xtls/xray-core/transport/internet/finalmask/fragment",
+        "github.com/xtls/xray-core/transport/internet/finalmask/header/custom",
+        "github.com/xtls/xray-core/transport/internet/finalmask/header/dns",
+        "github.com/xtls/xray-core/transport/internet/finalmask/header/dtls",
+        "github.com/xtls/xray-core/transport/internet/finalmask/header/srtp",
+        "github.com/xtls/xray-core/transport/internet/finalmask/header/utp",
+        "github.com/xtls/xray-core/transport/internet/finalmask/header/wechat",
+        "github.com/xtls/xray-core/transport/internet/finalmask/header/wireguard",
+        "github.com/xtls/xray-core/transport/internet/finalmask/mkcp/aes128gcm",
+        "github.com/xtls/xray-core/transport/internet/finalmask/mkcp/original",
+        "github.com/xtls/xray-core/transport/internet/finalmask/noise",
+        "github.com/xtls/xray-core/transport/internet/finalmask/salamander",
+        "github.com/xtls/xray-core/transport/internet/finalmask/sudoku",
+        "github.com/xtls/xray-core/transport/internet/finalmask/xdns",
+        "github.com/xtls/xray-core/transport/internet/finalmask/xicmp",
+        "github.com/xtls/xray-core/transport/internet/grpc",
+        "github.com/xtls/xray-core/transport/internet/grpc/encoding",
+        "github.com/xtls/xray-core/transport/internet/headers/http",
+        "github.com/xtls/xray-core/transport/internet/headers/noop",
+        "github.com/xtls/xray-core/transport/internet/httpupgrade",
+        "github.com/xtls/xray-core/transport/internet/hysteria",
+        "github.com/xtls/xray-core/transport/internet/hysteria/congestion",
+        "github.com/xtls/xray-core/transport/internet/hysteria/congestion/bbr",
+        "github.com/xtls/xray-core/transport/internet/hysteria/congestion/brutal",
+        "github.com/xtls/xray-core/transport/internet/hysteria/congestion/common",
+        "github.com/xtls/xray-core/transport/internet/hysteria/padding",
+        "github.com/xtls/xray-core/transport/internet/hysteria/udphop",
+        "github.com/xtls/xray-core/transport/internet/kcp",
+        "github.com/xtls/xray-core/transport/internet/reality",
+        "github.com/xtls/xray-core/transport/internet/splithttp",
+        "github.com/xtls/xray-core/transport/internet/stat",
+        "github.com/xtls/xray-core/transport/internet/tagged",
+        "github.com/xtls/xray-core/transport/internet/tcp",
+        "github.com/xtls/xray-core/transport/internet/tls",
+        "github.com/xtls/xray-core/transport/internet/udp",
+        "github.com/xtls/xray-core/transport/internet/websocket",
+        "github.com/xtls/xray-core/transport/pipe"
+      ],
+      "replacement": "./third_party/xray-core",
+      "root_legal_files": [
+        "vendor/github.com/xtls/xray-core/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "github.com/zeebo/blake3",
+      "version": "v0.2.4",
+      "packages": [
+        "github.com/zeebo/blake3",
+        "github.com/zeebo/blake3/internal/alg",
+        "github.com/zeebo/blake3/internal/alg/compress",
+        "github.com/zeebo/blake3/internal/alg/compress/compress_pure",
+        "github.com/zeebo/blake3/internal/alg/compress/compress_sse41",
+        "github.com/zeebo/blake3/internal/alg/hash",
+        "github.com/zeebo/blake3/internal/alg/hash/hash_avx2",
+        "github.com/zeebo/blake3/internal/alg/hash/hash_pure",
+        "github.com/zeebo/blake3/internal/consts",
+        "github.com/zeebo/blake3/internal/utils"
+      ],
+      "root_legal_files": [
+        "vendor/github.com/zeebo/blake3/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "gitlab.com/yawning/chacha20.git",
+      "version": "v0.0.0-20230427033715-7877545b1b37",
+      "packages": [
+        "gitlab.com/yawning/chacha20.git",
+        "gitlab.com/yawning/chacha20.git/internal/api",
+        "gitlab.com/yawning/chacha20.git/internal/hardware",
+        "gitlab.com/yawning/chacha20.git/internal/ref"
+      ],
+      "root_legal_files": [
+        "vendor/gitlab.com/yawning/chacha20.git/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "go.uber.org/multierr",
+      "version": "v1.11.0",
+      "packages": [
+        "go.uber.org/multierr"
+      ],
+      "root_legal_files": [
+        "vendor/go.uber.org/multierr/LICENSE.txt"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "go.uber.org/zap",
+      "version": "v1.27.1",
+      "packages": [
+        "go.uber.org/zap",
+        "go.uber.org/zap/buffer",
+        "go.uber.org/zap/internal",
+        "go.uber.org/zap/internal/bufferpool",
+        "go.uber.org/zap/internal/color",
+        "go.uber.org/zap/internal/exit",
+        "go.uber.org/zap/internal/pool",
+        "go.uber.org/zap/internal/stacktrace",
+        "go.uber.org/zap/zapcore"
+      ],
+      "root_legal_files": [
+        "vendor/go.uber.org/zap/LICENSE"
+      ],
+      "nested_legal_files": [
+        "vendor/go.uber.org/zap/exp/LICENSE"
+      ],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "go.uber.org/zap/exp",
+      "version": "v0.3.0",
+      "packages": [
+        "go.uber.org/zap/exp/zapslog"
+      ],
+      "root_legal_files": [
+        "vendor/go.uber.org/zap/LICENSE",
+        "vendor/go.uber.org/zap/exp/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "go4.org/netipx",
+      "version": "v0.0.0-20231129151722-fdeea329fbba",
+      "packages": [
+        "go4.org/netipx"
+      ],
+      "root_legal_files": [
+        "vendor/go4.org/netipx/AUTHORS",
+        "vendor/go4.org/netipx/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "golang.org/x/crypto",
+      "version": "v0.54.0",
+      "packages": [
+        "golang.org/x/crypto/argon2",
+        "golang.org/x/crypto/blake2b",
+        "golang.org/x/crypto/blake2s",
+        "golang.org/x/crypto/blowfish",
+        "golang.org/x/crypto/cast5",
+        "golang.org/x/crypto/chacha20",
+        "golang.org/x/crypto/chacha20poly1305",
+        "golang.org/x/crypto/cryptobyte",
+        "golang.org/x/crypto/cryptobyte/asn1",
+        "golang.org/x/crypto/curve25519",
+        "golang.org/x/crypto/hkdf",
+        "golang.org/x/crypto/internal/alias",
+        "golang.org/x/crypto/internal/poly1305",
+        "golang.org/x/crypto/ocsp",
+        "golang.org/x/crypto/pbkdf2",
+        "golang.org/x/crypto/poly1305",
+        "golang.org/x/crypto/salsa20/salsa",
+        "golang.org/x/crypto/sha3"
+      ],
+      "root_legal_files": [
+        "vendor/golang.org/x/crypto/LICENSE",
+        "vendor/golang.org/x/crypto/PATENTS"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "golang.org/x/exp",
+      "version": "v0.0.0-20260410095643-746e56fc9e2f",
+      "packages": [
+        "golang.org/x/exp/constraints",
+        "golang.org/x/exp/slices"
+      ],
+      "root_legal_files": [
+        "vendor/golang.org/x/exp/LICENSE",
+        "vendor/golang.org/x/exp/PATENTS"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "golang.org/x/mod",
+      "version": "v0.37.0",
+      "packages": [
+        "golang.org/x/mod/semver"
+      ],
+      "root_legal_files": [
+        "vendor/golang.org/x/mod/LICENSE",
+        "vendor/golang.org/x/mod/PATENTS"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "golang.org/x/net",
+      "version": "v0.57.0",
+      "packages": [
+        "golang.org/x/net/bpf",
+        "golang.org/x/net/dns/dnsmessage",
+        "golang.org/x/net/http/httpguts",
+        "golang.org/x/net/http2",
+        "golang.org/x/net/http2/h2c",
+        "golang.org/x/net/http2/hpack",
+        "golang.org/x/net/icmp",
+        "golang.org/x/net/idna",
+        "golang.org/x/net/internal/httpcommon",
+        "golang.org/x/net/internal/httpsfv",
+        "golang.org/x/net/internal/iana",
+        "golang.org/x/net/internal/socket",
+        "golang.org/x/net/internal/timeseries",
+        "golang.org/x/net/ipv4",
+        "golang.org/x/net/ipv6",
+        "golang.org/x/net/publicsuffix",
+        "golang.org/x/net/route",
+        "golang.org/x/net/trace"
+      ],
+      "root_legal_files": [
+        "vendor/golang.org/x/net/LICENSE",
+        "vendor/golang.org/x/net/PATENTS"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "golang.org/x/sync",
+      "version": "v0.22.0",
+      "packages": [
+        "golang.org/x/sync/errgroup",
+        "golang.org/x/sync/semaphore",
+        "golang.org/x/sync/singleflight"
+      ],
+      "root_legal_files": [
+        "vendor/golang.org/x/sync/LICENSE",
+        "vendor/golang.org/x/sync/PATENTS"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "golang.org/x/sys",
+      "version": "v0.47.0",
+      "packages": [
+        "golang.org/x/sys/cpu",
+        "golang.org/x/sys/unix",
+        "golang.org/x/sys/windows",
+        "golang.org/x/sys/windows/registry"
+      ],
+      "root_legal_files": [
+        "vendor/golang.org/x/sys/LICENSE",
+        "vendor/golang.org/x/sys/PATENTS"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "golang.org/x/text",
+      "version": "v0.40.0",
+      "packages": [
+        "golang.org/x/text/internal/language",
+        "golang.org/x/text/internal/language/compact",
+        "golang.org/x/text/internal/tag",
+        "golang.org/x/text/language",
+        "golang.org/x/text/secure/bidirule",
+        "golang.org/x/text/transform",
+        "golang.org/x/text/unicode/bidi",
+        "golang.org/x/text/unicode/norm"
+      ],
+      "root_legal_files": [
+        "vendor/golang.org/x/text/LICENSE",
+        "vendor/golang.org/x/text/PATENTS"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "golang.org/x/time",
+      "version": "v0.15.0",
+      "packages": [
+        "golang.org/x/time/rate"
+      ],
+      "root_legal_files": [
+        "vendor/golang.org/x/time/LICENSE",
+        "vendor/golang.org/x/time/PATENTS"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "golang.org/x/tools",
+      "version": "v0.47.0",
+      "packages": [
+        "golang.org/x/tools/go/ast/edge",
+        "golang.org/x/tools/go/ast/inspector",
+        "golang.org/x/tools/go/gcexportdata",
+        "golang.org/x/tools/go/packages",
+        "golang.org/x/tools/go/types/objectpath",
+        "golang.org/x/tools/go/types/typeutil",
+        "golang.org/x/tools/internal/aliases",
+        "golang.org/x/tools/internal/event",
+        "golang.org/x/tools/internal/event/core",
+        "golang.org/x/tools/internal/event/keys",
+        "golang.org/x/tools/internal/event/label",
+        "golang.org/x/tools/internal/gcimporter",
+        "golang.org/x/tools/internal/gocommand",
+        "golang.org/x/tools/internal/packagesinternal",
+        "golang.org/x/tools/internal/pkgbits",
+        "golang.org/x/tools/internal/stdlib",
+        "golang.org/x/tools/internal/typeparams",
+        "golang.org/x/tools/internal/typesinternal",
+        "golang.org/x/tools/internal/versions"
+      ],
+      "root_legal_files": [
+        "vendor/golang.org/x/tools/LICENSE",
+        "vendor/golang.org/x/tools/PATENTS"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "golang.zx2c4.com/wintun",
+      "version": "v0.0.0-20230126152724-0fa3db229ce2",
+      "packages": [
+        "golang.zx2c4.com/wintun"
+      ],
+      "root_legal_files": [
+        "vendor/golang.zx2c4.com/wintun/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "golang.zx2c4.com/wireguard",
+      "version": "v0.0.0-20250521234502-f333402bd9cb",
+      "packages": [
+        "golang.zx2c4.com/wireguard/conn",
+        "golang.zx2c4.com/wireguard/conn/winrio",
+        "golang.zx2c4.com/wireguard/device",
+        "golang.zx2c4.com/wireguard/ipc",
+        "golang.zx2c4.com/wireguard/ipc/namedpipe",
+        "golang.zx2c4.com/wireguard/ratelimiter",
+        "golang.zx2c4.com/wireguard/replay",
+        "golang.zx2c4.com/wireguard/rwcancel",
+        "golang.zx2c4.com/wireguard/tai64n",
+        "golang.zx2c4.com/wireguard/tun"
+      ],
+      "root_legal_files": [
+        "vendor/golang.zx2c4.com/wireguard/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "google.golang.org/genproto/googleapis/rpc",
+      "version": "v0.0.0-20251202230838-ff82c1b0f217",
+      "packages": [
+        "google.golang.org/genproto/googleapis/rpc/status"
+      ],
+      "root_legal_files": [
+        "vendor/google.golang.org/genproto/googleapis/rpc/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "google.golang.org/grpc",
+      "version": "v1.79.3",
+      "packages": [
+        "google.golang.org/grpc",
+        "google.golang.org/grpc/attributes",
+        "google.golang.org/grpc/backoff",
+        "google.golang.org/grpc/balancer",
+        "google.golang.org/grpc/balancer/base",
+        "google.golang.org/grpc/balancer/endpointsharding",
+        "google.golang.org/grpc/balancer/grpclb/state",
+        "google.golang.org/grpc/balancer/pickfirst",
+        "google.golang.org/grpc/balancer/pickfirst/internal",
+        "google.golang.org/grpc/balancer/roundrobin",
+        "google.golang.org/grpc/binarylog/grpc_binarylog_v1",
+        "google.golang.org/grpc/channelz",
+        "google.golang.org/grpc/codes",
+        "google.golang.org/grpc/connectivity",
+        "google.golang.org/grpc/credentials",
+        "google.golang.org/grpc/credentials/insecure",
+        "google.golang.org/grpc/encoding",
+        "google.golang.org/grpc/encoding/internal",
+        "google.golang.org/grpc/encoding/proto",
+        "google.golang.org/grpc/experimental/stats",
+        "google.golang.org/grpc/grpclog",
+        "google.golang.org/grpc/grpclog/internal",
+        "google.golang.org/grpc/internal",
+        "google.golang.org/grpc/internal/backoff",
+        "google.golang.org/grpc/internal/balancer/gracefulswitch",
+        "google.golang.org/grpc/internal/balancer/weight",
+        "google.golang.org/grpc/internal/balancerload",
+        "google.golang.org/grpc/internal/binarylog",
+        "google.golang.org/grpc/internal/buffer",
+        "google.golang.org/grpc/internal/channelz",
+        "google.golang.org/grpc/internal/credentials",
+        "google.golang.org/grpc/internal/envconfig",
+        "google.golang.org/grpc/internal/grpclog",
+        "google.golang.org/grpc/internal/grpcsync",
+        "google.golang.org/grpc/internal/grpcutil",
+        "google.golang.org/grpc/internal/idle",
+        "google.golang.org/grpc/internal/metadata",
+        "google.golang.org/grpc/internal/pretty",
+        "google.golang.org/grpc/internal/proxyattributes",
+        "google.golang.org/grpc/internal/resolver",
+        "google.golang.org/grpc/internal/resolver/delegatingresolver",
+        "google.golang.org/grpc/internal/resolver/dns",
+        "google.golang.org/grpc/internal/resolver/dns/internal",
+        "google.golang.org/grpc/internal/resolver/passthrough",
+        "google.golang.org/grpc/internal/resolver/unix",
+        "google.golang.org/grpc/internal/serviceconfig",
+        "google.golang.org/grpc/internal/stats",
+        "google.golang.org/grpc/internal/status",
+        "google.golang.org/grpc/internal/syscall",
+        "google.golang.org/grpc/internal/transport",
+        "google.golang.org/grpc/internal/transport/networktype",
+        "google.golang.org/grpc/keepalive",
+        "google.golang.org/grpc/mem",
+        "google.golang.org/grpc/metadata",
+        "google.golang.org/grpc/peer",
+        "google.golang.org/grpc/reflection",
+        "google.golang.org/grpc/reflection/grpc_reflection_v1",
+        "google.golang.org/grpc/reflection/grpc_reflection_v1alpha",
+        "google.golang.org/grpc/reflection/internal",
+        "google.golang.org/grpc/resolver",
+        "google.golang.org/grpc/resolver/dns",
+        "google.golang.org/grpc/serviceconfig",
+        "google.golang.org/grpc/stats",
+        "google.golang.org/grpc/status",
+        "google.golang.org/grpc/tap"
+      ],
+      "root_legal_files": [
+        "vendor/google.golang.org/grpc/AUTHORS",
+        "vendor/google.golang.org/grpc/LICENSE",
+        "vendor/google.golang.org/grpc/NOTICE.txt"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "google.golang.org/protobuf",
+      "version": "v1.36.11",
+      "packages": [
+        "google.golang.org/protobuf/encoding/protojson",
+        "google.golang.org/protobuf/encoding/prototext",
+        "google.golang.org/protobuf/encoding/protowire",
+        "google.golang.org/protobuf/internal/descfmt",
+        "google.golang.org/protobuf/internal/descopts",
+        "google.golang.org/protobuf/internal/detrand",
+        "google.golang.org/protobuf/internal/editiondefaults",
+        "google.golang.org/protobuf/internal/editionssupport",
+        "google.golang.org/protobuf/internal/encoding/defval",
+        "google.golang.org/protobuf/internal/encoding/json",
+        "google.golang.org/protobuf/internal/encoding/messageset",
+        "google.golang.org/protobuf/internal/encoding/tag",
+        "google.golang.org/protobuf/internal/encoding/text",
+        "google.golang.org/protobuf/internal/errors",
+        "google.golang.org/protobuf/internal/filedesc",
+        "google.golang.org/protobuf/internal/filetype",
+        "google.golang.org/protobuf/internal/flags",
+        "google.golang.org/protobuf/internal/genid",
+        "google.golang.org/protobuf/internal/impl",
+        "google.golang.org/protobuf/internal/order",
+        "google.golang.org/protobuf/internal/pragma",
+        "google.golang.org/protobuf/internal/protolazy",
+        "google.golang.org/protobuf/internal/set",
+        "google.golang.org/protobuf/internal/strs",
+        "google.golang.org/protobuf/internal/version",
+        "google.golang.org/protobuf/proto",
+        "google.golang.org/protobuf/protoadapt",
+        "google.golang.org/protobuf/reflect/protodesc",
+        "google.golang.org/protobuf/reflect/protoreflect",
+        "google.golang.org/protobuf/reflect/protoregistry",
+        "google.golang.org/protobuf/runtime/protoiface",
+        "google.golang.org/protobuf/runtime/protoimpl",
+        "google.golang.org/protobuf/types/descriptorpb",
+        "google.golang.org/protobuf/types/gofeaturespb",
+        "google.golang.org/protobuf/types/known/anypb",
+        "google.golang.org/protobuf/types/known/durationpb",
+        "google.golang.org/protobuf/types/known/timestamppb"
+      ],
+      "root_legal_files": [
+        "vendor/google.golang.org/protobuf/LICENSE",
+        "vendor/google.golang.org/protobuf/PATENTS"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "gopkg.in/yaml.v3",
+      "version": "v3.0.1",
+      "packages": [
+        "gopkg.in/yaml.v3"
+      ],
+      "root_legal_files": [
+        "vendor/gopkg.in/yaml.v3/LICENSE",
+        "vendor/gopkg.in/yaml.v3/NOTICE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "gvisor.dev/gvisor",
+      "version": "v0.0.0-20260122175437-89a5d21be8f0",
+      "packages": [
+        "gvisor.dev/gvisor/pkg/atomicbitops",
+        "gvisor.dev/gvisor/pkg/bits",
+        "gvisor.dev/gvisor/pkg/buffer",
+        "gvisor.dev/gvisor/pkg/context",
+        "gvisor.dev/gvisor/pkg/cpuid",
+        "gvisor.dev/gvisor/pkg/gohacks",
+        "gvisor.dev/gvisor/pkg/goid",
+        "gvisor.dev/gvisor/pkg/linewriter",
+        "gvisor.dev/gvisor/pkg/log",
+        "gvisor.dev/gvisor/pkg/rand",
+        "gvisor.dev/gvisor/pkg/rawfile",
+        "gvisor.dev/gvisor/pkg/refs",
+        "gvisor.dev/gvisor/pkg/sleep",
+        "gvisor.dev/gvisor/pkg/state",
+        "gvisor.dev/gvisor/pkg/state/wire",
+        "gvisor.dev/gvisor/pkg/sync",
+        "gvisor.dev/gvisor/pkg/sync/locking",
+        "gvisor.dev/gvisor/pkg/tcpip",
+        "gvisor.dev/gvisor/pkg/tcpip/adapters/gonet",
+        "gvisor.dev/gvisor/pkg/tcpip/checksum",
+        "gvisor.dev/gvisor/pkg/tcpip/hash/jenkins",
+        "gvisor.dev/gvisor/pkg/tcpip/header",
+        "gvisor.dev/gvisor/pkg/tcpip/header/parse",
+        "gvisor.dev/gvisor/pkg/tcpip/internal/tcp",
+        "gvisor.dev/gvisor/pkg/tcpip/link/channel",
+        "gvisor.dev/gvisor/pkg/tcpip/link/fdbased",
+        "gvisor.dev/gvisor/pkg/tcpip/link/stopfd",
+        "gvisor.dev/gvisor/pkg/tcpip/network/hash",
+        "gvisor.dev/gvisor/pkg/tcpip/network/internal/fragmentation",
+        "gvisor.dev/gvisor/pkg/tcpip/network/internal/ip",
+        "gvisor.dev/gvisor/pkg/tcpip/network/internal/multicast",
+        "gvisor.dev/gvisor/pkg/tcpip/network/ipv4",
+        "gvisor.dev/gvisor/pkg/tcpip/network/ipv6",
+        "gvisor.dev/gvisor/pkg/tcpip/ports",
+        "gvisor.dev/gvisor/pkg/tcpip/seqnum",
+        "gvisor.dev/gvisor/pkg/tcpip/stack",
+        "gvisor.dev/gvisor/pkg/tcpip/stack/gro",
+        "gvisor.dev/gvisor/pkg/tcpip/transport",
+        "gvisor.dev/gvisor/pkg/tcpip/transport/icmp",
+        "gvisor.dev/gvisor/pkg/tcpip/transport/internal/network",
+        "gvisor.dev/gvisor/pkg/tcpip/transport/internal/noop",
+        "gvisor.dev/gvisor/pkg/tcpip/transport/packet",
+        "gvisor.dev/gvisor/pkg/tcpip/transport/raw",
+        "gvisor.dev/gvisor/pkg/tcpip/transport/tcp",
+        "gvisor.dev/gvisor/pkg/tcpip/transport/tcpconntrack",
+        "gvisor.dev/gvisor/pkg/tcpip/transport/udp",
+        "gvisor.dev/gvisor/pkg/waiter"
+      ],
+      "root_legal_files": [
+        "vendor/gvisor.dev/gvisor/AUTHORS",
+        "vendor/gvisor.dev/gvisor/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    },
+    {
+      "module": "lukechampine.com/blake3",
+      "version": "v1.4.1",
+      "packages": [
+        "lukechampine.com/blake3",
+        "lukechampine.com/blake3/bao",
+        "lukechampine.com/blake3/guts"
+      ],
+      "root_legal_files": [
+        "vendor/lukechampine.com/blake3/LICENSE"
+      ],
+      "nested_legal_files": [],
+      "status": "root-legal-file-present"
+    }
+  ],
+  "missing_root_legal_files": []
+}

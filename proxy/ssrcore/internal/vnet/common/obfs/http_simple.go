@@ -1,0 +1,289 @@
+package obfs
+
+import (
+	"bytes"
+	"encoding/hex"
+	"fmt"
+	"net/http"
+	logrus "reconstructed.local/soga/proxy/ssrcore/internal/vnet/common/privatelog"
+	"reconstructed.local/soga/proxy/ssrcore/internal/vnet/utils/arrayx"
+	"reconstructed.local/soga/proxy/ssrcore/internal/vnet/utils/bytesx"
+	"reconstructed.local/soga/proxy/ssrcore/internal/vnet/utils/randomx"
+	"strconv"
+	"strings"
+	"time"
+)
+
+func init() {
+	registerMethod("http_simple", NewHttpSimple)
+}
+
+// 伪请求头里的填充文本，解码侧不读它：ServerDecode 只从 GET/POST 行的 URI 里取 salt 与元数据。
+// 随主流浏览器的当期稳定版更新即可，改动不影响互通。
+var USER_AGENT = []string{
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+	"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+	"Mozilla/5.0 (Linux; Android 17; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:158.0) Gecko/20100101 Firefox/158.0",
+	"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:158.0) Gecko/20100101 Firefox/158.0",
+	"Mozilla/5.0 (X11; Linux aarch64; rv:158.0) Gecko/20100101 Firefox/158.0",
+	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:158.0) Gecko/20100101 Firefox/158.0",
+	"Mozilla/5.0 (iPhone; CPU iPhone OS 27_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.0 Mobile/15E148 Safari/604.1",
+	"Mozilla/5.0 (iPad; CPU OS 27_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.0 Mobile/15E148 Safari/604.1",
+	"Mozilla/5.0 (iPhone; CPU iPhone OS 26_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Mobile/15E148 Safari/604.1",
+	"Mozilla/5.0 (Linux; Android 16; Pixel 7a) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+}
+
+func strMatchBegin(str1, str2 string) bool {
+	if len(str1) >= len(str2) {
+		if str1[:len(str2)] == str2 {
+			return true
+		}
+	}
+	return false
+}
+
+type HttpSimple struct {
+	Plain
+	hasSentHeader bool
+	hasRecvHeader bool
+	host          string
+	port          int
+	recvBuf       []byte
+	// 兜底回包可被 HttpPost 替换：ServerDecode 的接收者是内嵌实例，方法覆盖不会被它看到
+	notMatchData func(buf []byte) ([]byte, bool, bool)
+}
+
+func NewHttpSimple(method string) (Plain, error) {
+	newPlain, err := NewPlain(method)
+	if err != nil {
+		return nil, err
+	}
+	h := &HttpSimple{Plain: newPlain}
+	h.notMatchData = h.defaultNotMatchData
+	return h, nil
+}
+
+func (h *HttpSimple) encodeHead(buf []byte) []byte {
+	hexStr := []byte(hex.EncodeToString(buf))
+	chs := make([]byte, 0, len(hexStr))
+	for i := 0; i < len(hexStr); i += 2 {
+		chs = append(chs, bytesx.ContactSlice([]byte("%"), hexStr[i:i+2])...)
+	}
+	return chs
+}
+
+func (h *HttpSimple) getDataFromHttpHeader(buf []byte) (result []byte, err error) {
+	result = []byte{}
+	lines := strings.Split(string(buf), "\r\n")
+	if len(lines) > 1 {
+		hexItems := strings.Split(lines[0], "%")
+		if len(hexItems) > 1 {
+			for i, item := range hexItems {
+				if i == 0 {
+					continue
+				}
+				if len(hexItems) < 2 {
+					data, err := hex.DecodeString("0" + item)
+					if err != nil {
+						return nil, err
+					}
+					result = bytesx.ContactSlice(result, data)
+					break
+				} else if len(item) > 2 {
+					data, err := hex.DecodeString(item[:2])
+					if err != nil {
+						return nil, err
+					}
+					result = bytesx.ContactSlice(result, data)
+					break
+				} else {
+					data, err := hex.DecodeString(item)
+					if err != nil {
+						return nil, err
+					}
+					result = bytesx.ContactSlice(result, data)
+				}
+			}
+			return result, nil
+		}
+	}
+	return []byte{}, nil
+}
+
+func (h *HttpSimple) getHostFromHttpHeader(buf []byte) string {
+	lines := strings.Split(string(buf), "\r\n")
+	if len(lines) > 1 {
+		for _, line := range lines {
+			if strMatchBegin(line, "Host: ") {
+				return line[6:]
+			}
+		}
+	}
+	return ""
+}
+
+// defaultNotMatchData 是兜底回包的 http_simple 语义；HttpPost 在构造时替换 notMatchData 函数字段
+func (h *HttpSimple) defaultNotMatchData(buf []byte) ([]byte, bool, bool) {
+	return bytes.Repeat([]byte("E"), 2048), false, false
+}
+
+func (h *HttpSimple) notMatchReturn(buf []byte) ([]byte, bool, bool, error) {
+	h.hasSentHeader = true
+	h.hasRecvHeader = true
+	ret, needDecrypt, needSendBack := h.notMatchData(buf)
+	return ret, needDecrypt, needSendBack, nil
+}
+
+func (h *HttpSimple) errorReturn(buf []byte) ([]byte, bool, bool, error) {
+	h.hasSentHeader = true
+	h.hasRecvHeader = true
+	ret, needDecrypt, needSendBack := h.notMatchData(buf)
+	return ret, needDecrypt, needSendBack, nil
+}
+
+func (h *HttpSimple) ClientEncode(buf []byte) ([]byte, error) {
+	if h.hasSentHeader {
+		return buf, nil
+	}
+
+	headSize := len(h.GetServerInfo().GetIv()) + h.GetServerInfo().GetHeadLen()
+	var headLen int
+	if len(buf)-headSize > 64 {
+		headLen = headSize + randomx.RandIntRange(0, 64)
+	} else {
+		headLen = len(buf)
+	}
+	headData := buf[:headLen]
+	buf = buf[headLen:]
+	port := []byte{}
+	if h.GetServerInfo().GetPort() != 80 {
+		port = bytesx.ContactSlice([]byte(":"), []byte(strconv.Itoa(h.GetServerInfo().GetPort())))
+	}
+	body := []byte{}
+	hosts := ""
+	if h.GetServerInfo().GetObfsParam() != "" {
+		hosts = h.GetServerInfo().GetObfsParam()
+	} else {
+		hosts = h.GetServerInfo().GetHost()
+	}
+	pos := strings.Index(hosts, "#")
+	if pos >= 0 {
+		body = []byte(strings.ReplaceAll(hosts[pos+1:], "\n", "\r\n"))
+		body = []byte(strings.ReplaceAll(string(body), "\\n", "\r\n"))
+		hosts = hosts[:pos]
+	}
+	hostArr := strings.Split(hosts, ",")
+	host := randomx.RandomStringsChoice(hostArr)
+	httpHead := bytesx.ContactSlice([]byte("GET /"), h.encodeHead(headData), []byte(" HTTP/1.1\r\n"))
+	httpHead = bytesx.ContactSlice(httpHead, []byte("Host: "), []byte(host), port, []byte("\r\n"))
+	if len(body) > 0 {
+		httpHead = bytesx.ContactSlice(httpHead, body, []byte("\r\n\r\n"))
+	} else {
+		httpHead = bytesx.ContactSlice(httpHead, []byte("User-Agent: "),
+			[]byte(randomx.RandomStringsChoice(USER_AGENT)),
+			[]byte("\r\n"))
+		httpHead = bytesx.ContactSlice(httpHead, []byte("Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-US,en;q=0.8\r\nAccept-Encoding: gzip, deflate\r\nDNT: 1\r\nConnection: keep-alive\r\n\r\n"))
+	}
+	h.hasSentHeader = true
+	return bytesx.ContactSlice(httpHead, buf), nil
+}
+
+func (h *HttpSimple) ClientDecode(buf []byte) ([]byte, bool, error) {
+	if h.hasRecvHeader {
+		return buf, false, nil
+	}
+	h.recvBuf = append(h.recvBuf, buf...)
+	buf = h.recvBuf
+	if len(buf) > 65536 {
+		return nil, false, fmt.Errorf("HTTP obfs header too large")
+	}
+	pos := strings.Index(string(buf), "\r\n\r\n")
+	if pos >= 0 {
+		h.hasRecvHeader = true
+		h.recvBuf = nil
+		return buf[pos+4:], false, nil
+	} else {
+		return []byte{}, false, nil
+	}
+}
+
+func (h *HttpSimple) ServerEncode(buf []byte) ([]byte, error) {
+	if h.hasSentHeader {
+		return buf, nil
+	}
+
+	header := "HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Encoding: gzip\r\nContent-Type: text/html\r\nDate: "
+	header += time.Now().Format(http.TimeFormat)
+	header += "\r\nServer: nginx\r\nVary: Accept-Encoding\r\n\r\n"
+	h.hasSentHeader = true
+	return bytesx.ContactSlice([]byte(header), buf), nil
+
+}
+
+func (h *HttpSimple) ServerDecode(buf []byte) ([]byte, bool, bool, error) {
+	if h.hasRecvHeader {
+		return buf, true, false, nil
+	}
+	h.recvBuf = bytesx.ContactSlice(h.recvBuf, buf)
+	buf = h.recvBuf
+	if len(buf) > 10 {
+		if strMatchBegin(string(buf), "GET ") || strMatchBegin(string(buf), "POST ") {
+			if len(buf) > 65536 {
+				h.recvBuf = []byte{}
+				logrus.Warning("http_simple: over size")
+				return h.notMatchReturn(buf)
+			}
+		} else {
+			h.recvBuf = []byte{}
+			logrus.Warning("http_simple: not match begin")
+			return h.notMatchReturn(buf)
+		}
+	} else {
+		return []byte{}, true, false, nil
+	}
+
+	if strings.Index(string(buf), "\r\n\r\n") >= 0 {
+		datas := strings.Split(string(buf), "\r\n\r\n")
+		resultBuf, err := h.getDataFromHttpHeader(buf)
+		if err != nil {
+			return h.errorReturn(buf)
+		}
+		host := h.getHostFromHttpHeader(buf)
+
+		if len(host) > 0 && len(h.GetServerInfo().GetObfsParam()) > 0 {
+			pos := strings.Index(host, ":")
+			if pos >= 0 {
+				host = host[:pos]
+			}
+			// obfs_param 的「#」后段是客户端伪造的响应体，不进 Host 白名单：
+			// 不剥掉它，带 # 的 param 会让白名单里只剩一个带尾巴的域名，把正常连接判成不匹配
+			param := h.GetServerInfo().GetObfsParam()
+			if cut := strings.Index(param, "#"); cut >= 0 {
+				param = param[:cut]
+			}
+			hosts := strings.Split(param, ",")
+			if !arrayx.FindStringInArray(host, hosts) {
+				return h.notMatchReturn(buf)
+			}
+		}
+
+		if len(resultBuf) < 4 {
+			return h.errorReturn(buf)
+		}
+
+		if len(datas) > 1 {
+			resultBuf = bytesx.ContactSlice(resultBuf, []byte(datas[1]))
+		}
+
+		if len(resultBuf) >= 13 {
+			h.hasRecvHeader = true
+			return resultBuf, true, false, nil
+		}
+
+		return h.notMatchReturn(buf)
+	} else {
+		return []byte{}, true, false, nil
+	}
+}

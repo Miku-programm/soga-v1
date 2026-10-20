@@ -1,0 +1,29 @@
+协议依赖许可证说明
+
+这份清单不是对原 soga 二进制或原源码的许可声明。新重建代码与原
+程序来源不同；已复制的公开源码继续保留其原始版权和许可证。
+
+GPL-3.0 系列：
+- SagerNet sing-box / sing / sing-vmess / sing-shadowsocks；
+  具体文件允许 GPL v3 或以后版本时以其原 LICENSE 为准。
+- sing-anytls v0.0.11：GPL v3 或以后版本。
+- Mieru v3.38.1：GNU GPL v3，见该模块 LICENSE。
+- SSR 及 simple-obfs 参考：原授权说明随组件保留。
+
+MPL-2.0：
+- Xray-core v1.260327.0；根 third_party/xray-core/LICENSE 保留全文，
+  LOCAL_CHANGES.patch 标明本地修改。
+
+Apache-2.0：
+- go-proxyproto v0.11.0；对应模块保留 LICENSE。
+
+已复制源码的许可证位置：
+  internal/vmesscompat/LICENSE
+  internal/shadowaeadcompat/LICENSE
+  simpleobfs/LICENSE
+  ssrcore/（组件自己的来源/版权文件）
+  ../third_party/xray-core/LICENSE
+
+其它间接依赖具有各自的许可证；根 go.mod/go.sum 与 vendor 中的
+许可文件构成完整依赖记录。本清单不将不同许可统一改写为宽松许可，
+不删除原有版权，也不声称本目录可在忽略其依赖许可的情况下分发。

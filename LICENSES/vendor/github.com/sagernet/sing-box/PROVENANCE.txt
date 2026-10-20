@@ -1,0 +1,4 @@
+Local source copy of github.com/sagernet/sing-box v1.14.3.
+Original module checksum is retained in root go.sum. GPL-3.0 license retained.
+Changes are maintained in LOCAL_CHANGES.patch: explicitly configured legacy TLS cipher suites from the supplied Soga documentation are recognized using crypto/tls.InsecureCipherSuites; defaults remain unchanged.
+This is an independent compatibility change, not original Soga source.

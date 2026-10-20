@@ -1,0 +1,511 @@
+{
+  "repository": "https://github.com/ProxyPanel/VNet-SSR",
+  "commit": "39f00f978880e825f78e6ca406b1d0ba24dcb95f",
+  "license": "GPL-3.0",
+  "original_files": [
+    {
+      "path": "common/ciphers/block_stream_test.go",
+      "original_sha256": "8f8ee61386153a846a90e45d030df23c80150d62d9edf78b10a0a1ab85f0e8c4",
+      "retained": true,
+      "adapted_sha256": "8f8ee61386153a846a90e45d030df23c80150d62d9edf78b10a0a1ab85f0e8c4"
+    },
+    {
+      "path": "common/ciphers/cipher.go",
+      "original_sha256": "b87476a15861716551d914b103ca4ad75207728c7df058214f574cd95f295ad4",
+      "retained": true,
+      "adapted_sha256": "daf9a18d8cc250895e77a7c4644310b4bedc4dd21de8eac812fe678ac0207673"
+    },
+    {
+      "path": "common/ciphers/cipher_test.go",
+      "original_sha256": "8ea67942912f7e7b7e53f65e49e5ca7ec271b3fdb52550bced750dc0c6599fc4",
+      "retained": true,
+      "adapted_sha256": "9e0332448a1c50718c01997d0989f51ed8c81c553592914af018d9601531669a"
+    },
+    {
+      "path": "common/ciphers/common.go",
+      "original_sha256": "5c91b39856569ba6fcccc18f7984a2e06ea6498f61e8939b4f514c118f5a2ece",
+      "retained": true,
+      "adapted_sha256": "5c91b39856569ba6fcccc18f7984a2e06ea6498f61e8939b4f514c118f5a2ece"
+    },
+    {
+      "path": "utils/bytesx/bytesx.go",
+      "original_sha256": "07165b36d90b7d6fc78aea796e0a90b877dd52b5cb1e508f6c43f96011973266",
+      "retained": true,
+      "adapted_sha256": "c6ac17ba971e1ae5f7bb778f816e1648ea52ac32e210e8d9845161cf54b0226a"
+    },
+    {
+      "path": "utils/bytesx/bytesx_test.go",
+      "original_sha256": "1eabfa626c3e4913fd2dd0d671151bcc884fcc54f45b2132fb04c0f041026f77",
+      "retained": true,
+      "adapted_sha256": "1eabfa626c3e4913fd2dd0d671151bcc884fcc54f45b2132fb04c0f041026f77"
+    },
+    {
+      "path": "common/ciphers/stream/aes_cfb.go",
+      "original_sha256": "c0f9429dabd478eb82dafb120795bcbc3c10aa7f627e3425a0d697a64565e0f1",
+      "retained": true,
+      "adapted_sha256": "c0f9429dabd478eb82dafb120795bcbc3c10aa7f627e3425a0d697a64565e0f1"
+    },
+    {
+      "path": "common/ciphers/stream/aes_ctr.go",
+      "original_sha256": "986cfe3e28fa427f9a6bcf0c5ea393979ac7063fab32268310d0ecdb4aaac472",
+      "retained": true,
+      "adapted_sha256": "986cfe3e28fa427f9a6bcf0c5ea393979ac7063fab32268310d0ecdb4aaac472"
+    },
+    {
+      "path": "common/ciphers/stream/aes_modes.go",
+      "original_sha256": "5e45e7564f7117dcbb69140f02657fc43c6d5389395423fe6094e11e556ab4af",
+      "retained": true,
+      "adapted_sha256": "c46ced81919d99fbc2d69da24f5ee6c1e9fa984bb0f17a87dd80f6c1c388f192"
+    },
+    {
+      "path": "common/ciphers/stream/bf_cfb.go",
+      "original_sha256": "7f8ad6149fa98520831fd9ff4161914c7230e74602474e77e3881c25a6f38c66",
+      "retained": true,
+      "adapted_sha256": "7f8ad6149fa98520831fd9ff4161914c7230e74602474e77e3881c25a6f38c66"
+    },
+    {
+      "path": "common/ciphers/stream/blockmodes_test.go",
+      "original_sha256": "0ddb8aa1dee81e3875e8c65d4aad4cdc8e23487129c75f27ab47da7e04afa425",
+      "retained": true,
+      "adapted_sha256": "0ddb8aa1dee81e3875e8c65d4aad4cdc8e23487129c75f27ab47da7e04afa425"
+    },
+    {
+      "path": "common/ciphers/stream/cast5_cfb.go",
+      "original_sha256": "53a96dc60ac3ddc532862480094171b32032977fc859e1953cc6cbed8cff9c54",
+      "retained": true,
+      "adapted_sha256": "53a96dc60ac3ddc532862480094171b32032977fc859e1953cc6cbed8cff9c54"
+    },
+    {
+      "path": "common/ciphers/stream/chacha20.go",
+      "original_sha256": "7799b5e1a36917d25a352bb28f852e66ead7537fc0676979590658bd93beac57",
+      "retained": true,
+      "adapted_sha256": "7799b5e1a36917d25a352bb28f852e66ead7537fc0676979590658bd93beac57"
+    },
+    {
+      "path": "common/ciphers/stream/chacha20_golden_test.go",
+      "original_sha256": "93a649e3d3faa7a65cb0bc52e8ef18a78a7e5ca20f06f34378403dc603eb749a",
+      "retained": true,
+      "adapted_sha256": "93a649e3d3faa7a65cb0bc52e8ef18a78a7e5ca20f06f34378403dc603eb749a"
+    },
+    {
+      "path": "common/ciphers/stream/des_cfb.go",
+      "original_sha256": "47cb0f5c04b68b1b68471a9993df0c5132ca2fd69e5016adb09dcd7e6a4ef85a",
+      "retained": true,
+      "adapted_sha256": "47cb0f5c04b68b1b68471a9993df0c5132ca2fd69e5016adb09dcd7e6a4ef85a"
+    },
+    {
+      "path": "common/ciphers/stream/none.go",
+      "original_sha256": "140876d0464a1b02f2f54703355cf3aa8555e7cf75d43de9df3cefda45b4177e",
+      "retained": true,
+      "adapted_sha256": "8e8b463db735d120aea15aee3b0b1d81f7ea879920bde455096a71c86bed80c3"
+    },
+    {
+      "path": "common/ciphers/stream/rc4.go",
+      "original_sha256": "c9c06103aebd046950d52e0cdec5d730931355dd9bd1977cfa91b07c29539069",
+      "retained": true,
+      "adapted_sha256": "c9c06103aebd046950d52e0cdec5d730931355dd9bd1977cfa91b07c29539069"
+    },
+    {
+      "path": "common/ciphers/stream/rc4_md5.go",
+      "original_sha256": "bcfbe3bfba9df14ce779a75becc63044552ac03a08c7af4e9be11e352c5ec258",
+      "retained": true,
+      "adapted_sha256": "bcfbe3bfba9df14ce779a75becc63044552ac03a08c7af4e9be11e352c5ec258"
+    },
+    {
+      "path": "common/ciphers/stream/salsa20.go",
+      "original_sha256": "1407094985e5a6217b0791b6888130ffad1f6d8898f7702316a584a031fb8f0b",
+      "retained": true,
+      "adapted_sha256": "44e1da5b392afc570490f7be11596143b6abec9093e1ebe83b850e214cfd4bc2"
+    },
+    {
+      "path": "common/ciphers/stream/stream.go",
+      "original_sha256": "dba6690b79c4a83b64057eb64191e9ef169c733f9a0cec62d6e79d591c22ae0c",
+      "retained": true,
+      "adapted_sha256": "dba6690b79c4a83b64057eb64191e9ef169c733f9a0cec62d6e79d591c22ae0c"
+    },
+    {
+      "path": "common/pool/pool.go",
+      "original_sha256": "eaeade43543fb0593f0cc7a8ccd8f88d5f46b6762cd389c2b8cbdb331d319427",
+      "retained": true,
+      "adapted_sha256": "3ac2ed1b5ae1035c38ec1d48f5245170a44bb6e78b14addb187c11805df4db69"
+    },
+    {
+      "path": "common/pool/pool_test.go",
+      "original_sha256": "663f062cdbd49a37710b77849a2747ccf2ab3f2fc463663ed790484055f83cd7",
+      "retained": true,
+      "adapted_sha256": "663f062cdbd49a37710b77849a2747ccf2ab3f2fc463663ed790484055f83cd7"
+    },
+    {
+      "path": "common/ciphers/aead/aead.go",
+      "original_sha256": "483a142faade55ba5eded79dd3cb40521c7edf030e7e01299191736c4d6cd24d",
+      "retained": true,
+      "adapted_sha256": "483a142faade55ba5eded79dd3cb40521c7edf030e7e01299191736c4d6cd24d"
+    },
+    {
+      "path": "common/ciphers/aead/aes_gcm.go",
+      "original_sha256": "50f4352b7bba03f44b0a31aa1a42f746c7e29f33afe27e2b5bdfb218f88ea52c",
+      "retained": true,
+      "adapted_sha256": "92393e1312e9297c13b6da71d5496c73e63f86b14679e2398d4017ef25f6a3c5"
+    },
+    {
+      "path": "common/ciphers/aead/chacha20_ietf_poly1305.go",
+      "original_sha256": "eec0045227d405d77feb7b864cafbf3e775871d36b6bbea230e44d6e0cd09639",
+      "retained": true,
+      "adapted_sha256": "a31bcab37e24f66ed324689147765e9af842b307f2ab3fa51c6b63aab7db0cad"
+    },
+    {
+      "path": "utils/shadowsocksx/shadowsocksx.go",
+      "original_sha256": "38eb1d4bf0611aee8fba4128c1a9a38942973404476cf45b2e2cf00aad0a1f50",
+      "retained": true,
+      "adapted_sha256": "38eb1d4bf0611aee8fba4128c1a9a38942973404476cf45b2e2cf00aad0a1f50"
+    },
+    {
+      "path": "utils/shadowsocksx/shadowsocksx_test.go",
+      "original_sha256": "0dd4ab770486322d8936136f2711ae5274d1618091d583c07e7db4de9b7a9778",
+      "retained": true,
+      "adapted_sha256": "0dd4ab770486322d8936136f2711ae5274d1618091d583c07e7db4de9b7a9778"
+    },
+    {
+      "path": "common/ciphers/block/aes_cbc.go",
+      "original_sha256": "1ff54b4600a746a216289ae7b3a129c20608eaf37771025e1fa4076d41484e5f",
+      "retained": true,
+      "adapted_sha256": "1ff54b4600a746a216289ae7b3a129c20608eaf37771025e1fa4076d41484e5f"
+    },
+    {
+      "path": "common/ciphers/block/block.go",
+      "original_sha256": "214431c8265d8b9cf01528f61e9f98fadace382bd0cb64d6d04b7e93b5413670",
+      "retained": true,
+      "adapted_sha256": "214431c8265d8b9cf01528f61e9f98fadace382bd0cb64d6d04b7e93b5413670"
+    },
+    {
+      "path": "common/obfs/auth_aes128.go",
+      "original_sha256": "1332baf260dca230074a4628ab0d963bdd79cbc152f50174c309c734c28487c6",
+      "retained": true,
+      "adapted_sha256": "d576432001de0270f861af582b81558ddede691e08c8fefecf98be461a096bd8"
+    },
+    {
+      "path": "common/obfs/auth_aes128_test.go",
+      "original_sha256": "f9990fc8ae2219882e46852aec10c87dfebf5fe035f463fdb9b3e8d1e88c1455",
+      "retained": true,
+      "adapted_sha256": "df42a9bfc1785d4df7a4390f275035f1c6a1d8817c07711dfb2c51210cc54fea"
+    },
+    {
+      "path": "common/obfs/auth_chain.go",
+      "original_sha256": "0063fb1fe4efab9924fa312a324b04603ae0a0a478eb43427fa1146ba6de077e",
+      "retained": true,
+      "adapted_sha256": "248d51636d1d2f8632330befd97e92b073f7534c2e0a965cbe9dcfc50e284303"
+    },
+    {
+      "path": "common/obfs/auth_chain_test.go",
+      "original_sha256": "4c7739e3e1da0245437604fa8fba23e94bee43209941c722684d7449cf6e6674",
+      "retained": true,
+      "adapted_sha256": "00259214ed1d8adf5db903fedb26222dd7cbbe3fb6aae0e8bc2eb70b5b32712f"
+    },
+    {
+      "path": "common/obfs/auth_chain_variants_test.go",
+      "original_sha256": "7f35e38dbc7f190235119aaeb291409c62514f3f9f32e2c76039fd13fbf9f721",
+      "retained": true,
+      "adapted_sha256": "0ffca100bd4bee96082c216dac37a611691d777dc2b42f81a4ee1bbf8541ffe8"
+    },
+    {
+      "path": "common/obfs/auth_sha1_v4.go",
+      "original_sha256": "37e59b2c76aac5f31d7752f69d17a7cdf611ca7f81a65cf770d7022060da9512",
+      "retained": true,
+      "adapted_sha256": "10679d045abeec30cdf489e9acc2a01ade6bab947fa98e4c8c4655320666b45b"
+    },
+    {
+      "path": "common/obfs/auth_sha1_v4_test.go",
+      "original_sha256": "19ce86cb3486db0c296e859921c261e162e669ab1c05027bbc70cf2a8057fae4",
+      "retained": true,
+      "adapted_sha256": "b59fd2027ee9ed901809f51317d76315d4b32f2163cde2fa6bf18d32522a926b"
+    },
+    {
+      "path": "common/obfs/client_limit_test.go",
+      "original_sha256": "2feb83501746c3a378e493e629511e7f333aea4b287880364835c34e17037528",
+      "retained": true,
+      "adapted_sha256": "b368b526221a69bdc0c5057475d93fe660c5b5861fb017accbadc543e10c1675"
+    },
+    {
+      "path": "common/obfs/common.go",
+      "original_sha256": "09f2ecdce2918bf79a6889c60e85626c7ae0efcc8b4f4424559dd7df1197a2a6",
+      "retained": true,
+      "adapted_sha256": "14147d02e09175c446ab1e20d645828bbaabb98d81e33963132638ab5bbf239b"
+    },
+    {
+      "path": "common/obfs/http_post.go",
+      "original_sha256": "33b3001b899aebc596bfe487b655bd08128230f23fa013e09f2262071154a958",
+      "retained": true,
+      "adapted_sha256": "b022ec6b810dc0c7d8bea186b0c621068102015ae535e771cfda8ac4a0d40f99"
+    },
+    {
+      "path": "common/obfs/http_post_test.go",
+      "original_sha256": "91fa87814a54c0f96b6a870331c97be45c340862b9aa9b5ab41e38caa2a16f53",
+      "retained": true,
+      "adapted_sha256": "7e6545104dedac78fe5177253569461083fcaf0de7ad5a793b64a3853a7b354d"
+    },
+    {
+      "path": "common/obfs/http_simple.go",
+      "original_sha256": "e928c8ae7260cee7c140650417caee9759956a5df74e10f68a9d86c2da8510ee",
+      "retained": true,
+      "adapted_sha256": "20c30fa0536e357c969c3377c4d9d2526c62e07f829534344fe6e750f91cc342"
+    },
+    {
+      "path": "common/obfs/http_simple_test.go",
+      "original_sha256": "fee4c38051bd8d8f1be6b5158f834a2761af03b2102af108ecce17473d48f5b6",
+      "retained": true,
+      "adapted_sha256": "fee4c38051bd8d8f1be6b5158f834a2761af03b2102af108ecce17473d48f5b6"
+    },
+    {
+      "path": "common/obfs/obfs.go",
+      "original_sha256": "35ec9cdee3f064dee3b75b1677e89c4573749c89eafce1d9cbe491c1c26edc02",
+      "retained": true,
+      "adapted_sha256": "35ec9cdee3f064dee3b75b1677e89c4573749c89eafce1d9cbe491c1c26edc02"
+    },
+    {
+      "path": "common/obfs/obfs_tls.go",
+      "original_sha256": "ead859c09de4f09315139f0c3a2084afbfefbb676fe23494c3c38990dd53ae0b",
+      "retained": true,
+      "adapted_sha256": "58663972478eecc602a5ed088952d647b734bc48131dd15441ad550071ccb40e"
+    },
+    {
+      "path": "common/obfs/obfs_tls_test.go",
+      "original_sha256": "3b93552d6a028536318cc9e61f2db387ec1201bc98ec8b81efceb6873ae6c7bc",
+      "retained": true,
+      "adapted_sha256": "3b93552d6a028536318cc9e61f2db387ec1201bc98ec8b81efceb6873ae6c7bc"
+    },
+    {
+      "path": "common/obfs/plain.go",
+      "original_sha256": "96416a1781f0a1134dabc026c2791cad3c4fa5a6a3afbe4ae34fe728da8eb237",
+      "retained": true,
+      "adapted_sha256": "96416a1781f0a1134dabc026c2791cad3c4fa5a6a3afbe4ae34fe728da8eb237"
+    },
+    {
+      "path": "common/obfs/protocol_concurrency_test.go",
+      "original_sha256": "1509f25ab79efbb66b9eb1ab20d7b863a81d5c0dd1d57c96ee99696e549c0a29",
+      "retained": true,
+      "adapted_sha256": "b4b7cab2a5e37c89e1354fc10c12e311b6552b807ddfaa0f0528a5edff30ec78"
+    },
+    {
+      "path": "common/obfs/registry_test.go",
+      "original_sha256": "9bcba717df65e18a69e414378efeb0c9ed641a7c35dd718b4b6f8f8b182a219f",
+      "retained": true,
+      "adapted_sha256": "2a1317dbc773a68c2aa4814b5dbe76e7175766269fdf19208f743ac85c65aa0a"
+    },
+    {
+      "path": "common/obfs/server_info.go",
+      "original_sha256": "20c5ff997559c1569cfd7e1208bec06971d2347df6f67aad5dfb9cca0272b013",
+      "retained": true,
+      "adapted_sha256": "61414cb180db7d07f01277e88ee962541ae511d86cc1c985b7a71d8c241cbaea"
+    },
+    {
+      "path": "core/global_data.go",
+      "original_sha256": "2f32b96ecc01697bbb863660f95a071d85786696e144bf20be1f63c0135c9d45",
+      "retained": true,
+      "adapted_sha256": "b4993e9b887a91c9a03689b231e9f525ccccfefbe383f53aefc199d05170f391"
+    },
+    {
+      "path": "core/interface.go",
+      "original_sha256": "33026993be0d3210b5792d16d4036250763145e513ef944e5ed1c3ad3719800c",
+      "retained": true,
+      "adapted_sha256": "c391b315985e50433df0b4fea92091511d2e33b2db4d3961f3134e0fb2116a26"
+    },
+    {
+      "path": "core/version.go",
+      "original_sha256": "d58e5306f733e2a8e51e5bcde205a753028aa32502250a8dc77c74b0c78b5072",
+      "retained": false
+    },
+    {
+      "path": "core/version_test.go",
+      "original_sha256": "df352dde1c1f1cd667c6c2ce52239787218130e6247725a624b89917196929aa",
+      "retained": false
+    },
+    {
+      "path": "model/model.go",
+      "original_sha256": "d21fca15171121414d950d8148aad46a368ce2f7a96b0dbba10508f7bb282338",
+      "retained": true,
+      "adapted_sha256": "d21fca15171121414d950d8148aad46a368ce2f7a96b0dbba10508f7bb282338"
+    },
+    {
+      "path": "model/model_test.go",
+      "original_sha256": "5d1a8667a843150ec96435c5e749cf0da110ad2235cd0456310a123b0113208d",
+      "retained": false
+    },
+    {
+      "path": "utils/binaryx/binaryx.go",
+      "original_sha256": "e57971ca5e11bb483dfe27f84584898e2d83513f7a779783f9338167011ee4d8",
+      "retained": true,
+      "adapted_sha256": "e57971ca5e11bb483dfe27f84584898e2d83513f7a779783f9338167011ee4d8"
+    },
+    {
+      "path": "utils/binaryx/binaryx_test.go",
+      "original_sha256": "66d166a78ed4db84e28862a911655cb1206e8a199144cf9e37cdd184cfa2cd74",
+      "retained": true,
+      "adapted_sha256": "66d166a78ed4db84e28862a911655cb1206e8a199144cf9e37cdd184cfa2cd74"
+    },
+    {
+      "path": "utils/stringx/stringx.go",
+      "original_sha256": "4472bac459121de222a3aee44fabf058456a00683ac14c684e438881be68e36a",
+      "retained": true,
+      "adapted_sha256": "4472bac459121de222a3aee44fabf058456a00683ac14c684e438881be68e36a"
+    },
+    {
+      "path": "utils/stringx/stringx_test.go",
+      "original_sha256": "af41b5fc98790461db2cd39f49e95093e65566b68681fe898d6b626de8b40c19",
+      "retained": true,
+      "adapted_sha256": "579c4d25b91bb634b6f790e76111cc7da764943c4b8bb0e0b08285f15efaa604"
+    },
+    {
+      "path": "utils/randomx/randomx.go",
+      "original_sha256": "b88d097221283649bb8fe79bad58d9243d81d282e1a8da289481ede9963d194b",
+      "retained": true,
+      "adapted_sha256": "9e83c38e012f52295f39ee2cd7948fa65659d101bf4a272f57bb6a68e5290670"
+    },
+    {
+      "path": "utils/randomx/randomx_test.go",
+      "original_sha256": "01e771bd8d26b3a2e05aba893f552bb30b87e56b7b610c90e0802f851ddfb5f9",
+      "retained": true,
+      "adapted_sha256": "01e771bd8d26b3a2e05aba893f552bb30b87e56b7b610c90e0802f851ddfb5f9"
+    },
+    {
+      "path": "utils/arrayx/arrayx.go",
+      "original_sha256": "72f87bbd7e09ec420685edb54947a70134500e40459c1e34d0fcab34cfab288c",
+      "retained": true,
+      "adapted_sha256": "72f87bbd7e09ec420685edb54947a70134500e40459c1e34d0fcab34cfab288c"
+    },
+    {
+      "path": "utils/arrayx/arrayx_test.go",
+      "original_sha256": "efed50f2c8cff3fc5f1b596751091d9d90754248b39c7f2aead79a0b8e385915",
+      "retained": true,
+      "adapted_sha256": "efed50f2c8cff3fc5f1b596751091d9d90754248b39c7f2aead79a0b8e385915"
+    },
+    {
+      "path": "common/log/logging.go",
+      "original_sha256": "30e873b92b6ba5c5884554bc3447022e3428ed26005b655356b599cfedf7792b",
+      "retained": true,
+      "adapted_sha256": "46d7747839afbece29f0b74a6cd824387ea41c8b4062a1396efbb1696fd65795"
+    },
+    {
+      "path": "common/log/logging_test.go",
+      "original_sha256": "df0089eb7d6c8a3d9f8b9dd95ba5e2f6a6cd229df1c9c2f5642540dfe2ec49d6",
+      "retained": true,
+      "adapted_sha256": "0281d4579bbf26ec31a7ea874595b5d4cfbe835c35f00159221af02dde19a7c3"
+    },
+    {
+      "path": "common/cache/cache.go",
+      "original_sha256": "77e259dbde6e6f6d1bb89fa82645c5cf7e5bf85e50cc124b48aa254337e14e69",
+      "retained": true,
+      "adapted_sha256": "77e259dbde6e6f6d1bb89fa82645c5cf7e5bf85e50cc124b48aa254337e14e69"
+    },
+    {
+      "path": "common/cache/cache_test.go",
+      "original_sha256": "dd3041eef5f391f711838918a5cc2dbddfad178dec981ad93bfa56fe2472d265",
+      "retained": true,
+      "adapted_sha256": "dd3041eef5f391f711838918a5cc2dbddfad178dec981ad93bfa56fe2472d265"
+    },
+    {
+      "path": "common/cache/lru_cache.go",
+      "original_sha256": "2c1ff0154711f3a5f57ce1c47070f255f5cc227bd1314e8ce4ea93ed9b442927",
+      "retained": true,
+      "adapted_sha256": "2c1ff0154711f3a5f57ce1c47070f255f5cc227bd1314e8ce4ea93ed9b442927"
+    },
+    {
+      "path": "utils/langx/langx.go",
+      "original_sha256": "dac6710fdaa12a6847e71840d8545d4e2d9634c139ab800219285a159c2c3a69",
+      "retained": true,
+      "adapted_sha256": "09d0d414d9a4bb49d5c1270d8683b437b1d249380bac0b55592310c1c674350b"
+    },
+    {
+      "path": "utils/langx/langx_test.go",
+      "original_sha256": "158a241c7e91a57cf332c4144d5506234ca14d4850d29292c6e12dc78c7f1bb3",
+      "retained": true,
+      "adapted_sha256": "c8079078725558282d39fbda87ae5c803e1a28bf33e584e260172c212548f0b7"
+    }
+  ],
+  "import_rewrite": "github.com/ProxyPanel/VNet-SSR -> reconstructed.local/soga/proxy/ssrcore/internal/vnet",
+  "original_binary_executed": false,
+  "reference_python": {
+    "repository": "https://github.com/shadowsocksrr/shadowsocksr",
+    "commit": "fd723a92c488d202b407323f0512987346944136",
+    "purpose": "independent protocol-layer interoperability tests",
+    "tls_reference": {
+      "url": "https://raw.githubusercontent.com/shadowsocksrr/shadowsocksr/fd723a92c488d202b407323f0512987346944136/shadowsocks/obfsplugin/obfs_tls.py",
+      "sha256": "48b89af31e3efc2823d5893c811f9715783e70563017d9269c79e7851c1a0dda"
+    }
+  },
+  "race_status": "PASS: full retained package tree including new mu integration, PROXY protocol, independent Python TLS clients; ssrcore 12.651s (ssr-race-with-mu.log)",
+  "owned_files": [
+    {
+      "path": "README.txt",
+      "sha256": "699f50b7e1111a8a2e428cb4ec0fa7f071fc2cc08f7925a1e5d110abb2b446f3"
+    },
+    {
+      "path": "codec.go",
+      "sha256": "73d6e83eb211a9334267689d1ce6c5ce665a086f84ec8d326189c161fcfe829e"
+    },
+    {
+      "path": "identity.go",
+      "sha256": "f324b714ba114c48aeb784b7f658751a9f223cb10493a1016a91f9e724271dcd"
+    },
+    {
+      "path": "inbound.go",
+      "sha256": "bfca70c8102c30b2b6db1b6f9655a4afe5ec5fe13185c3fcc210316550dba944"
+    },
+    {
+      "path": "internal/vnet/LICENSE",
+      "sha256": "d2b0cd072af07e55b26501bfcca5a69d173d8bd2ed1442501304c6f966aec51b"
+    },
+    {
+      "path": "internal/vnet/common/ciphers/stream/testdata/blockmodes.golden",
+      "sha256": "9d7f6d74ca69006582d5339bddb30e89fee65067d88b7ebd4e3c10f7abff55b7"
+    },
+    {
+      "path": "internal/vnet/common/ciphers/stream/testdata/chacha20.golden",
+      "sha256": "5914f08de2df5ea30d3c2126a7c7ace476f08498ee3725700b0267b9f9ccd025"
+    },
+    {
+      "path": "internal/vnet/common/obfs/reference_vectors_test.go",
+      "sha256": "d63dfb7ffeb47175555efee38bc0ba1a17606f5fd1469a1b0d89cdb4484d80f2"
+    },
+    {
+      "path": "internal/vnet/common/obfs/testdata/reference_chain_vectors.json",
+      "sha256": "b9a85618dbbf3c357a94961cd5090b4b6273d221b84b9630145a1a543dce9e0e"
+    },
+    {
+      "path": "internal/vnet/common/privatelog/privatelog.go",
+      "sha256": "4ecf7db6d31b27f3bf37c28bd5223f490823e861ea05ada659b38f44248f9c97"
+    },
+    {
+      "path": "mu_test.go",
+      "sha256": "5bfd6b03a79bb710ff615a424199f074c6e2d495f7380fa8d286d4c58d350258"
+    },
+    {
+      "path": "muhost.go",
+      "sha256": "896b0df6d9f65a0570c26ab7a0e6fef70c5a6c5e1a3c42479be7da2ad39e086e"
+    },
+    {
+      "path": "mupeek.go",
+      "sha256": "d88c474754c0937f37104c6726e800c627c1a984ab4f5c791e8c2c1d0a41e7ea"
+    },
+    {
+      "path": "options.go",
+      "sha256": "d162862525307dae368b11606ca4d845bf855adb4aa3918bb2fa5120268c82d5"
+    },
+    {
+      "path": "outbound.go",
+      "sha256": "46666316835ecf3a17409c33289c691eb57e0989beb21a5ecb1a97fc9942e826"
+    },
+    {
+      "path": "packet.go",
+      "sha256": "098cfea779826af9aa1856cd81c20bae342321d1a234dc3848e1d166deddbe29"
+    },
+    {
+      "path": "ssrcore_test.go",
+      "sha256": "f27216d250d669d227a46b3058566cdca3f1f492f18f8c1bc942f7cfb2470566"
+    }
+  ],
+  "regular_status": "PASS: full retained package tree including independent Python clients; ssrcore 8.238s (ssr-final-with-mu.log), no test skips",
+  "mu_status": "PASS: 10 SSR protocols x 4 SSR obfuscators x 2 billing users with one carrier key; independent official simple-obfs HTTP/TLS clients with legacy stream cipher; unknown Host/wrong key rejection; opt-in carrier UDP for all 10 protocols; UDP default disabled",
+  "mu_static_evidence": "muhost-evidence/derivation.json",
+  "reference_limits": "chain_c-f: real local interoperability and independent algorithm vectors, no external C# client process; no production panel deployment claimed",
+  "carrier_zero_followup": "PASS: targeted UDP -race after allowing synthetic CarrierID=0; ordinary User.ID remains positive. ssr-race-zero-carrier.log 1.031s."
+}
