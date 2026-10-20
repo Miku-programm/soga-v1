@@ -26,6 +26,19 @@ esac
 if [ -z "$stage" ]; then
   [ "$(uname -s)" = Linux ] || { printf '%s\n' '实际安装仅支持 Linux。' >&2; exit 1; }
   [ "$(id -u)" -eq 0 ] || { printf '%s\n' '实际安装需要 root；临时验证请使用 DESTDIR。' >&2; exit 1; }
+  if ! command -v python3 >/dev/null 2>&1; then
+    if command -v apt-get >/dev/null 2>&1; then
+      apt-get update
+      apt-get install -y python3
+    elif command -v dnf >/dev/null 2>&1; then
+      dnf install -y python3
+    elif command -v yum >/dev/null 2>&1; then
+      yum install -y python3
+    else
+      printf '%s\n' '管理菜单需要 Python 3，请先安装 python3。' >&2
+      exit 1
+    fi
+  fi
 fi
 binary="$PROJECT_DIR/bin/soga-reconstructed-linux-$architecture"
 [ -f "$binary" ] && [ ! -L "$binary" ] || {
@@ -47,6 +60,12 @@ for directory in "$bindir" "$configdir" "$unitdir" "$docdir"; do
   [ ! -L "$directory" ] || { printf '拒绝写入符号链接目录：%s\n' "$directory" >&2; exit 1; }
 done
 [ ! -L "$docdir/LICENSES" ] || { printf '%s\n' '拒绝写入符号链接 LICENSES 目录。' >&2; exit 1; }
+if [ -e "$bindir/soga" ] || [ -L "$bindir/soga" ]; then
+  [ ! -L "$bindir/soga" ] && grep -q '^# soga-reconstructed manager launcher$' "$bindir/soga" || {
+    printf '%s\n' '已有其他 /usr/local/bin/soga；请先将其备份移走再安装此管理菜单。' >&2
+    exit 1
+  }
+fi
 install -d -m 0755 "$bindir" "$unitdir" "$docdir"
 if [ ! -d "$configdir" ]; then install -d -m 0700 "$configdir"; fi
 temporary=$(mktemp "$bindir/.soga-reconstructed.XXXXXX")
@@ -96,10 +115,18 @@ cp -R "$PROJECT_DIR/LICENSES/." "$docdir/LICENSES/"
 find "$docdir/LICENSES" -type d -exec chmod 0755 {} +
 find "$docdir/LICENSES" -type f -exec chmod 0644 {} +
 install -m 0755 "$PROJECT_DIR/scripts/uninstall.sh" "$docdir/uninstall.sh"
+install -m 0644 "$PROJECT_DIR/scripts/manager.py" "$docdir/manager.py"
+install -m 0755 "$PROJECT_DIR/scripts/soga" "$bindir/soga"
+if [ -f "$PROJECT_DIR/BUILD-INFO.json" ]; then
+  install -m 0644 "$PROJECT_DIR/BUILD-INFO.json" "$docdir/build-info.json"
+else
+  rm -f -- "$docdir/build-info.json"
+fi
 if [ -z "$stage" ] && [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
   systemctl daemon-reload
 fi
 printf '安装完成，配置目录：%s\n' "$configdir"
+printf '%s\n' '输入 soga 打开交互式管理菜单。'
 printf '%s\n' '服务未启动、未设为开机启动。配置完成后显式执行：' \
   '  sudo soga-reconstructed instance start default' \
   '  sudo soga-reconstructed instance enable default'

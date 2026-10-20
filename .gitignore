@@ -1,6 +1,7 @@
 /bin/
 /dist/
 /ci-results/
+/BUILD-INFO.json
 /release-notes.txt
 /state/
 __pycache__/

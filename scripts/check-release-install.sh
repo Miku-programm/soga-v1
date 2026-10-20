@@ -27,6 +27,7 @@ export TEST_REQUESTS="$scratch/download-requests"
 export PATH="$scratch/tools:$PATH"
 DESTDIR="$scratch/stage" bash "$root/install.sh"
 cmp "$root/bin/soga-reconstructed-linux-amd64" "$scratch/stage/usr/local/bin/soga-reconstructed"
+"$scratch/stage/usr/local/bin/soga" version | grep -q 'soga 管理脚本'
 printf '\n# preserve-this-setting\n' >> "$scratch/stage/etc/soga-reconstructed/soga.conf"
 DESTDIR="$scratch/stage" bash "$root/install.sh"
 grep -q preserve-this-setting "$scratch/stage/etc/soga-reconstructed/soga.conf"
@@ -59,6 +60,18 @@ if DESTDIR="$scratch/configured" bash "$root/install.sh" $'webapi_key=a\nnode_id
   echo 'Multiline configuration unexpectedly accepted.' >&2; exit 1
 fi
 [[ $(sha256sum "$conf") == "$before" ]]
+DESTDIR="$scratch/stage" sh "$root/scripts/uninstall.sh"
+[[ ! -e $scratch/stage/usr/local/bin/soga ]]
+[[ ! -e $scratch/stage/usr/local/share/doc/soga-reconstructed/manager.py ]]
+grep -q preserve-this-setting "$scratch/stage/etc/soga-reconstructed/soga.conf"
+
+mkdir -p "$scratch/collision/usr/local/bin"
+printf '#!/bin/sh\n# another manager\n' > "$scratch/collision/usr/local/bin/soga"
+if DESTDIR="$scratch/collision" bash "$root/install.sh"; then
+  echo 'Installer overwrote an unrelated soga command.' >&2; exit 1
+fi
+grep -q 'another manager' "$scratch/collision/usr/local/bin/soga"
+[[ ! -e $scratch/collision/usr/local/bin/soga-reconstructed ]]
 
 # Verify service decisions with a command stub, never the host systemd.
 source "$root/install.sh"
@@ -82,4 +95,4 @@ simulate_failure=true
 if finish_install_service false true; then
   echo 'Failed service unexpectedly reported success.' >&2; exit 1
 fi
-echo 'PASS: install, config preservation/arguments, secret redaction, checksum rejection, and service lifecycle.'
+echo 'PASS: install, manager launcher/removal/collision, config preservation/arguments, secret redaction, checksum rejection, and service lifecycle.'

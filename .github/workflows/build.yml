@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      channel:
+        description: Release channel
+        type: choice
+        default: stable
+        options: [stable, preview]
 
 permissions:
   contents: write
@@ -32,19 +38,31 @@ jobs:
         run: |
           python3 scripts/smoke.py bin/soga-reconstructed-linux-amd64 --output ci-results/cli.json
           python3 scripts/runtime_smoke.py bin/soga-reconstructed-linux-amd64 --output ci-results/runtime.json
+          python3 -m unittest discover -s scripts -p 'test_manager.py' -v
       - name: Package programs, source, and checksums
+        env:
+          CHANNEL: ${{ inputs.channel || 'stable' }}
         run: |
           mkdir -p dist
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          channel = os.environ["CHANNEL"]
+          prefix = "preview" if channel == "preview" else "build"
+          tag = f'{prefix}-{os.environ["GITHUB_RUN_NUMBER"]}-{os.environ["GITHUB_RUN_ATTEMPT"]}-{os.environ["GITHUB_SHA"][:7]}'
+          Path("BUILD-INFO.json").write_text(json.dumps({"tag": tag, "channel": channel, "commit": os.environ["GITHUB_SHA"]}) + "\n")
+          PY
           for arch in amd64 arm64; do
             tar -czf "dist/soga-linux-${arch}.tar.gz" \
               --transform 's,^,soga-reconstructed/,' \
               "bin/soga-reconstructed-linux-${arch}" examples scripts \
-              LICENSE LICENSES THIRD_PARTY_NOTICES.txt README.txt GITHUB.txt
+              LICENSE LICENSES THIRD_PARTY_NOTICES.txt README.txt GITHUB.txt BUILD-INFO.json
           done
           git archive --format=tar.gz --prefix=soga-reconstructed/ \
             --output=dist/soga-source.tar.gz HEAD
           cp bin/soga-reconstructed-linux-* dist/
           cp ci-results/*.json dist/
+          cp scripts/manager.py dist/soga-manager.py
           cd dist
           sha256sum soga-* *.json > SHA256SUMS
       - name: Check one-command installer without changing this runner
@@ -58,8 +76,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}
+          CHANNEL: ${{ inputs.channel || 'stable' }}
         run: |
-          tag="build-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}-${GITHUB_SHA:0:7}"
+          tag=$(python3 -c 'import json; print(json.load(open("BUILD-INFO.json"))["tag"])')
           cat > release-notes.txt <<'NOTES'
           Independent soga-reconstructed build; not the original author's source.
           Linux amd64 and arm64, plus complete source and third-party licenses.
@@ -68,6 +87,8 @@ jobs:
           v2node API routing is unchanged at the user's request. See GITHUB.txt
           for configuration keys and known compatibility limitations.
           NOTES
+          flags=(--latest)
+          if [[ "$CHANNEL" == preview ]]; then flags=(--prerelease); fi
           gh release create "$tag" dist/* --repo "$REPOSITORY" \
             --target "$GITHUB_SHA" --title "Linux build ${GITHUB_SHA:0:7}" \
-            --notes-file release-notes.txt --latest
+            --notes-file release-notes.txt "${flags[@]}"

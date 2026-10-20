@@ -108,7 +108,7 @@ fi
 if [[ -z ${DESTDIR:-} ]]; then
   finish_install_service "$had_config" "$supplied_config"
   printf '\n%s\n' \
-    '管理实例：soga-reconstructed instance' \
+    '输入 soga 打开交互式管理菜单。' \
     '查看日志：journalctl -u soga-reconstructed@default -f'
 else
   echo '临时目录安装完成；未操作宿主 systemd。'

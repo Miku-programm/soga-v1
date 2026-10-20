@@ -2,6 +2,7 @@ soga-reconstructed — 独立兼容实现与源码工程
 参考样本：soga 2.17.0，Linux amd64
 
 GitHub 下载与一键安装：见根目录 GITHUB.txt。
+安装后输入 soga 打开交互式菜单，管理实例、日志、配置、更新及自启状态。
 构建产物：https://github.com/Miku-programm/soga-v1/releases/latest
 面板通讯密钥填 webapi_key；soga_key 和 soga_panel_* 留空。
 本次上传按用户要求保留现有 v2node 行为，已知接口路径差异没有修复。

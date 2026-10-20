@@ -30,10 +30,15 @@ if [ -z "$stage" ]; then
 fi
 rm -f -- "$stage/usr/local/bin/soga-reconstructed" \
   "$stage/etc/systemd/system/soga-reconstructed@.service"
+if [ -f "$stage/usr/local/bin/soga" ] && [ ! -L "$stage/usr/local/bin/soga" ] &&
+   grep -q '^# soga-reconstructed manager launcher$' "$stage/usr/local/bin/soga"; then
+  rm -f -- "$stage/usr/local/bin/soga"
+fi
 docdir="$stage/usr/local/share/doc/soga-reconstructed"
 if [ ! -L "$docdir" ]; then
   rm -f -- "$docdir/部署说明.txt" "$docdir/LICENSE-VNet-SSR" "$docdir/LICENSE" \
     "$docdir/THIRD_PARTY_NOTICES.txt" "$docdir/uninstall.sh"
+  rm -f -- "$docdir/manager.py" "$docdir/build-info.json"
   rm -rf -- "$docdir/LICENSES"
   if [ -d "$docdir" ]; then rmdir "$docdir" 2>/dev/null || :; fi
 fi

@@ -3,6 +3,38 @@ GitHub 编译、安装和 key 填写说明
 仓库：https://github.com/Miku-programm/soga-v1
 下载：https://github.com/Miku-programm/soga-v1/releases/latest
 
+交互式管理菜单
+
+已核对官方 https://github.com/vaxilu/soga ：install_cmd.sh 下载
+https://github.com/vaxilu/soga-cmd 的管理程序；根目录 soga.sh 是旧版单实例菜单。
+截至本次核对，soga-cmd 仓库只提供 README 和发布程序，未公开菜单源码。
+这里按用户提供的新版多实例菜单独立实现，并接入本重建工程。
+
+安装后输入 soga，即可显示与提供的菜单相同的顶层布局：
+0 退出；1 安装/更新；2 完全卸载；3 切换稳定/测试分支；
+4 更新管理脚本；5 新增实例；6 起按实例列表进入对应实例管理。
+支持直接输入实例名。列表显示真实运行状态、自启状态及配置文件路径。
+实例菜单包含启停、重启、自启、日志、实时日志、查看/编辑配置、重命名及删除。
+default 不能重命名或删除。完全卸载需输入「卸载」确认，会删除本重建版配置。
+直接运行 scripts/uninstall.sh 仍保留配置；与菜单的「完全卸载」用途不同。
+
+管理器使用 Python 3 标准库；真实安装缺少 Python 3 时通过系统包管理器安装。
+管理器版本单独显示，不冒充原版 v0.0.6；程序版本标注「重建版」。
+命令入口为 /usr/local/bin/soga；管理 /etc/soga-reconstructed 下的实例，
+服务名为 soga-reconstructed@实例名。不会把原版 /etc/soga 的实例当作已接管实例。
+若 /usr/local/bin/soga 已有其他管理器，安装会要求先备份移走，避免覆盖。
+
+稳定版取 GitHub 最新正式 Release；测试版取最新非草稿预发布。
+维护者可在 Actions 手动运行时选择 preview，生成真正的测试版 Release。
+没有测试版时会明确提示，不会将稳定版冒充测试版。
+检查更新失败不会阻止实例管理；自更新管理脚本会验证发布包 SHA-256。
+管理脚本更新后重新运行 soga；程序更新会复用默认实例配置并重启默认实例，
+其他运行实例如需切换至新程序，请在各自菜单中重启。
+
+也支持命令：soga list / new / remove / rename / start / stop / restart /
+enable / disable / status / log / config / update / uninstall / self-update / version。
+例如 soga log anytls -f、soga restart anytls。
+
 这是独立兼容重建工程，不是原作者源码。原始 soga 二进制没有上传。
 用户要求保留现有业务实现；安装流程参照官方脚本的版本参数、配置写入及自动启动行为。
 参考：https://github.com/vaxilu/soga/blob/master/install.sh
@@ -64,9 +96,10 @@ node_id 和 server_type 应与面板创建的节点一致。
 
 GitHub 编译
 
-推送 main 自动运行，也可进入 Actions → Build Linux programs → Run workflow。
+推送 main 自动发布稳定版，也可进入 Actions → Build Linux programs → Run workflow，
+选择 stable 或 preview。稳定版更新 latest；测试版标记为预发布，不覆盖 latest。
 Go 1.27.3 使用仓库内 vendor 离线构建两个架构。
-amd64 执行 CLI 与本地进程检查；arm64 只交叉编译，不冒充原生运行验证。
+amd64 执行 CLI、本地进程及管理菜单测试；arm64 只交叉编译，不冒充原生运行验证。
 一键安装入口另验收临时目录安装、配置保留及参数写入、密钥不回显、
 损坏下载包拒绝安装，以及通过命令替身验证首次/升级/失败的服务启停流程。
 成功后生成 Release，提供裸程序、带安装文件的 tar.gz、完整源码 tar.gz、
