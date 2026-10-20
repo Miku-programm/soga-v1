@@ -9,8 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class InstallationRegressionTests(unittest.TestCase):
-    def shell(self, source, *args, env=None):
-        return subprocess.run(["bash", "-c", source, "test", *map(str, args)],
+    def shell(self, source, *args, env=None, interpreter="bash"):
+        return subprocess.run([interpreter, "-c", source, "test", *map(str, args)],
                               capture_output=True, text=True, env=env, timeout=10)
 
     def test_real_systemctl_empty_listing_is_not_install_failure(self):
@@ -24,13 +24,17 @@ stage=$2
 systemctl() { command systemctl --root="$stage" "$@"; }
 list_legacy_services list-unit-files --plain --no-legend 'soga-reconstructed@*.service'
 echo CONTINUED
-""", ROOT, stage)
+""", ROOT, stage, interpreter="sh")
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("CONTINUED", result.stdout)
 
     def test_migration_empty_present_and_error_cases(self):
-        for mode in ("empty", "present", "error", "stop-error"):
-            result = self.shell("""
+        modes = ("empty", "present", "error", "show-error", "stop-error", "disable-error",
+                 "missing-failed", "missing-inactive", "missing-active", "disabled-inactive",
+                 "missing-reset-error")
+        for mode in modes:
+            with self.subTest(mode=mode):
+                result = self.shell("""
 set -eu
 . "$1/scripts/service-migration.sh"
 mode=$2
@@ -43,24 +47,48 @@ systemctl() {
         *) echo 'soga-reconstructed@default.service enabled'
            echo 'unrelated.service enabled' ;;
       esac ;;
-    disable)
+    show)
+      case "$mode" in
+        show-error) echo 'Failed to connect to bus' >&2; return 1 ;;
+        missing-*) echo 'LoadState=not-found'; echo 'UnitFileState='
+          case "$mode" in
+            missing-active) echo 'ActiveState=active' ;;
+            missing-inactive) echo 'ActiveState=inactive' ;;
+            *) echo 'ActiveState=failed' ;;
+          esac ;;
+        disabled-inactive) printf 'LoadState=loaded\nUnitFileState=disabled\nActiveState=inactive\n' ;;
+        *) printf 'LoadState=loaded\nUnitFileState=enabled\nActiveState=active\n' ;;
+      esac ;;
+    stop)
       echo "STOP $*"
       [ "$mode" != stop-error ] || return 1 ;;
+    disable)
+      echo "DISABLE $*"
+      case "$mode" in
+        missing-*) echo 'Failed to disable unit: Unit file does not exist.' >&2; return 1 ;;
+        disable-error) return 1 ;;
+      esac ;;
+    reset-failed)
+      echo RESET
+      [ "$mode" != missing-reset-error ] || return 1 ;;
     daemon-reload) echo RELOAD ;;
   esac
 }
 retire_legacy_services
 echo COMPLETED
-""", ROOT, mode)
-            if mode in ("error", "stop-error"):
-                self.assertNotEqual(result.returncode, 0)
-                self.assertNotIn("COMPLETED", result.stdout)
-                self.assertIn("失败", result.stderr)
-            else:
-                self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertIn("COMPLETED", result.stdout)
-                self.assertNotIn("unrelated.service", result.stdout)
-                self.assertEqual(result.stdout.count("STOP"), int(mode == "present"))
+""", ROOT, mode, interpreter="sh")
+                if mode in ("error", "show-error", "stop-error", "disable-error"):
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertNotIn("COMPLETED", result.stdout)
+                    self.assertIn("失败", result.stderr)
+                else:
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertIn("COMPLETED", result.stdout)
+                    self.assertNotIn("unrelated.service", result.stdout)
+                    self.assertEqual(result.stdout.count("STOP"), int(mode in ("present", "missing-active")))
+                    self.assertEqual(result.stdout.count("DISABLE"), int(mode == "present"))
+                    if mode.startswith("missing-"):
+                        self.assertIn("跳过禁用", result.stdout)
 
     def test_existing_bash_command_hash_keeps_working_after_migration(self):
         with tempfile.TemporaryDirectory() as stage:
