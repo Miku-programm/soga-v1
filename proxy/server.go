@@ -19,6 +19,7 @@ import (
 	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing/common/json/badoption"
 	"reconstructed.local/soga/proxy/ssrcore"
+	"reconstructed.local/soga/proxy/wireproxy"
 	"reconstructed.local/soga/tunnel"
 )
 
@@ -114,6 +115,8 @@ type Config struct {
 	InvalidAccess                      *InvalidAccessConfig
 	AuthCache                          *AuthenticationCache
 	UDPProxyProtocol                   bool
+	// ProxyProtocolTrusted limits whose PROXY headers are honoured; empty trusts all.
+	ProxyProtocolTrusted               wireproxy.Trusted
 	SSObfs, SSObfsMode, SSHost, SSPath string
 	Tunnel                             *tunnel.Config
 }
@@ -438,6 +441,7 @@ func inboundOptions(c Config) (option.Inbound, error) {
 		o := &ssrcore.Options{Listen: c.Listen, Port: c.Port, Method: c.Method, Password: c.Password,
 			TCPFastOpen: c.TCPFastOpen, TCPMultiPath: c.TCPMultiPath,
 			ProxyProtocol: c.ProxyProtocol, UDPProxyProtocol: c.UDPProxyProtocol, ForceProxyProtocol: c.ForceProxyProtocol,
+			ProxyProtocolTrusted: c.ProxyProtocolTrusted,
 			Protocol: c.SSRProtocol, Obfs: c.SSRObfs, ProtocolParam: c.SSRProtocolParam,
 			ObfsParam: c.SSRObfsParam, SinglePortType: c.SSRSinglePortType}
 		o.CarrierID, o.ObfsUDP, o.MURegex, o.MUSuffix = c.SSRCarrierID, c.SSRObfsUDP, c.MURegex, c.MUSuffix

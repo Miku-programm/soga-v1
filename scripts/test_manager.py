@@ -7,6 +7,7 @@ import subprocess
 import tempfile
 import unittest
 from unittest import mock
+import urllib.error
 
 from manager import Manager
 
@@ -227,12 +228,49 @@ class ManagerTests(unittest.TestCase):
         self.assertEqual(destination.read_bytes(), data)
 
     def test_update_executes_installer_with_exact_tag(self):
-        with mock.patch.object(self.app, "download", return_value=b"#!/bin/bash\nexit 0\n"):
+        script = b"#!/bin/bash\nexit 0\n"
+        sums = (hashlib.sha256(script).hexdigest() + "  soga-install.sh\n").encode()
+        with mock.patch.object(self.app, "download", side_effect=[script, sums]) as download:
             self.app.update("build-123")
+        self.assertEqual(download.call_args_list[0][0][0],
+                         "https://github.com/Miku-programm/soga-v1/releases/download/build-123/soga-install.sh")
         self.assertEqual(self.calls[-1][:3], ["env", "SOGA_NO_MENU=1", "bash"])
         self.assertEqual(self.calls[-1][-1], "build-123")
         with self.assertRaises(ValueError):
             self.app.update("../escape")
+
+    def test_update_rejects_installer_with_wrong_checksum(self):
+        sums = ("0" * 64 + "  soga-install.sh\n").encode()
+        with mock.patch.object(self.app, "download", side_effect=[b"#!/bin/bash\n", sums]):
+            with self.assertRaisesRegex(ValueError, "SHA-256"):
+                self.app.update("build-123")
+        self.assertEqual(self.calls, [])
+
+    def test_update_of_older_release_uses_installer_from_its_tag(self):
+        missing = urllib.error.HTTPError("https://example.invalid", 404, "Not Found", {}, None)
+        with mock.patch.object(self.app, "download", side_effect=[missing, b"#!/bin/bash\n"]) as download:
+            self.app.update("build-9-1-44d9b76")
+        self.assertEqual(download.call_args_list[-1][0][0],
+                         "https://raw.githubusercontent.com/Miku-programm/soga-v1/build-9-1-44d9b76/install.sh")
+        self.assertEqual(self.calls[-1][-1], "build-9-1-44d9b76")
+
+    def test_captured_commands_run_on_python_36(self):
+        seen = {}
+
+        def fake(args, **kwargs):
+            seen.update(kwargs)
+            return subprocess.CompletedProcess(args, 0, stdout="")
+
+        self.run_patch.stop()
+        try:
+            with mock.patch.object(subprocess, "run", side_effect=fake):
+                self.app.run(["true"], capture=True)
+        finally:
+            self.run_patch.start()
+        # Python 3.6 (EL7/EL8, Ubuntu 18.04) has neither keyword.
+        self.assertNotIn("text", seen)
+        self.assertNotIn("capture_output", seen)
+        self.assertEqual(seen.get("encoding"), "utf-8")
 
     def test_instance_traversal_rejected(self):
         with self.assertRaises(ValueError):

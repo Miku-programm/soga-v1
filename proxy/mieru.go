@@ -76,7 +76,7 @@ func newMieruInbound(ctx context.Context, router adapter.Router, _ log.ContextLo
 	var factory apicommon.StreamListenerFactory = streamListener
 	if c.Tunnel != nil {
 		factory = &mieruTunnelFactory{socket: streamListener, config: *c.Tunnel,
-			directProxy: c.ProxyProtocol, required: c.ForceProxyProtocol}
+			directProxy: c.ProxyProtocol, required: c.ForceProxyProtocol, trusted: c.ProxyProtocolTrusted}
 	}
 	if err := m.server.Store(&server.ServerConfig{Config: cfg, StreamListenerFactory: factory}); err != nil {
 		return nil, err

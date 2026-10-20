@@ -38,6 +38,9 @@ http / dns:
   DNSProvider must name an actual dns_* script in the pinned bundle.
   SupportedDNSProviders returns that inventory. The documented config entries
   DNS_CF_Email / DNS_CF_Key become CF_Email / CF_Key environment entries.
+  The configuration loader lowercases keys, so names are matched
+  case-insensitively against the selected provider script: dns_cf_key in
+  soga.conf also becomes CF_Key. Registered dns_* settings are not passed.
   Credentials are passed literally, with restricted environment variable names.
   No configuration text, command line or reload hook is evaluated by this Go
   module. The upstream DNS provider scripts necessarily run to perform DNS

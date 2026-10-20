@@ -74,7 +74,7 @@ fi
 if [[ -z ${DESTDIR:-} ]]; then
   command -v systemctl >/dev/null || { echo 'This installer requires systemd.' >&2; exit 1; }
 fi
-# Match the official dependency and certificate-client setup on real hosts.
+# Install the official dependency set (socat/openssl/curl serve the bundled acme.sh).
 if [[ -z ${DESTDIR:-} ]]; then
   if command -v apt-get >/dev/null; then
     apt-get update
@@ -88,15 +88,8 @@ if [[ -z ${DESTDIR:-} ]]; then
     echo '未检测到受支持的包管理器（apt、dnf、yum）。' >&2
     exit 1
   fi
-  if [[ ! -x /root/.acme.sh/acme.sh ]]; then
-    acme_setup=$(mktemp)
-    if ! curl -fLSs --retry 3 https://get.acme.sh -o "$acme_setup"; then
-      rm -f "$acme_setup"; exit 1
-    fi
-    sh "$acme_setup" || { rm -f "$acme_setup"; exit 1; }
-    rm -f "$acme_setup"
-  fi
-  /root/.acme.sh/acme.sh --set-default-ca --server letsencrypt
+  # Certificates use the acme.sh copy pinned inside the program (it selects
+  # Let's Encrypt itself); no unpinned script from get.acme.sh runs as root.
 fi
 for program in curl tar sha256sum mktemp awk; do
   command -v "$program" >/dev/null || { echo "Missing dependency: $program" >&2; exit 1; }

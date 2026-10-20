@@ -283,3 +283,16 @@ func TestLoadErrorsAndExplicitCreation(t *testing.T) {
 		t.Fatal("existing configuration must not be truncated")
 	}
 }
+
+func TestDNSVariablesSelectsOnlyCredentials(t *testing.T) {
+	text := "dns_provider=dns_cf\nDNS_CF_Key=file-key\ndns_strategy=prefer_ipv4\nwebapi_key=secret\n"
+	loaded, err := Load(strings.NewReader(text), LoadOptions{Environ: []string{"DNS_CF_Email=env@example.com", "DNS_CF_Token="}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := DNSVariables(loaded.Values)
+	want := map[string]string{"dns_cf_key": "file-key", "dns_cf_email": "env@example.com"}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("DNSVariables = %v, want %v", got, want)
+	}
+}

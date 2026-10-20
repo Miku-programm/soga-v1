@@ -88,6 +88,9 @@ dns_provider=
 # 代理协议中转配置
 proxy_protocol=true
 udp_proxy_protocol=true
+# 可信中转地址（IP 或 CIDR，逗号分隔），只采用这些地址发来的代理协议头；
+# 留空则信任任何来源，客户端可伪造来源 IP 绕过 IP 限制，建议填写中转服务器地址
+proxy_protocol_trusted=
 
 # 全局用户连接地址数量限制配置（需要 Redis 8.0 或更高版本）
 redis_ip_limit_enable=false
@@ -133,6 +136,7 @@ submit_alive_ip_min_traffic=300
 - `webapi_key` 是面板后端通讯密钥，不是 GitHub 密钥。V2Board 类面板通常在后台节点设置中配置该值。
 - `api=webapi` 使用接口对接；数据库对接需改为 `api=db`，填写数据库信息，并确认对应面板适配器支持数据库模式。
 - 模板保留了 `proxy_protocol=true` 和 `udp_proxy_protocol=true`，上游应发送匹配的代理协议头；客户端直接连接时应按部署情况调整这两项。
+- `proxy_protocol_trusted` 填中转服务器的 IP 或网段（逗号分隔）。填写后只采用这些地址发来的代理协议头，其他来源一律按真实地址处理；同时开启 `force_proxy_protocol=true` 时，非中转来源的连接会被拒绝。留空会信任任何来源，客户端可以伪造来源 IP 绕过 IP 数限制，启动日志会给出警告。
 - 动态限速时段、阈值和白名单均按提供的模板保留，可按实际需求修改。
 - 本工程不调用原版商业授权服务，`soga_key` 可留空；尚未恢复的 `soga_panel_url`、`soga_panel_key` 均应留空。
 
@@ -220,13 +224,18 @@ sh scripts/build.sh all
 构建产物位于 `bin/`。检查命令：
 
 ```bash
+CGO_ENABLED=0 go vet -mod=vendor ./...
 CGO_ENABLED=0 go test -mod=vendor ./...
 python3 scripts/smoke.py bin/soga-reconstructed-linux-amd64
 python3 scripts/runtime_smoke.py bin/soga-reconstructed-linux-amd64
 python3 -m unittest discover -s scripts -p 'test_*.py' -v
 ```
 
-推送 `main` 后，GitHub Actions 自动构建两个架构并发布 Release，包含程序、安装包、源码、检查记录和 `SHA256SUMS`。也可在 Actions 手动选择 `stable` 或 `preview` 发布。
+推送任意分支或提交 PR，GitHub Actions 都会执行 `go vet`、Go 单元测试、构建和检查；只有 `main` 会发布 Release（程序、安装包、源码、检查记录和 `SHA256SUMS`）。推送 `main` 只生成测试版（预发布）；确认无误后，在 Actions 手动运行并选择 `stable`，才会发布一键安装和 `soga update` 默认使用的稳定版：
+
+```bash
+gh workflow run build.yml -f channel=stable
+```
 
 amd64 执行命令行、本地进程、管理菜单和安装流程检查；arm64 为交叉编译。每次发布不重复历史完整集成测试。`validation/` 保存历史验收记录；生产面板和真实账号的连接能力需在实际部署中验证。
 

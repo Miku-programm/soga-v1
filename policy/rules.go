@@ -263,14 +263,78 @@ func (p *Policy) Check(t Target) error {
 	if p.AllowOnly && !MatchAny(p.Allowed, t) {
 		return &Denied{Rule: "panel_allow_list"}
 	}
-	if p.BanPrivate {
-		for _, ip := range addresses(t) {
-			ip = ip.Unmap()
-			if ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast() ||
-				ip.IsMulticast() || ip.IsUnspecified() {
-				return &Denied{Rule: "ban_private_ip"}
-			}
+	return p.checkPrivate(t)
+}
+
+// CheckSniffed checks a destination whose name was also sniffed from the
+// client's TLS SNI, HTTP Host or QUIC handshake. The sniffed name is chosen by
+// the client and need not belong to the address actually dialled, so it can
+// only add denials: block rules apply to both the real destination and the
+// sniffed name, and a whitelist entry matching only the sniffed name exempts
+// neither the real destination's block rules nor ban_private_ip. The panel
+// allow list accepts either name, because an IP destination can only be
+// associated with a domain through sniffing.
+func (p *Policy) CheckSniffed(actual Target, sniffed string) error {
+	if sniffed == "" || domain(sniffed) == domain(actual.Host) {
+		return p.Check(actual)
+	}
+	if p == nil || (!actual.Unattributed && p.ExemptUsers[actual.UserID]) || MatchAny(p.White, actual) {
+		return nil
+	}
+	view := actual
+	view.Host = sniffed
+	sniffedWhite := MatchAny(p.White, view)
+	for _, rule := range p.Block {
+		if rule.Match(actual) || (!sniffedWhite && rule.Match(view)) {
+			return &Denied{rule.Text, rule.AuditID}
+		}
+	}
+	if p.AllowOnly && !MatchAny(p.Allowed, actual) && !MatchAny(p.Allowed, view) {
+		return &Denied{Rule: "panel_allow_list"}
+	}
+	return p.checkPrivate(actual)
+}
+
+func (p *Policy) checkPrivate(t Target) error {
+	if !p.BanPrivate {
+		return nil
+	}
+	for _, ip := range addresses(t) {
+		if privateAddress(ip) {
+			return &Denied{Rule: "ban_private_ip"}
 		}
 	}
 	return nil
+}
+
+// Ranges that are not publicly routable but are missed by netip's predicates.
+// 100.64.0.0/10 also hosts cloud metadata services such as 100.100.100.200.
+var reservedPrefixes = []netip.Prefix{
+	netip.MustParsePrefix("0.0.0.0/8"),
+	netip.MustParsePrefix("100.64.0.0/10"),
+	netip.MustParsePrefix("192.0.0.0/24"),
+	netip.MustParsePrefix("198.18.0.0/15"),
+	netip.MustParsePrefix("240.0.0.0/4"),
+	netip.MustParsePrefix("64:ff9b:1::/48"),
+}
+
+var nat64Prefix = netip.MustParsePrefix("64:ff9b::/96")
+
+func privateAddress(ip netip.Addr) bool {
+	ip = ip.Unmap()
+	if nat64Prefix.Contains(ip) {
+		// Well-known NAT64 translates the embedded IPv4 address.
+		b := ip.As16()
+		ip = netip.AddrFrom4([4]byte{b[12], b[13], b[14], b[15]})
+	}
+	if ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast() ||
+		ip.IsMulticast() || ip.IsUnspecified() {
+		return true
+	}
+	for _, prefix := range reservedPrefixes {
+		if prefix.Contains(ip) {
+			return true
+		}
+	}
+	return false
 }

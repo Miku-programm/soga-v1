@@ -33,7 +33,7 @@ default 不能重命名或删除。完全卸载需输入 y 或 Y 确认，会删
 如果该位置是其他程序，安装会明确报错，避免误删。
 
 稳定版取 GitHub 最新正式 Release；测试版取最新非草稿预发布。
-维护者可在 Actions 手动运行时选择 preview，生成真正的测试版 Release。
+推送 main 自动生成测试版；稳定版需维护者在 Actions 手动运行并选择 stable。
 没有测试版时会明确提示，不会将稳定版冒充测试版。
 交互式终端安装结束后自动打开菜单；SOGA_NO_MENU=1 可关闭自动打开。
 从菜单内更新不再嵌套打开新菜单。终端显示彩色菜单，重定向输出保持纯文本。
@@ -41,6 +41,8 @@ default 不能重命名或删除。完全卸载需输入 y 或 Y 确认，会删
 旧服务仍在 systemd 列表但文件已不存在时，跳过 disable；如仍有活动实例，
 先停止再迁移。残留失败记录尝试重置；真实停止或取消自启失败仍明确报错。
 检查更新失败不会阻止实例管理；自更新管理脚本会验证发布包 SHA-256。
+程序更新运行所选 Release 附带的 soga-install.sh，同样先校验 SHA-256；
+更早的 Release 没有该文件时，改用该 Release 标签下的 install.sh，不再使用 main 分支上的脚本。
 管理脚本更新后重新运行 soga；程序更新会复用默认实例配置并重启默认实例，
 其他运行实例如需切换至新程序，请在各自菜单中重启。
 
@@ -82,7 +84,8 @@ bash <(curl -Ls https://raw.githubusercontent.com/Miku-programm/soga-v1/main/ins
 
 以上标签只是格式示例；实际标签以 Releases 页面为准。
 
-真实安装支持 apt/dnf/yum，自动安装依赖及 acme.sh，并设置 Let’s Encrypt 默认 CA。
+真实安装支持 apt/dnf/yum，自动安装依赖。证书签发使用程序内置的固定版本 acme.sh（Let’s Encrypt），
+不再以 root 运行从 get.acme.sh 在线下载的脚本。
 脚本识别架构、下载 Release、校验 SHA-256，然后安装程序及 systemd 模板。
 配置参数可与版本参数混合排列，同名参数以后面的值为准。
 已有配置会保留，仅覆盖显式传入的字段；已有配置或传入参数时自动重启。
@@ -116,6 +119,8 @@ soga_panel_key=
 ```
 
 webapi_url 填面板基础地址，不要追加 /api/v1/server/UniProxy/config。
+开启 proxy_protocol 时，请在 proxy_protocol_trusted 填写中转服务器 IP 或网段（逗号分隔）；
+留空会信任任何来源的代理协议头，客户端可伪造来源 IP。
 node_id 和 server_type 应与面板创建的节点一致。
 手动配置时使用以下命令；安装脚本带参数运行时已自动完成：
 
@@ -126,8 +131,10 @@ sudo journalctl -u soga -f
 
 ## GitHub 编译
 
-推送 main 自动发布稳定版，也可进入 Actions → Build Linux programs → Run workflow，
-选择 stable 或 preview。稳定版更新 latest；测试版标记为预发布，不覆盖 latest。
+推送任意分支或提交 PR 都会执行 go vet、Go 单元测试、构建和检查，只有 main 会发布。
+推送 main 生成测试版（预发布，不覆盖 latest）。确认测试版正常后，进入 Actions → Build Linux programs →
+Run workflow 选择 stable（或执行 gh workflow run build.yml -f channel=stable），发布稳定版并更新 latest。
+一键安装和 soga update 默认使用稳定版，因此未经手动确认的提交不会直接装到节点上。
 Go 1.27.3 使用仓库内 vendor 离线构建两个架构。
 amd64 执行 CLI、本地进程及管理菜单测试；arm64 只交叉编译，不冒充原生运行验证。
 一键安装入口另验收临时目录安装、配置保留及参数写入、密钥不回显、

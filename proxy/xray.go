@@ -75,7 +75,7 @@ func newXrayInbound(ctx context.Context, router adapter.Router, logger log.Conte
 			c.XrayStream = nil
 			c.ProxyProtocol, c.ForceProxyProtocol = true, true
 		} else {
-			frontend = &proxyFrontend{address: net.JoinHostPort(c.Listen, strconv.Itoa(int(c.Port))), backend: backend, required: c.ForceProxyProtocol, tfo: c.TCPFastOpen, mptcp: c.TCPMultiPath}
+			frontend = &proxyFrontend{address: net.JoinHostPort(c.Listen, strconv.Itoa(int(c.Port))), backend: backend, required: c.ForceProxyProtocol, trusted: c.ProxyProtocolTrusted, tfo: c.TCPFastOpen, mptcp: c.TCPMultiPath}
 		}
 		c.Listen, c.Port = "127.0.0.1", uint16(port)
 	}

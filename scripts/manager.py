@@ -12,6 +12,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import urllib.error
 import urllib.request
 
 VERSION = "0.1.0"
@@ -48,7 +49,8 @@ class Manager:
 
     def run(self, args, capture=False):
         if capture:
-            return subprocess.run([str(x) for x in args], text=True, encoding="utf-8",
+            # encoding= selects text mode; text= needs Python 3.7 (EL8 ships 3.6).
+            return subprocess.run([str(x) for x in args], encoding="utf-8",
                                   errors="replace", stdout=subprocess.PIPE,
                                   stderr=subprocess.DEVNULL, timeout=8)
         return subprocess.run([str(x) for x in args], check=True)
@@ -203,6 +205,17 @@ class Manager:
             if os.path.exists(temporary):
                 os.unlink(temporary)
 
+    def release_file(self, tag, name):
+        """Download a release asset that matches the release's SHA256SUMS."""
+        base = "https://github.com/" + REPO + "/releases/download/" + tag + "/"
+        data = self.download(base + name)
+        checksums = self.download(base + "SHA256SUMS").decode()
+        hashes = [line.split()[0] for line in checksums.splitlines()
+                  if len(line.split()) == 2 and line.split()[1] == name]
+        if len(hashes) != 1 or hashlib.sha256(data).hexdigest() != hashes[0]:
+            raise ValueError(name + " SHA-256 校验失败，未使用该文件。")
+        return data
+
     def update(self, tag=None):
         self.require_root()
         if tag is None:
@@ -212,7 +225,14 @@ class Manager:
             tag = release["tag_name"]
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", tag):
             raise ValueError("无效的发布标签。")
-        script = self.download("https://raw.githubusercontent.com/" + REPO + "/main/install.sh")
+        try:
+            script = self.release_file(tag, "soga-install.sh")
+        except urllib.error.HTTPError as error:
+            if error.code != 404:
+                raise
+            # Releases published before soga-install.sh was attached: use the
+            # installer from the release's own tag rather than from main.
+            script = self.download("https://raw.githubusercontent.com/" + REPO + "/" + tag + "/install.sh")
         with tempfile.TemporaryDirectory(prefix="soga-update-") as folder:
             path = Path(folder) / "install.sh"
             path.write_bytes(script)
@@ -227,13 +247,7 @@ class Manager:
         tag = release["tag_name"]
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", tag):
             raise ValueError("无效的发布标签。")
-        base = "https://github.com/" + REPO + "/releases/download/" + tag + "/"
-        data = self.download(base + "soga-manager.py")
-        checksums = self.download(base + "SHA256SUMS").decode()
-        hashes = [line.split()[0] for line in checksums.splitlines()
-                  if len(line.split()) == 2 and line.split()[1] == "soga-manager.py"]
-        if len(hashes) != 1 or hashlib.sha256(data).hexdigest() != hashes[0]:
-            raise ValueError("管理脚本 SHA-256 校验失败，未替换原文件。")
+        data = self.release_file(tag, "soga-manager.py")
         ast.parse(data.decode("utf-8"))
         self.atomic_write(self.doc / "manager.py", data, 0o644)
         self.display("管理脚本已更新；重新运行 soga 即可使用新版菜单。")

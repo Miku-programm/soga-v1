@@ -11,6 +11,7 @@ import (
 
 	"reconstructed.local/soga/proxy/ssrcore/internal/vnet/common/ciphers/stream"
 	"reconstructed.local/soga/proxy/ssrcore/internal/vnet/common/obfs"
+	"reconstructed.local/soga/proxy/wireproxy"
 )
 
 const Type = "ssr"
@@ -46,6 +47,7 @@ type Options struct {
 	TCPFastOpen                                         bool
 	TCPMultiPath                                        bool
 	ProxyProtocol, UDPProxyProtocol, ForceProxyProtocol bool
+	ProxyProtocolTrusted                                wireproxy.Trusted
 	// WrapConnection adapts an independent transport (for example official
 	// simple-obfs) before the legacy stream cipher. It must preserve net.Conn
 	// deadlines, addresses and closure. Do not use it to peel SSR obfs twice.

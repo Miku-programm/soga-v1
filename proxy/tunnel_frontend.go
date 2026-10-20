@@ -37,6 +37,7 @@ func (s *Server) startTunnel() error {
 	// original peer. The backend socket is never exposed on a public interface.
 	backend.ProxyProtocol, backend.ForceProxyProtocol = true, true
 	backend.UDPProxyProtocol = true
+	backend.ProxyProtocolTrusted = nil
 	reserved, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		return err
@@ -76,13 +77,11 @@ func (f *tunnelFrontend) start(ctx context.Context) error {
 	}
 	// NewListener@0x18b9340 installs the configured direct PROXY listener
 	// before tunnel TLS/WebSocket/encryption. The session-level PROXY header
-	// below is a separate, always optional layer.
+	// below is a separate, always optional layer. It travels inside the
+	// password-authenticated tunnel, so only tunnel peers (relays) can set it.
 	if f.config.ProxyProtocol {
-		pp := &proxyproto.Listener{Listener: raw, ReadHeaderTimeout: 5 * time.Second}
-		if f.config.ForceProxyProtocol {
-			pp.Policy = func(net.Addr) (proxyproto.Policy, error) { return proxyproto.REQUIRE, nil }
-		}
-		raw = pp
+		raw = &proxyproto.Listener{Listener: raw, ReadHeaderTimeout: 5 * time.Second,
+			ConnPolicy: f.config.ProxyProtocolTrusted.ConnPolicy(f.config.ForceProxyProtocol)}
 	}
 	f.listener, err = tunnel.WrapListener(raw, *f.config.Tunnel)
 	if err != nil {
@@ -136,7 +135,7 @@ func (f *tunnelFrontend) tcp(ctx context.Context, raw net.Conn) {
 	// The original soga tunnel factory unconditionally enables its optional
 	// PROXY listener (0x133044a -> 0x11db436). Keep that behavior even when
 	// the separate direct-listener proxy_protocol option is false.
-	conn, err := wireproxy.Connection(raw, false)
+	conn, err := wireproxy.Connection(raw, false, nil)
 	if err != nil {
 		return
 	}
@@ -211,7 +210,7 @@ func (f *tunnelFrontend) udp(ctx context.Context, conn *tunnel.Conn) {
 		}
 		payload := b[:n]
 		if first || f.config.UDPProxyProtocol {
-			payload, source, err = wireproxy.Datagram(payload, source, false)
+			payload, source, err = wireproxy.Datagram(payload, source, false, nil)
 			if err != nil {
 				return
 			}

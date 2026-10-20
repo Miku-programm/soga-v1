@@ -46,6 +46,24 @@ func ParseText(text string) map[string]string {
 	return values
 }
 
+// DNSVariables selects the DNS_* credential entries from a loaded value map.
+// Keys are lowercased by the load pipeline, so the result keeps that spelling;
+// registered dns_* settings such as dns_provider are not credentials and empty
+// values are omitted. The certificates package restores provider spelling.
+func DNSVariables(values map[string]string) map[string]string {
+	result := map[string]string{}
+	for key, value := range values {
+		if value == "" || !strings.HasPrefix(strings.ToLower(key), "dns_") {
+			continue
+		}
+		if _, registered := fieldIndices[strings.ToLower(key)]; registered {
+			continue
+		}
+		result[key] = value
+	}
+	return result
+}
+
 // CleanValue reproduces 0x13241a0: cut at the first literal space-plus-#,
 // then TrimSpace. A bare '#' or tab-plus-# inside a value is preserved.
 func CleanValue(value string) string {

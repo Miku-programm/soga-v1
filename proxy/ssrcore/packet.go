@@ -35,7 +35,7 @@ func (s *server) handlePacket(wire []byte, source net.Addr) {
 	peer := source
 	if s.options.UDPProxyProtocol {
 		var err error
-		wire, source, err = wireproxy.Datagram(wire, source, s.options.ForceProxyProtocol)
+		wire, source, err = wireproxy.Datagram(wire, source, s.options.ForceProxyProtocol, s.options.ProxyProtocolTrusted)
 		if err != nil {
 			return
 		}

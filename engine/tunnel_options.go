@@ -55,7 +55,7 @@ func buildTunnel(ctx context.Context, c config.Config, values map[string]string,
 		paths, err := certificates.Resolve(ctx, certificates.Options{
 			CertFile: c.CertFile, KeyFile: c.KeyFile, Domain: c.CertDomain,
 			Mode: c.CertMode, KeyLength: c.CertKeyLength, DNSProvider: c.DnsProvider,
-			Variables: values, StateDir: filepath.Join(p.StateDir, "tunnel-certificates"),
+			Variables: config.DNSVariables(values), StateDir: filepath.Join(p.StateDir, "tunnel-certificates"),
 			ACMEExecutable: p.ACMEExecutable,
 		})
 		if err != nil {

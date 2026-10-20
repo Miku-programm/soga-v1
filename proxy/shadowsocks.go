@@ -120,7 +120,7 @@ func ssObfsOptions(c Config) (simpleobfs.Options, error) {
 func ssLegacyOptions(c Config) ssrcore.Options {
 	o := ssrcore.Options{Listen: c.Listen, Port: c.Port, Method: c.Method, Protocol: "origin", Obfs: "plain",
 		TCPFastOpen: c.TCPFastOpen, TCPMultiPath: c.TCPMultiPath, ProxyProtocol: c.ProxyProtocol,
-		UDPProxyProtocol: c.UDPProxyProtocol, ForceProxyProtocol: c.ForceProxyProtocol}
+		UDPProxyProtocol: c.UDPProxyProtocol, ForceProxyProtocol: c.ForceProxyProtocol, ProxyProtocolTrusted: c.ProxyProtocolTrusted}
 	for _, u := range c.Users {
 		o.Users = append(o.Users, ssrcore.User{ID: u.ID, ProtocolID: 1, Password: u.Password})
 	}
@@ -279,7 +279,7 @@ func (h *shadowsocksInbound) NewConnection(ctx context.Context, conn net.Conn, m
 		}
 	}()
 	if h.config.ProxyProtocol {
-		conn, err = wireproxy.Connection(conn, h.config.ForceProxyProtocol)
+		conn, err = wireproxy.Connection(conn, h.config.ForceProxyProtocol, h.config.ProxyProtocolTrusted)
 		if err != nil {
 			return
 		}
@@ -326,7 +326,7 @@ func (h *shadowsocksInbound) NewPacket(buffer *buf.Buffer, source M.Socksaddr) {
 	}
 	peer := source
 	if h.config.UDPProxyProtocol {
-		wire, real, err := wireproxy.Datagram(buffer.Bytes(), source.UDPAddr(), h.config.ForceProxyProtocol)
+		wire, real, err := wireproxy.Datagram(buffer.Bytes(), source.UDPAddr(), h.config.ForceProxyProtocol, h.config.ProxyProtocolTrusted)
 		if err != nil {
 			buffer.Release()
 			return

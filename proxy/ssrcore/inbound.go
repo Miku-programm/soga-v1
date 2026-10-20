@@ -175,7 +175,7 @@ func (s *server) handle(raw net.Conn) {
 	transport := raw
 	var err error
 	if s.options.ProxyProtocol {
-		transport, err = wireproxy.Connection(transport, s.options.ForceProxyProtocol)
+		transport, err = wireproxy.Connection(transport, s.options.ForceProxyProtocol, s.options.ProxyProtocolTrusted)
 		if err != nil {
 			done(err)
 			return

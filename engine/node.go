@@ -104,6 +104,10 @@ func StartNode(parent context.Context, opts Options) (*Node, error) {
 	if opts.Logger == nil {
 		opts.Logger = slog.Default()
 	}
+	if (opts.Config.ProxyProtocol || opts.Config.UdpProxyProtocol) && opts.Values[proxyProtocolTrustedKey] == "" {
+		opts.Logger.Warn("PROXY headers are accepted from any client, which can forge its source IP; set " +
+			proxyProtocolTrustedKey + " to the relay addresses")
+	}
 	if opts.Config.CheckInterval <= 0 || opts.Config.CheckInterval > maxIntervalSeconds ||
 		opts.Config.SubmitInterval <= 0 || opts.Config.SubmitInterval > maxIntervalSeconds ||
 		opts.Config.RandomIntervalRange < 0 || opts.Config.RandomIntervalRange > maxIntervalSeconds {
@@ -537,6 +541,9 @@ func (n *Node) transform(ctx context.Context, req proxy.Request) (proxy.Request,
 		}
 		target.Addresses = ips
 	}
+	// The sniffed name is client-supplied; policy checks keep the real
+	// destination too, so a spoofed SNI/Host cannot relax the rules.
+	actual := target
 	if req.SniffedDomain != "" {
 		target.Host = req.SniffedDomain
 	}
@@ -545,9 +552,9 @@ func (n *Node) transform(ctx context.Context, req proxy.Request) (proxy.Request,
 	if active == nil {
 		return req, errors.New("node policy is not ready")
 	}
-	checkErr := active.Check(target)
+	checkErr := active.CheckSniffed(actual, req.SniffedDomain)
 	if checkErr == nil {
-		checkErr = active.CheckPacket(target, req.FirstPacket)
+		checkErr = active.CheckPacket(actual, req.FirstPacket)
 	}
 	if err := checkErr; err != nil {
 		if !req.Unattributed {

@@ -20,6 +20,7 @@ type mieruTunnelFactory struct {
 	config      tunnel.Config
 	directProxy bool
 	required    bool
+	trusted     wireproxy.Trusted
 }
 
 func (f *mieruTunnelFactory) Listen(ctx context.Context, network, address string) (net.Listener, error) {
@@ -28,13 +29,8 @@ func (f *mieruTunnelFactory) Listen(ctx context.Context, network, address string
 		return nil, err
 	}
 	if f.directProxy {
-		p := &proxyproto.Listener{Listener: raw, ReadHeaderTimeout: 5 * time.Second}
-		if f.required {
-			p.ConnPolicy = func(proxyproto.ConnPolicyOptions) (proxyproto.Policy, error) {
-				return proxyproto.REQUIRE, nil
-			}
-		}
-		raw = p
+		raw = &proxyproto.Listener{Listener: raw, ReadHeaderTimeout: 5 * time.Second,
+			ConnPolicy: f.trusted.ConnPolicy(f.required)}
 	}
 	l, err := tunnel.WrapListener(raw, f.config)
 	if err != nil {
@@ -71,7 +67,7 @@ func (l *mieruTunnelListener) run() {
 			defer l.workers.Done()
 			// The SDK reads RemoteAddr immediately on its accept goroutine.
 			// Finish optional PROXY parsing here to avoid serial head blocking.
-			parsed, err := wireproxy.Connection(c, false)
+			parsed, err := wireproxy.Connection(c, false, nil)
 			if err != nil {
 				_ = c.Close()
 				return

@@ -142,11 +142,7 @@ func (h *xrayH2Frontend) start(ctx context.Context) error {
 		return err
 	}
 	if h.config.ProxyProtocol {
-		policy := proxyproto.USE
-		if h.config.ForceProxyProtocol {
-			policy = proxyproto.REQUIRE
-		}
-		l = &proxyproto.Listener{Listener: l, ConnPolicy: func(proxyproto.ConnPolicyOptions) (proxyproto.Policy, error) { return policy, nil }, ReadHeaderTimeout: 5 * time.Second}
+		l = &proxyproto.Listener{Listener: l, ConnPolicy: h.config.ProxyProtocolTrusted.ConnPolicy(h.config.ForceProxyProtocol), ReadHeaderTimeout: 5 * time.Second}
 	}
 	h.listener = l
 	go h.transport.Serve(l)

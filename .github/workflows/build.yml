@@ -1,8 +1,13 @@
 name: Build Linux programs
 
+# Every branch and pull request is built and tested. Only main publishes:
+# pushes become preview pre-releases, and a stable "latest" release (the one
+# install.sh and `soga update` use by default) needs a manual run with
+# channel=stable after the preview has been checked.
 on:
   push:
-    branches: [main]
+    branches: ['**']
+  pull_request:
   workflow_dispatch:
     inputs:
       channel:
@@ -15,7 +20,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: linux-release
+  group: linux-release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -28,6 +33,16 @@ jobs:
         with:
           go-version: '1.27.3'
           cache: false
+      - name: Vet and test Go packages
+        env:
+          GOFLAGS: -mod=vendor
+          GOPROXY: 'off'
+          GOSUMDB: 'off'
+          GOTOOLCHAIN: local
+          CGO_ENABLED: '0'
+        run: |
+          go vet ./...
+          go test -timeout 20m ./...
       - name: Build Linux amd64 and arm64 offline
         env:
           GOPROXY: 'off'
@@ -41,7 +56,7 @@ jobs:
           python3 -m unittest discover -s scripts -p 'test_*.py' -v
       - name: Package programs, source, and checksums
         env:
-          CHANNEL: ${{ inputs.channel || 'stable' }}
+          CHANNEL: ${{ inputs.channel || 'preview' }}
         run: |
           mkdir -p dist
           python3 - <<'PY'
@@ -63,6 +78,7 @@ jobs:
           cp bin/soga-reconstructed-linux-* dist/
           cp ci-results/*.json dist/
           cp scripts/manager.py dist/soga-manager.py
+          cp install.sh dist/soga-install.sh
           cd dist
           sha256sum soga-* *.json > SHA256SUMS
       - name: Check one-command installer without changing this runner
@@ -73,16 +89,18 @@ jobs:
           path: dist/*
           if-no-files-found: error
       - name: Publish downloadable build
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}
-          CHANNEL: ${{ inputs.channel || 'stable' }}
+          CHANNEL: ${{ inputs.channel || 'preview' }}
         run: |
           tag=$(python3 -c 'import json; print(json.load(open("BUILD-INFO.json"))["tag"])')
           cat > release-notes.txt <<'NOTES'
           Independent soga-reconstructed build; not the original author's source.
           Linux amd64 and arm64, plus complete source and third-party licenses.
-          amd64 CLI and local-process smoke checks passed; arm64 is cross-compiled.
+          go vet, Go unit tests and amd64 CLI/local-process smoke checks passed;
+          arm64 is cross-compiled.
           This workflow does not repeat the historical full integration suite.
           v2node API routing is unchanged at the user's request. See GITHUB.md
           for configuration keys and known compatibility limitations.

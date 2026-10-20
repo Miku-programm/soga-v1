@@ -9,6 +9,7 @@ import (
 
 	tfo "github.com/database64128/tfo-go/v2"
 	"github.com/pires/go-proxyproto"
+	"reconstructed.local/soga/proxy/wireproxy"
 )
 
 // Xray's native socket setting always requires a PROXY header. This local
@@ -18,6 +19,7 @@ import (
 type proxyFrontend struct {
 	address, backend string
 	required         bool
+	trusted          wireproxy.Trusted
 	tfo, mptcp       bool
 	listener         net.Listener
 	mu               sync.Mutex
@@ -63,9 +65,9 @@ func (f *proxyFrontend) start(ctx context.Context) error {
 
 func (f *proxyFrontend) serve(ctx context.Context, raw net.Conn) {
 	defer func() { raw.Close(); f.mu.Lock(); delete(f.conns, raw); f.mu.Unlock() }()
-	policy := proxyproto.USE
-	if f.required {
-		policy = proxyproto.REQUIRE
+	policy, err := f.trusted.Policy(raw.RemoteAddr(), f.required)
+	if err != nil {
+		return
 	}
 	conn := proxyproto.NewConn(raw, proxyproto.WithPolicy(policy), proxyproto.SetReadHeaderTimeout(5*time.Second))
 	if _, err := conn.Read(nil); err != nil {

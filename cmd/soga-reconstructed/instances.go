@@ -40,7 +40,7 @@ func instanceRun(args []string, out, errOut io.Writer) int {
 	return serve([]string{"-c", filepath.Join(dir, "soga.conf"),
 		"-b", filepath.Join(dir, "blockList"), "-w", filepath.Join(dir, "whiteList"),
 		"-d", filepath.Join(dir, "dns.yml"), "-r", filepath.Join(dir, "routes.toml"),
-		"-state-dir", filepath.Join(dir, "state"), "-acme-executable", "/root/.acme.sh/acme.sh", "-restart-after-update"}, out, errOut)
+		"-state-dir", filepath.Join(dir, "state"), "-restart-after-update"}, out, errOut)
 }
 
 func systemCommand(out, errOut io.Writer, program string, args ...string) error {

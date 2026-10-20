@@ -155,11 +155,7 @@ func (h *tlsServiceInbound) Start(stage adapter.StartStage, scope *adapter.Scope
 			return err
 		}
 		if h.config.ProxyProtocol {
-			policy := proxyproto.USE
-			if h.config.ForceProxyProtocol {
-				policy = proxyproto.REQUIRE
-			}
-			l = &proxyproto.Listener{Listener: l, ConnPolicy: func(proxyproto.ConnPolicyOptions) (proxyproto.Policy, error) { return policy, nil }, ReadHeaderTimeout: 5 * time.Second}
+			l = &proxyproto.Listener{Listener: l, ConnPolicy: h.config.ProxyProtocolTrusted.ConnPolicy(h.config.ForceProxyProtocol), ReadHeaderTimeout: 5 * time.Second}
 		}
 		scope.Add(h.transport.Close)
 		go h.transport.Serve(l)
@@ -223,9 +219,10 @@ func (h *tlsServiceInbound) NewConnection(ctx context.Context, conn net.Conn, me
 		})
 	}
 	if h.config.ProxyProtocol && h.transport == nil {
-		policy := proxyproto.USE
-		if h.config.ForceProxyProtocol {
-			policy = proxyproto.REQUIRE
+		policy, err := h.config.ProxyProtocolTrusted.Policy(conn.RemoteAddr(), h.config.ForceProxyProtocol)
+		if err != nil {
+			closed(err)
+			return
 		}
 		p := proxyproto.NewConn(conn, proxyproto.WithPolicy(policy), proxyproto.SetReadHeaderTimeout(5*time.Second))
 		if _, err := p.Read(nil); err != nil {

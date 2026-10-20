@@ -25,6 +25,7 @@ var bundled embed.FS
 
 var providerPattern = regexp.MustCompile(`^dns_[A-Za-z0-9_]+$`)
 var variablePattern = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
+var shellIdentifier = regexp.MustCompile(`[A-Za-z_][A-Za-z0-9_]*`)
 
 // SupportedDNSProviders reports actual scripts shipped in the pinned bundle.
 func SupportedDNSProviders() []string {
@@ -40,15 +41,17 @@ func SupportedDNSProviders() []string {
 }
 
 func resolveACME(ctx context.Context, opts Options, mode string, paths Paths) (Paths, error) {
+	var script []byte
 	if mode == "dns" {
 		if !providerPattern.MatchString(opts.DNSProvider) {
 			return Paths{}, errors.New("dns_provider must name an acme.sh dns_* provider")
 		}
-		if _, err := bundled.ReadFile("bundled/dnsapi/" + opts.DNSProvider + ".sh"); err != nil {
+		var err error
+		if script, err = bundled.ReadFile("bundled/dnsapi/" + opts.DNSProvider + ".sh"); err != nil {
 			return Paths{}, fmt.Errorf("DNS provider %q is absent from bundled acme.sh %s", opts.DNSProvider, BundledACMEVersion)
 		}
 	}
-	env, err := acmeEnvironment(opts.Variables)
+	env, err := acmeEnvironment(providerVariables(opts.Variables, script))
 	if err != nil {
 		return Paths{}, err
 	}
@@ -107,6 +110,43 @@ func resolveACME(ctx context.Context, opts Options, mode string, paths Paths) (P
 		return Paths{}, fmt.Errorf("ACME did not install a valid certificate pair: %w", err)
 	}
 	return paths, nil
+}
+
+// providerVariables restores the spelling acme.sh expects. The configuration
+// pipeline lowercases keys, so DNS_CF_Key arrives as dns_cf_key, while the
+// provider scripts read case-sensitive names such as CF_Key. Names are matched
+// against identifiers in the pinned provider script; other names only get the
+// DNS_ prefix normalized. Keys without the prefix pass through unchanged and
+// are rejected by acmeEnvironment.
+func providerVariables(variables map[string]string, script []byte) map[string]string {
+	spelling := map[string]string{}
+	for _, name := range shellIdentifier.FindAllString(string(script), -1) {
+		lower := strings.ToLower(name)
+		if previous, seen := spelling[lower]; seen && previous != name {
+			name = "" // Ambiguous spelling; keep the configured one.
+		}
+		spelling[lower] = name
+	}
+	keys := make([]string, 0, len(variables))
+	for key := range variables {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys) // Exact upper-case DNS_ spellings win over lowered duplicates.
+	result := make(map[string]string, len(variables))
+	for _, key := range keys {
+		value := variables[key]
+		if len(key) > len("DNS_") && strings.EqualFold(key[:len("DNS_")], "DNS_") {
+			name := key[len("DNS_"):]
+			if spelled := spelling[strings.ToLower(name)]; spelled != "" {
+				name = spelled
+			}
+			key = "DNS_" + name
+		}
+		if _, exists := result[key]; !exists {
+			result[key] = value
+		}
+	}
+	return result
 }
 
 func acmeEnvironment(variables map[string]string) ([]string, error) {

@@ -259,3 +259,32 @@ func TestACMECancellation(t *testing.T) {
 		t.Fatalf("cancellation was not propagated promptly: %v", err)
 	}
 }
+
+func TestACMEUsesLoweredConfigurationCredentials(t *testing.T) {
+	cert, key, err := selfSigned("node.example", "ec-256", time.Now())
+	if err != nil {
+		t.Fatal(err)
+	}
+	executable, fixture := fakeACME(t, cert, key, "")
+	// The configuration pipeline lowercases keys; acme.sh still needs CF_Key.
+	_, err = Resolve(context.Background(), Options{Mode: "dns", Domain: "node.example", KeyLength: "ec-256",
+		StateDir: t.TempDir(), ACMEExecutable: executable, DNSProvider: "dns_cf",
+		Variables: map[string]string{"dns_cf_key": "lowered-secret"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, _ := os.ReadFile(filepath.Join(fixture, "credential")); string(got) != "lowered-secret" {
+		t.Fatalf("credential = %q", got)
+	}
+}
+
+func TestProviderVariablesRestoresScriptSpelling(t *testing.T) {
+	script := []byte("CF_Key=\"${CF_Key:-}\"\nCF_Email=\"${CF_Email:-}\"\n")
+	got := providerVariables(map[string]string{
+		"dns_cf_key": "a", "DNS_CF_Email": "b", "dns_custom_name": "c", "CF_Key": "d",
+	}, script)
+	want := map[string]string{"DNS_CF_Key": "a", "DNS_CF_Email": "b", "DNS_custom_name": "c", "CF_Key": "d"}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("providerVariables = %v, want %v", got, want)
+	}
+}

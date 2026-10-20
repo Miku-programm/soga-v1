@@ -22,6 +22,7 @@ import (
 	"reconstructed.local/soga/config"
 	"reconstructed.local/soga/panel"
 	"reconstructed.local/soga/proxy"
+	"reconstructed.local/soga/proxy/wireproxy"
 )
 
 type Paths struct {
@@ -29,6 +30,10 @@ type Paths struct {
 	GeoSite, GeoIP, StateDir          string
 	ACMEExecutable                    string
 }
+
+// proxyProtocolTrustedKey lists relay addresses whose PROXY headers are
+// honoured. Empty keeps the historical behaviour of trusting every peer.
+const proxyProtocolTrustedKey = "proxy_protocol_trusted"
 
 type listenerPlan struct {
 	node    panel.Node
@@ -176,6 +181,13 @@ func buildProxy(ctx context.Context, c config.Config, values map[string]string, 
 	result.ProxyProtocol = c.ProxyProtocol
 	result.UDPProxyProtocol = c.UdpProxyProtocol
 	result.ForceProxyProtocol = c.ForceProxyProtocol
+	// Reconstruction-specific key, read like reconstruction_update_url because
+	// the recovered 157-field schema has no slot for it.
+	trusted, err := wireproxy.ParseTrusted(values[proxyProtocolTrustedKey])
+	if err != nil {
+		return proxy.Config{}, fmt.Errorf("%s: %w", proxyProtocolTrustedKey, err)
+	}
+	result.ProxyProtocolTrusted = trusted
 	result.SSRClientIDLimit = c.SsrCidLimit
 	result.SSRObfsUDP = c.SsObfsUdp
 	result.MURegex, result.MUSuffix = c.MuRegex, c.MuSuffix
@@ -326,7 +338,7 @@ func buildProxy(ctx context.Context, c config.Config, values map[string]string, 
 		paths, err := certificates.Resolve(ctx, certificates.Options{
 			CertFile: c.CertFile, KeyFile: c.KeyFile, Domain: domain,
 			Mode: mode, KeyLength: c.CertKeyLength, DNSProvider: c.DnsProvider,
-			Variables: values, StateDir: filepath.Join(p.StateDir, "certificates"),
+			Variables: config.DNSVariables(values), StateDir: filepath.Join(p.StateDir, "certificates"),
 			ACMEExecutable: p.ACMEExecutable,
 		})
 		if err != nil {
