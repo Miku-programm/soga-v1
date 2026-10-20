@@ -43,8 +43,8 @@ class Manager:
         text = re.sub(r"(?m)^(.*(?:发现新版本|暂时无法检查更新)[^\n]*)$", lambda m: self.color(m[0], "33"), text)
         print(text)
 
-    def ask(self, prompt):
-        return input(self.color(prompt, "33"))
+    def ask(self, prompt, code="33"):
+        return input(self.color(prompt, code) if code else prompt)
 
     def run(self, args, capture=False):
         if capture:
@@ -176,14 +176,15 @@ class Manager:
         self.display("\n  0. 退出\n————————————————")
         self.display("  1. 安装/更新 soga\n  2. 完全卸载 soga")
         self.display("  3. 切换 soga 安装分支  [当前: %s]" %
-              ("稳定版" if self.channel() == "stable" else "测试版"))
+              self.color("稳定版" if self.channel() == "stable" else "测试版", "33"))
         self.display("————————————————\n  4. 更新管理脚本\n  5. 新增 soga 实例\n————————————————")
         for number, name in enumerate(names, 6):
             self.display("  %d. 管理实例 [%s]" % (number, name))
         self.display("\n  实例列表:")
         for name in names:
             active, enabled = self.state(name)
-            self.display("    %-12s [%s] [自启: %s]  %s" % (name, active, enabled, self.config_path(name)))
+            self.display("    %-12s [%s] [自启: %s]  %s" %
+                         (name, active, enabled, self.color(str(self.config_path(name)), "33")))
         if not names:
             self.display("    暂无实例")
         return names
@@ -365,7 +366,8 @@ class Manager:
     def menu(self):
         while True:
             names = self.show()
-            value = self.ask("\n请输入选择 [0-%d] 或 [实例名]: " % (5 + len(names))).strip()
+            value = self.ask("\n请输入选择 [0-%d] 或 %s: " %
+                             (5 + len(names), self.color("[实例名]", "35")), code=None).strip()
             try:
                 if value == "0":
                     return
