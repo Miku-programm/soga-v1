@@ -60,26 +60,29 @@ func TestAuthSha1V4RoundTrip(t *testing.T) {
 	}
 }
 
-// 篡改正文必须被帧尾 adler32 拦住
+// 篡改首帧正文必须被帧尾 HMAC-SHA1 拦住。补长段长度随机，
+// 多跑几轮以覆盖单字节标记和 255 长标记两种情况
 func TestAuthSha1V4RejectsTamperedFrame(t *testing.T) {
-	client, server := newV4Pair(t)
-	payload := bytes.Repeat([]byte("k"), 60)
-	encoded, err := client.ClientPreEncrypt(payload)
-	if err != nil {
-		t.Fatal(err)
-	}
-	// 按帧结构走到正文第一字节：长度2 + crc2 + 补长段
-	body := 4 + skipLen(encoded[4], encoded[4:7])
-	// 跳过 12 字节 auth 前缀（utc+client+connection）
-	body += 12
-	if body >= len(encoded)-4 {
-		t.Fatalf("帧太短，正文起点 %d 落在校验区内", body)
-	}
-	encoded[body] ^= 0xFF
+	for i := 0; i < 64; i++ {
+		client, server := newV4Pair(t)
+		payload := bytes.Repeat([]byte("k"), 60)
+		encoded, err := client.ClientPreEncrypt(payload)
+		if err != nil {
+			t.Fatal(err)
+		}
+		// 首帧是认证帧：长度2 + crc32 4 + 补长段 + 12 字节 auth 前缀
+		// （utc+client+connection）+ 至少 30 字节正文 + HMAC 10
+		body := 6 + skipLen(encoded[6], encoded[6:9]) + 12
+		frameLen := int(encoded[0])<<8 | int(encoded[1])
+		if body >= frameLen-10 {
+			t.Fatalf("正文起点 %d 落在校验区内（帧长 %d）", body, frameLen)
+		}
+		encoded[body] ^= 0xFF
 
-	out, _, err := server.ServerPostDecrypt(encoded)
-	if err == nil && bytes.Contains(out, payload) {
-		t.Fatal("篡改帧被静默接受了")
+		out, _, err := server.ServerPostDecrypt(encoded)
+		if err == nil && bytes.Contains(out, payload) {
+			t.Fatal("篡改帧被静默接受了")
+		}
 	}
 }
 
