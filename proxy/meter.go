@@ -260,7 +260,7 @@ func (r *guardedRouter) RoutePacketConnectionEx(ctx context.Context, conn N.Pack
 		closeDenied(conn, onClose, err)
 		return
 	}
-	counted := &meterPacketConn{PacketConn: conn, meter: r.meter, req: req, router: r, ctx: ctx, metadata: metadata, done: done, originalDestinations: make(map[M.Socksaddr]M.Socksaddr)}
+	counted := &meterPacketConn{PacketConn: conn, meter: r.meter, req: req, router: r, ctx: ctx, metadata: metadata, done: done, originalDestinations: make(map[M.Socksaddr]M.Socksaddr), decisions: make(map[M.Socksaddr]udpDecision)}
 	metadata.Destination = M.ParseSocksaddr(req.Destination)
 	metadata.Network = "udp"
 	if r.udpTimeout > 0 {
@@ -359,6 +359,7 @@ type meterPacketConn struct {
 	metadata             adapter.InboundContext
 	mu                   sync.Mutex
 	originalDestinations map[M.Socksaddr]M.Socksaddr
+	decisions            map[M.Socksaddr]udpDecision
 	done                 func()
 }
 
@@ -368,28 +369,12 @@ func (c *meterPacketConn) ReadPacket(b *buf.Buffer) (M.Socksaddr, error) {
 		return dst, err
 	}
 	if dst.IsValid() {
-		metadata := c.metadata
-		if dst != metadata.Destination {
-			metadata.Domain, metadata.SniffContext = "", nil
-		}
-		metadata.Destination = dst
-		first := c.router.inspection.packet(c.ctx, &metadata, b.Bytes())
-		if dst == c.metadata.Destination {
-			c.metadata.Domain, c.metadata.SniffContext = metadata.Domain, metadata.SniffContext
-		}
-		req, requestErr := c.router.request(c.ctx, metadata, "udp", first)
-		if requestErr == nil && req.Outbound != c.req.Outbound {
-			requestErr = errors.New("proxy: changing outbound inside one UDP association is not supported")
-		}
-		if requestErr != nil {
+		routed, routeErr := c.route(dst, b.Bytes())
+		if routeErr != nil {
 			_ = c.Close()
-			return dst, requestErr
+			return dst, routeErr
 		}
-		newDst := M.ParseSocksaddr(req.Destination)
-		c.mu.Lock()
-		c.originalDestinations[newDst] = dst
-		c.mu.Unlock()
-		dst = newDst
+		dst = routed
 	}
 	if err := c.router.limiter.wait(c.ctx, requestMeterID(c.req), b.Len()); err != nil {
 		return dst, err
@@ -397,6 +382,80 @@ func (c *meterPacketConn) ReadPacket(b *buf.Buffer) (M.Socksaddr, error) {
 	c.meter.add(requestMeterID(c.req), b.Len(), 0)
 	return dst, nil
 }
+// A UDP association repeats the full per-destination decision (sniffing, DNS,
+// policy, routing and access log) only when a cached one expires, so policy,
+// DNS and route changes still reach long-lived associations within the TTL.
+const (
+	udpDecisionTTL   = 30 * time.Second
+	udpDecisionLimit = 256
+)
+
+type udpDecision struct {
+	dst     M.Socksaddr
+	expires time.Time
+	// inspect mirrors when the uncached path hands a packet to payload rules:
+	// only while the destination has no sniffed domain.
+	inspect bool
+	check   func([]byte) error
+}
+
+// route maps a client destination to the checked target for one packet.
+func (c *meterPacketConn) route(dst M.Socksaddr, payload []byte) (M.Socksaddr, error) {
+	now := time.Now()
+	c.mu.Lock()
+	decision, cached := c.decisions[dst]
+	c.mu.Unlock()
+	if cached && now.Before(decision.expires) {
+		if decision.inspect && decision.check != nil && c.router.inspection.maxPacket > 0 {
+			if err := decision.check(payload[:min(len(payload), c.router.inspection.maxPacket)]); err != nil {
+				return dst, err
+			}
+		}
+		return decision.dst, nil
+	}
+	metadata := c.metadata
+	if dst != metadata.Destination {
+		metadata.Domain, metadata.SniffContext = "", nil
+	}
+	metadata.Destination = dst
+	first := c.router.inspection.packet(c.ctx, &metadata, payload)
+	if dst == c.metadata.Destination {
+		c.metadata.Domain, c.metadata.SniffContext = metadata.Domain, metadata.SniffContext
+	}
+	req, err := c.router.request(c.ctx, metadata, "udp", first)
+	if err == nil && req.Outbound != c.req.Outbound {
+		err = errors.New("proxy: changing outbound inside one UDP association is not supported")
+	}
+	if err != nil {
+		return dst, err
+	}
+	newDst := M.ParseSocksaddr(req.Destination)
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.originalDestinations[newDst] = dst
+	// A QUIC handshake that is still being sniffed may yet reveal a domain
+	// that changes the decision, so only settled decisions are reused.
+	if metadata.Domain == "" && metadata.SniffContext != nil {
+		return newDst, nil
+	}
+	if len(c.decisions) >= udpDecisionLimit {
+		for key, old := range c.decisions {
+			if !now.Before(old.expires) {
+				delete(c.decisions, key)
+			}
+		}
+		for key := range c.decisions {
+			if len(c.decisions) < udpDecisionLimit {
+				break
+			}
+			delete(c.decisions, key)
+		}
+	}
+	c.decisions[dst] = udpDecision{dst: newDst, expires: now.Add(udpDecisionTTL),
+		inspect: dst != c.metadata.Destination || c.metadata.Domain == "", check: req.PacketCheck}
+	return newDst, nil
+}
+
 func (c *meterPacketConn) WritePacket(b *buf.Buffer, dst M.Socksaddr) error {
 	if err := c.router.limiter.wait(c.ctx, requestMeterID(c.req), b.Len()); err != nil {
 		b.Release()

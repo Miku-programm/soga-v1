@@ -97,3 +97,42 @@ func TestPanelAllowPolicyAndDenialRetry(t *testing.T) {
 		t.Fatal("carrier counted as ordinary user", err)
 	}
 }
+
+func TestUDPDecisionCarriesPacketCheck(t *testing.T) {
+	reservation, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	port := reservation.Addr().(*net.TCPAddr).Port
+	reservation.Close()
+	api := &policyPanel{node: panel.Node{Config: panel.NodeConfig{Port: port}}}
+	c := config.Defaults()
+	c.ServerType, c.Listen = "vmess", "127.0.0.1"
+	c.CheckInterval, c.SubmitInterval, c.RandomIntervalRange = 3600, 3600, 0
+	c.IpUserCacheSaveDir = t.TempDir()
+	c.ForbiddenBitTorrent = true
+	n, err := StartNode(context.Background(), Options{Config: c, NodeID: "1", API: api, Paths: Paths{StateDir: t.TempDir()}, Logger: slog.New(slog.NewTextHandler(io.Discard, nil))})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer n.Close(context.Background())
+	udp := proxy.Request{UserID: 23, Network: "udp", Source: "127.0.0.1:123", Destination: "192.0.2.5:6881"}
+	req, err := n.transform(context.Background(), udp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if req.PacketCheck == nil {
+		t.Fatal("UDP decision has no payload check while forbidden_bit_torrent is on")
+	}
+	if err := req.PacketCheck([]byte("plain game data")); err != nil {
+		t.Fatal("ordinary payload denied", err)
+	}
+	if err := req.PacketCheck([]byte("\x13BitTorrent protocol")); err == nil {
+		t.Fatal("BitTorrent handshake in a later packet was accepted")
+	}
+	tcp := udp
+	tcp.Network = "tcp"
+	if req, err = n.transform(context.Background(), tcp); err != nil || req.PacketCheck != nil {
+		t.Fatal("TCP decisions need no per-packet check", err)
+	}
+}

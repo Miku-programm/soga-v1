@@ -9,10 +9,12 @@ import (
 	"crypto/md5"
 	"crypto/sha256"
 	"encoding/binary"
+	"hash"
 	"hash/crc32"
 	"io"
 	"math"
 	"net"
+	"slices"
 	"sync"
 	"time"
 	"unsafe"
@@ -54,17 +56,58 @@ type Service[U comparable] struct {
 	reducedMemory        bool
 	authCache            AuthenticationCache
 	legacyAccess         sync.RWMutex
-	alterIds             map[U][][16]byte
-	alterIdUpdateTime    map[U]int64
-	alterIdMap           map[[16]byte]legacyUserEntry[U]
+	legacyUpdate         sync.Mutex
+	legacyUsers          []U
+	legacyIDs            []legacyIdentity
+	alterIdMap           map[[16]byte]legacyEntry
+	legacyBase           int64
+	legacyFrom           int64
+	legacyTo             int64
 	alterIdUpdateTask    *time.Ticker
 	alterIdUpdateDone    chan struct{}
 }
 
-type legacyUserEntry[U comparable] struct {
-	User  U
-	Time  int64
-	Index int
+// Legacy (MD5/alterId) authentication table.
+//
+// alterIdMap maps HMAC-MD5(key, big-endian unix second) to a compact
+// legacyEntry, for every identity in legacyIDs and every second in the
+// retained range [legacyFrom, legacyTo] = [now-window, now+window+10] as of
+// the last refresh. The clock window itself is enforced at lookup by
+// validLegacyTime. A periodic refresh only hashes the seconds that enter and
+// leave the range; the table is built from scratch only when the user set
+// changes or the clock jumps backwards or by more than the window.
+//
+// Lookups read alterIdMap, legacyUsers, legacyIDs and legacyBase under
+// legacyAccess.RLock. Writers hold legacyUpdate for their whole run and take
+// the legacyAccess write lock only to install changes, so they may read those
+// fields, and the writer-only legacyFrom and legacyTo, without legacyAccess.
+// legacyUsers and legacyIDs change only in UpdateUsers, which also writes
+// userKey and userIdCipher.
+
+const (
+	// legacyRefreshSeconds is the refresh period of the legacy table, which
+	// also covers that much clock lookahead beyond the window.
+	legacyRefreshSeconds = 10
+
+	// legacyApplyBatch bounds the map changes applied per write-lock hold.
+	legacyApplyBatch = 4096
+)
+
+type legacyIdentity struct {
+	key   [16]byte // HMAC key: an alterId UUID, or the user UUID for alterId=0
+	user  uint32   // index into legacyUsers
+	index uint32   // alterId index of key for this user
+}
+
+type legacyEntry struct {
+	id     uint32 // index into legacyIDs
+	second uint32 // unix second minus legacyBase
+}
+
+type legacyOp struct {
+	authID [16]byte
+	entry  legacyEntry
+	remove bool
 }
 
 func NewService[U comparable](handler Handler, options ...ServiceOption) *Service[U] {
@@ -84,6 +127,9 @@ func (s *Service[U]) UpdateUsers(userList []U, userIdList []string, alterIdList 
 	userKeyMap := make(map[U][16]byte)
 	userIdCipherMap := make(map[U]cipher.Block)
 	userAlterIds := make(map[U][][16]byte)
+	// legacyUsers keeps first-appearance order so that an unchanged user list
+	// yields an identical identity set and skips the table rebuild.
+	var legacyUsers []U
 	for i, user := range userList {
 		userId := userIdList[i]
 		userUUID, err := uuid.FromString(userId)
@@ -100,31 +146,41 @@ func (s *Service[U]) UpdateUsers(userList []U, userIdList []string, alterIdList 
 		if s.authMode == "aead" || (s.authMode != "md5" && alterId == 0) {
 			userIdCipherMap[user] = userIdCipher
 		}
-		if s.authMode != "aead" && alterId > 0 {
-			alterIds := make([][16]byte, 0, alterId)
+		if s.authMode == "aead" {
+			continue
+		}
+		var alterIds [][16]byte
+		if alterId > 0 {
+			alterIds = make([][16]byte, 0, alterId)
 			currentId := userUUID
 			for j := 0; j < alterId; j++ {
 				currentId = AlterId(currentId)
 				alterIds = append(alterIds, currentId)
 			}
-			userAlterIds[user] = alterIds
-		} else if s.authMode != "aead" {
+		} else {
 			// Documented compatibility: alterId=0 accepts UUID-based MD5.
-			userAlterIds[user] = [][16]byte{[16]byte(userUUID)}
+			alterIds = [][16]byte{[16]byte(userUUID)}
+		}
+		if _, loaded := userAlterIds[user]; !loaded {
+			legacyUsers = append(legacyUsers, user)
+		}
+		userAlterIds[user] = alterIds
+	}
+	var legacyIDs []legacyIdentity
+	for userIndex, user := range legacyUsers {
+		for alterIndex, key := range userAlterIds[user] {
+			legacyIDs = append(legacyIDs, legacyIdentity{key: key, user: uint32(userIndex), index: uint32(alterIndex)})
 		}
 	}
 	s.userKey = userKeyMap
 	s.userIdCipher = userIdCipherMap
-	s.alterIds = userAlterIds
-	s.alterIdUpdateTime = make(map[U]int64)
-	s.generateLegacyKeys()
+	s.updateLegacyIdentities(legacyUsers, legacyIDs)
 	return nil
 }
 
 func (s *Service[U]) Start() error {
-	const updateInterval = 10 * time.Second
-	if len(s.alterIds) > 0 {
-		s.alterIdUpdateTask = time.NewTicker(updateInterval)
+	if len(s.legacyIDs) > 0 {
+		s.alterIdUpdateTask = time.NewTicker(legacyRefreshSeconds * time.Second)
 		s.alterIdUpdateDone = make(chan struct{})
 		go s.loopGenerateLegacyKeys()
 	}
@@ -150,44 +206,169 @@ func (s *Service[U]) loopGenerateLegacyKeys() {
 	}
 }
 
+// generateLegacyKeys moves the legacy table to the current time.
 func (s *Service[U]) generateLegacyKeys() {
-	s.legacyAccess.Lock()
-	defer s.legacyAccess.Unlock()
+	s.legacyUpdate.Lock()
+	defer s.legacyUpdate.Unlock()
+	s.refreshLegacyKeys(s.time().Unix())
+}
+
+// updateLegacyIdentities installs a new identity set with a full table build,
+// unless it equals the installed set, in which case the table is only
+// refreshed.
+func (s *Service[U]) updateLegacyIdentities(users []U, ids []legacyIdentity) {
+	s.legacyUpdate.Lock()
+	defer s.legacyUpdate.Unlock()
 	nowSec := s.time().Unix()
-	window := int64(CacheDurationSeconds)
-	if s.reducedMemory {
-		window = 25
+	if slices.Equal(users, s.legacyUsers) && slices.Equal(ids, s.legacyIDs) {
+		s.refreshLegacyKeys(nowSec)
+		return
 	}
-	// Cover one 10-second refresh interval, then enforce the clock window
-	// separately at lookup. Rebuild the whole retained past window as well.
-	endSec := nowSec + window + 10
-	var hashValue [16]byte
+	from, to := s.legacyRange(nowSec)
+	table := buildLegacyTable(ids, from, to)
+	s.legacyAccess.Lock()
+	s.legacyUsers = users
+	s.legacyIDs = ids
+	s.swapLegacyTable(table, from, to)
+	s.legacyAccess.Unlock()
+}
 
-	userAlterIdMap := make(map[[16]byte]legacyUserEntry[U])
-	userAlterIdUpdateTime := make(map[U]int64)
-
-	for user, alterIds := range s.alterIds {
-		beginSec := nowSec - window
-		for i, alterId := range alterIds {
-			idHash := hmac.New(md5.New, alterId[:])
-			for ts := beginSec; ts <= endSec; ts++ {
-				common.Must(binary.Write(idHash, binary.BigEndian, uint64(ts)))
-				idHash.Sum(hashValue[:0])
-				idHash.Reset()
-				userAlterIdMap[hashValue] = legacyUserEntry[U]{user, ts, i}
+// refreshLegacyKeys moves the retained range to nowSec. Only the seconds that
+// enter or leave the range are hashed, outside legacyAccess; the resulting map
+// changes are applied in batches, each under a short write lock. A lookup may
+// observe a partly applied refresh, which differs from the states before and
+// after it only in seconds that validLegacyTime rejects at that time. The
+// caller holds legacyUpdate.
+func (s *Service[U]) refreshLegacyKeys(nowSec int64) {
+	ids := s.legacyIDs
+	if len(ids) == 0 {
+		return
+	}
+	from, to := s.legacyRange(nowSec)
+	shift := from - s.legacyFrom
+	if shift == 0 {
+		return
+	}
+	if shift < 0 || shift > s.legacyWindow() || to-s.legacyBase > math.MaxUint32 {
+		// The clock went backwards or jumped further than the window.
+		table := buildLegacyTable(ids, from, to)
+		s.legacyAccess.Lock()
+		s.swapLegacyTable(table, from, to)
+		s.legacyAccess.Unlock()
+		return
+	}
+	// 0 < shift <= window < to-from, so [legacyFrom, from) leaves the range
+	// and (legacyTo, to] enters it, shift seconds each per identity.
+	base := s.legacyBase
+	perIdentity := 2 * int(shift)
+	batchIdentities := max(1, legacyApplyBatch/perIdentity)
+	ops := make([]legacyOp, 0, min(len(ids), batchIdentities)*perIdentity)
+	for start := 0; start < len(ids); start += batchIdentities {
+		end := min(start+batchIdentities, len(ids))
+		ops = ops[:0]
+		for i := start; i < end; i++ {
+			mac := hmac.New(md5.New, ids[i].key[:])
+			for ts := s.legacyFrom; ts < from; ts++ {
+				ops = append(ops, legacyOp{authID: legacyAuthID(mac, ts), entry: legacyEntry{id: uint32(i), second: uint32(ts - base)}, remove: true})
+			}
+			for ts := s.legacyTo + 1; ts <= to; ts++ {
+				ops = append(ops, legacyOp{authID: legacyAuthID(mac, ts), entry: legacyEntry{id: uint32(i), second: uint32(ts - base)}})
 			}
 		}
-		userAlterIdUpdateTime[user] = nowSec
+		s.applyLegacyOps(ops)
 	}
-	s.alterIdUpdateTime = userAlterIdUpdateTime
-	s.alterIdMap = userAlterIdMap
+	s.legacyFrom, s.legacyTo = from, to
+}
+
+// applyLegacyOps applies one batch of refresh changes under the write lock.
+// A removal only deletes the entry it computed, never a different one stored
+// under the same auth ID.
+func (s *Service[U]) applyLegacyOps(ops []legacyOp) {
+	s.legacyAccess.Lock()
+	defer s.legacyAccess.Unlock()
+	for _, op := range ops {
+		if !op.remove {
+			s.alterIdMap[op.authID] = op.entry
+		} else if current, loaded := s.alterIdMap[op.authID]; loaded && current == op.entry {
+			delete(s.alterIdMap, op.authID)
+		}
+	}
+}
+
+// swapLegacyTable installs a complete table covering [from, to]. The caller
+// holds legacyUpdate and the legacyAccess write lock.
+func (s *Service[U]) swapLegacyTable(table map[[16]byte]legacyEntry, from, to int64) {
+	s.alterIdMap = table
+	s.legacyBase = from
+	s.legacyFrom = from
+	s.legacyTo = to
+}
+
+// buildLegacyTable hashes every second of [from, to] for every identity into
+// a presized map whose entry seconds are relative to from.
+func buildLegacyTable(ids []legacyIdentity, from, to int64) map[[16]byte]legacyEntry {
+	if len(ids) == 0 {
+		return nil
+	}
+	table := make(map[[16]byte]legacyEntry, len(ids)*int(to-from+1))
+	for i := range ids {
+		mac := hmac.New(md5.New, ids[i].key[:])
+		for ts := from; ts <= to; ts++ {
+			table[legacyAuthID(mac, ts)] = legacyEntry{id: uint32(i), second: uint32(ts - from)}
+		}
+	}
+	return table
+}
+
+// legacyAuthID returns the legacy auth ID HMAC-MD5(key, big-endian ts), where
+// mac is a freshly created or reset hmac.New(md5.New, key). It leaves mac
+// reset.
+func legacyAuthID(mac hash.Hash, ts int64) (authID [16]byte) {
+	var stamp [8]byte
+	binary.BigEndian.PutUint64(stamp[:], uint64(ts))
+	common.Must1(mac.Write(stamp[:]))
+	mac.Sum(authID[:0])
+	mac.Reset()
+	return
+}
+
+// legacyWindow is the accepted MD5 clock skew in seconds.
+func (s *Service[U]) legacyWindow() int64 {
+	if s.reducedMemory {
+		return 25
+	}
+	return CacheDurationSeconds
+}
+
+// legacyRange is the retained range of seconds at nowSec: the clock window
+// plus one refresh period of lookahead.
+func (s *Service[U]) legacyRange(nowSec int64) (from, to int64) {
+	window := s.legacyWindow()
+	return nowSec - window, nowSec + window + legacyRefreshSeconds
+}
+
+// lookupLegacyAuthID resolves a legacy MD5 auth ID to its user, alterId index
+// and timestamp if it is in the table and inside the clock window.
+func (s *Service[U]) lookupLegacyAuthID(authID [16]byte) (user U, alterIndex int, timestamp int64, ok bool) {
+	s.legacyAccess.RLock()
+	defer s.legacyAccess.RUnlock()
+	entry, loaded := s.alterIdMap[authID]
+	if !loaded {
+		return
+	}
+	timestamp = s.legacyBase + int64(entry.second)
+	if !s.validLegacyTime(timestamp) {
+		return user, 0, 0, false
+	}
+	identity := s.legacyIDs[entry.id]
+	return s.legacyUsers[identity.user], int(identity.index), timestamp, true
 }
 
 func (s *Service[U]) NewConnection(ctx context.Context, conn net.Conn, source M.Socksaddr, onClose N.CloseHandlerFunc) error {
 	const headerLenBufferLen = 2 + CipherOverhead
 	const aeadMinHeaderLen = 16 + headerLenBufferLen + 8 + CipherOverhead + 42
 	minHeaderLen := aeadMinHeaderLen
-	if len(s.alterIds) > 0 {
+	if len(s.legacyIDs) > 0 {
 		minHeaderLen = 16 + 38
 	}
 
@@ -261,14 +442,12 @@ func (s *Service[U]) NewConnection(ctx context.Context, conn net.Conn, source M.
 	var legacyTimestamp uint64
 	if !found {
 		copy(decodedId[:], authId)
-		s.legacyAccess.RLock()
-		if currUser, loaded := s.alterIdMap[decodedId]; loaded && s.validLegacyTime(currUser.Time) {
+		if currUser, _, timestamp, loaded := s.lookupLegacyAuthID(decodedId); loaded {
 			found = true
 			legacyProtocol = true
-			user = currUser.User
-			legacyTimestamp = uint64(currUser.Time)
+			user = currUser
+			legacyTimestamp = uint64(timestamp)
 		}
-		s.legacyAccess.RUnlock()
 	}
 	if !found {
 		return ErrBadRequest
@@ -443,16 +622,11 @@ func (s *Service[U]) IsLegacyAuthID(header []byte) bool {
 	}
 	var id [16]byte
 	copy(id[:], header)
-	s.legacyAccess.RLock()
-	defer s.legacyAccess.RUnlock()
-	entry, ok := s.alterIdMap[id]
-	return ok && s.validLegacyTime(entry.Time)
+	_, _, _, ok := s.lookupLegacyAuthID(id)
+	return ok
 }
 func (s *Service[U]) validLegacyTime(ts int64) bool {
-	window := int64(CacheDurationSeconds)
-	if s.reducedMemory {
-		window = 25
-	}
+	window := s.legacyWindow()
 	delta := ts - s.time().Unix()
 	return delta >= -window && delta <= window
 }

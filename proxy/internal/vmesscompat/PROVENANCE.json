@@ -74,7 +74,7 @@
     {
       "file": "service.go",
       "upstream_sha256": "a980891a8b434423d3f3ada560ea7b739a3503dbc3938a00004f4e26cdf6f64e",
-      "local_sha256": "8c7f48e1676c6fb38262ef6325e2bde3eaa5891b80ae85f8f072ebb1f78eb843",
+      "local_sha256": "485d7a67927db0c5464983c754bc09e8af9291608a649ed78916fd847573d2d1",
       "modified": true
     },
     {

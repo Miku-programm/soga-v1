@@ -44,14 +44,7 @@ func (r Rule) Match(t Target) bool { return r.match(t) }
 
 func Compile(text string, geo GeoSource) (Rule, error) {
 	r := Rule{Text: text}
-	arg := text
-	kind := ""
-	if i := strings.IndexByte(text, ':'); i >= 0 {
-		switch text[:i] {
-		case "regexp", "domain", "full", "keyword", "geosite", "ip", "geoip", "port", "node_id":
-			kind, arg = text[:i], text[i+1:]
-		}
-	}
+	kind, arg := splitRule(text)
 	if text == "*" {
 		r.match = func(Target) bool { return true }
 		return r, nil
@@ -79,7 +72,11 @@ func Compile(text string, geo GeoSource) (Rule, error) {
 			return Rule{}, fmt.Errorf("rule %q: %w", text, err)
 		}
 		r.match = func(t Target) bool {
-			for _, ip := range addresses(t) {
+			// addresses(t), without allocating its slice.
+			if ip, ok := parseHostAddr(t.Host); ok && prefix.Contains(ip.Unmap()) {
+				return true
+			}
+			for _, ip := range t.Addresses {
 				if prefix.Contains(ip.Unmap()) {
 					return true
 				}
@@ -126,50 +123,25 @@ func Compile(text string, geo GeoSource) (Rule, error) {
 		if geo == nil {
 			return Rule{}, fmt.Errorf("rule %q requires geosite data", text)
 		}
-		entries, found := geo.Domains(category)
+		// One compiled set (memoised per data set for *GeoData) replaces the
+		// former per-entry sub-rules with identical results.
+		m, found, err := geoSiteMatcher(geo, category, attribute)
 		if !found {
 			return Rule{}, fmt.Errorf("geosite category %q not found", category)
 		}
-		var sub []Rule
-		for _, entry := range entries {
-			if attribute != "" && !entry.Attributes[attribute] {
-				continue
-			}
-			prefixes := []string{"", "regexp:", "domain:", "full:"}
-			if entry.Kind > 3 {
-				return Rule{}, fmt.Errorf("unknown geosite domain type %d", entry.Kind)
-			}
-			child, err := Compile(prefixes[entry.Kind]+entry.Value, nil)
-			if err != nil {
-				return Rule{}, err
-			}
-			sub = append(sub, child)
+		if err != nil {
+			return Rule{}, err
 		}
-		r.match = func(t Target) bool { return MatchAny(sub, t) }
+		r.match = m.match
 	case "geoip":
 		if geo == nil {
 			return Rule{}, fmt.Errorf("rule %q requires geoip data", text)
 		}
-		prefixes, inverse, found := geo.Prefixes(strings.ToLower(arg))
+		m, found := geoIPMatcher(geo, strings.ToLower(arg))
 		if !found {
 			return Rule{}, fmt.Errorf("geoip category %q not found", arg)
 		}
-		r.match = func(t Target) bool {
-			ips := addresses(t)
-			for _, ip := range ips {
-				found := false
-				for _, prefix := range prefixes {
-					if prefix.Contains(ip.Unmap()) {
-						found = true
-						break
-					}
-				}
-				if found != inverse {
-					return true
-				}
-			}
-			return false
-		}
+		r.match = m.match
 	default:
 		arg = strings.ToLower(arg)
 		r.match = func(t Target) bool { return strings.Contains(domain(t.Host), arg) }
@@ -198,13 +170,44 @@ func MatchAny(rules []Rule, t Target) bool {
 	return false
 }
 
+// splitRule returns the recognised "kind:" prefix of a rule text (or "") and
+// its operand.
+func splitRule(text string) (kind, arg string) {
+	if i := strings.IndexByte(text, ':'); i >= 0 {
+		switch text[:i] {
+		case "regexp", "domain", "full", "keyword", "geosite", "ip", "geoip", "port", "node_id":
+			return text[:i], text[i+1:]
+		}
+	}
+	return "", text
+}
+
 func domain(s string) string { return strings.ToLower(strings.TrimSuffix(s, ".")) }
 func addresses(t Target) []netip.Addr {
-	if ip, err := netip.ParseAddr(t.Host); err == nil {
+	if ip, ok := parseHostAddr(t.Host); ok {
 		return append([]netip.Addr{ip}, t.Addresses...)
 	}
 	return t.Addresses
 }
+
+// parseHostAddr is netip.ParseAddr(host) without building an error (an
+// allocation) for names that cannot be IP literals: without a ':' only
+// dotted-decimal IPv4, made of digits and dots alone, can parse.
+func parseHostAddr(host string) (netip.Addr, bool) {
+	if host == "" {
+		return netip.Addr{}, false
+	}
+	if strings.IndexByte(host, ':') < 0 {
+		for i := 0; i < len(host); i++ {
+			if c := host[i]; c != '.' && (c < '0' || c > '9') {
+				return netip.Addr{}, false
+			}
+		}
+	}
+	ip, err := netip.ParseAddr(host)
+	return ip, err == nil
+}
+
 func parsePrefix(text string) (netip.Prefix, error) {
 	if ip, err := netip.ParseAddr(text); err == nil {
 		ip = ip.Unmap()

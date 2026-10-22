@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"io"
 	"net"
+	"strconv"
 	"sync"
 
 	"reconstructed.local/soga/proxy/ssrcore/internal/vnet/common/ciphers"
@@ -19,9 +19,38 @@ type codec struct {
 	protocol        obfs.Plain
 	obfs            obfs.Plain
 	userID          int64
-	billingIDs      map[string]int64
+	users           *userIndex
 	client          bool
 	clientHandshake []byte
+}
+
+// userIndex maps packed little-endian wire UIDs to user passwords and billing
+// IDs for protocol single-port. It is immutable once built: the auth plugins
+// only look passwords up (GetUsers()[uid], len(GetUsers())) and nothing calls
+// SetUsers again, so one index is shared read-only by every codec of a
+// listener. Users only change by rebuilding the listener (proxy.Server
+// UpdateUsers recreates the inbound), which builds a fresh index.
+type userIndex struct {
+	passwords map[string]string
+	billing   map[string]int64
+}
+
+// newUserIndex builds the index for o. Outside protocol single-port both maps
+// are empty, as before.
+func newUserIndex(o Options) *userIndex {
+	if o.SinglePortType != "protocol" {
+		return &userIndex{passwords: make(map[string]string), billing: make(map[string]int64)}
+	}
+	idx := &userIndex{
+		passwords: make(map[string]string, len(o.Users)),
+		billing:   make(map[string]int64, len(o.Users)),
+	}
+	for _, u := range o.Users {
+		uid := string(uidBytes(int64(u.wireID())))
+		idx.passwords[uid] = u.Password
+		idx.billing[uid] = u.ID
+	}
+	return idx
 }
 
 func uidBytes(id int64) []byte {
@@ -30,7 +59,49 @@ func uidBytes(id int64) []byte {
 	return b
 }
 
+// remotePort parses the port half of net.SplitHostPort. Decimal ports take the
+// strconv path. Other input keeps the former fmt.Sscanf("%d") result as far as
+// possible: leading blanks, an optional sign and the leading decimal digits are
+// parsed; no digits or an out-of-range value yields 0.
+func remotePort(port string) int {
+	if n, err := strconv.Atoi(port); err == nil {
+		return n
+	}
+	i := 0
+	for i < len(port) && (port[i] == ' ' || port[i] == '\t') {
+		i++
+	}
+	start := i
+	if i < len(port) && (port[i] == '+' || port[i] == '-') {
+		i++
+	}
+	digits := i
+	for i < len(port) && port[i] >= '0' && port[i] <= '9' {
+		i++
+	}
+	if i == digits {
+		return 0
+	}
+	n, err := strconv.Atoi(port[start:i])
+	if err != nil {
+		return 0
+	}
+	return n
+}
+
+// newCodec builds a codec with its own user index. Listeners use
+// newCodecWithUsers so all their connections and datagrams share one index.
 func newCodec(o Options, replay core.ObfsProtocolService, remote net.Addr) (*codec, error) {
+	return newCodecWithUsers(o, newUserIndex(o), replay, remote)
+}
+
+// newCodecWithUsers builds a per-connection (or per-datagram) codec on top of
+// a shared, read-only user index built by newUserIndex from options with the
+// same SinglePortType and Users. A nil index is built from o.
+func newCodecWithUsers(o Options, users *userIndex, replay core.ObfsProtocolService, remote net.Addr) (*codec, error) {
+	if users == nil {
+		users = newUserIndex(o)
+	}
 	enc, err := ciphers.NewEncryptor(o.Method, o.Password)
 	if err != nil {
 		return nil, err
@@ -43,17 +114,22 @@ func newCodec(o Options, replay core.ObfsProtocolService, remote net.Addr) (*cod
 	if err != nil {
 		return nil, err
 	}
-	c := &codec{enc: enc, protocol: p, obfs: b}
-	users := make(map[string]string)
-	c.billingIDs = make(map[string]int64)
-	if o.SinglePortType == "protocol" {
-		for _, u := range o.Users {
-			uid := string(uidBytes(int64(u.wireID())))
-			users[uid] = u.Password
-			c.billingIDs[uid] = u.ID
-		}
-	} else {
+	c := &codec{enc: enc, protocol: p, obfs: b, users: users}
+	if o.SinglePortType != "protocol" {
 		c.userID = o.Users[0].ID
+	}
+	var clientIP net.IP
+	var clientPort int
+	if remote != nil {
+		host, port, _ := net.SplitHostPort(remote.String())
+		clientIP = net.ParseIP(host)
+		clientPort = remotePort(port)
+	}
+	// The billing user is per codec state; only the lookup tables are shared.
+	updateUser := func(uid []byte) {
+		if len(uid) == 4 && users.passwords[string(uid)] != "" {
+			c.userID = users.billing[string(uid)]
+		}
 	}
 	overhead := p.GetOverhead(false) + b.GetOverhead(false)
 	for _, part := range []obfs.Plain{p, b} {
@@ -62,11 +138,8 @@ func newCodec(o Options, replay core.ObfsProtocolService, remote net.Addr) (*cod
 		info.SetHost(o.Listen)
 		info.SetPort(int(o.Port))
 		if remote != nil {
-			host, port, _ := net.SplitHostPort(remote.String())
-			info.SetClient(net.ParseIP(host))
-			var n int
-			fmt.Sscanf(port, "%d", &n)
-			info.SetClientPort(n)
+			info.SetClient(clientIP)
+			info.SetClientPort(clientPort)
 		}
 		info.SetKey(enc.Key)
 		info.SetKeyStr(enc.KeyStr)
@@ -74,15 +147,11 @@ func newCodec(o Options, replay core.ObfsProtocolService, remote net.Addr) (*cod
 		info.SetTCPMss(obfs.TCP_MSS)
 		info.SetBufferSize(obfs.BUF_SIZE - overhead)
 		info.SetOverhead(overhead)
-		info.SetUsers(users)
+		info.SetUsers(users.passwords)
 		if c.userID != 0 {
 			info.SetIdentity(uidBytes(int64(o.Users[0].wireID())))
 		}
-		info.SetUpdateUserFunc(func(uid []byte) {
-			if len(uid) == 4 && users[string(uid)] != "" {
-				c.userID = c.billingIDs[string(uid)]
-			}
-		})
+		info.SetUpdateUserFunc(updateUser)
 		if part == p {
 			info.SetProtocolParam(o.ProtocolParam)
 		} else {
@@ -134,6 +203,12 @@ func (c *codec) encode(data []byte) (out []byte, err error) {
 
 // decode returns optional handshake responses. No upstream "compatible" raw
 // fallback may reach the router, even after the claimed UID was observed.
+//
+// decode does not retain data after it returns: the obfs and protocol plugins
+// copy whatever they buffer (bytesx.ContactSlice, conbineToBytes, append to a
+// nil or owned slice), and slices they hand back unchanged are always
+// decrypted into a fresh buffer before use. streamConn relies on this to reuse
+// its read buffer.
 func (c *codec) decode(data []byte) (plain, response []byte, err error) {
 	defer func() {
 		if recover() != nil {
@@ -228,6 +303,13 @@ func (c *codec) decode(data []byte) (plain, response []byte, err error) {
 	return data, response, err
 }
 
+const (
+	// streamReadSize is the wire read size of one streamConn.Read.
+	streamReadSize = 32 * 1024
+	// maxIdlePending is the largest drained pending capacity kept for reuse.
+	maxIdlePending = 64 * 1024
+)
+
 type streamConn struct {
 	net.Conn
 	codec   *codec
@@ -235,6 +317,7 @@ type streamConn struct {
 	readMu  sync.Mutex
 	writeMu sync.Mutex
 	pending bytes.Buffer
+	readBuf []byte // wire buffer reused by Read, allocated lazily; guarded by readMu
 	once    sync.Once
 }
 
@@ -251,9 +334,14 @@ func (s *streamConn) Read(p []byte) (n int, err error) {
 		return 0, nil
 	}
 	if s.pending.Len() > 0 {
-		return s.pending.Read(p)
+		return s.readPending(p)
 	}
-	b := make([]byte, 32*1024)
+	if s.readBuf == nil {
+		s.readBuf = make([]byte, streamReadSize)
+	}
+	// decode never retains its input and its outputs are copied into pending
+	// or written out before the next Conn.Read, so the buffer can be reused.
+	b := s.readBuf
 	for {
 		n, readErr := s.Conn.Read(b)
 		if n == 0 {
@@ -272,12 +360,23 @@ func (s *streamConn) Read(p []byte) (n int, err error) {
 		}
 		if len(plain) > 0 {
 			s.pending.Write(plain)
-			return s.pending.Read(p)
+			return s.readPending(p)
 		}
 		if readErr != nil {
 			return 0, readErr
 		}
 	}
+}
+
+// readPending serves p from pending. Once drained, a pending buffer that grew
+// beyond maxIdlePending is dropped so a burst does not pin its memory for the
+// rest of the connection; smaller buffers are kept for reuse.
+func (s *streamConn) readPending(p []byte) (int, error) {
+	n, err := s.pending.Read(p)
+	if s.pending.Len() == 0 && s.pending.Cap() > maxIdlePending {
+		s.pending = bytes.Buffer{}
+	}
+	return n, err
 }
 
 func (s *streamConn) Write(p []byte) (int, error) {

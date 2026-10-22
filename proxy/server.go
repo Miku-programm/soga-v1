@@ -49,6 +49,9 @@ type Request struct {
 	FirstPacket      []byte
 	Unattributed     bool   // Carrier UDP has no authenticated ordinary-user identity.
 	DeviceID         string // Authenticated SSR client ID, when the protocol exposes one.
+	// PacketCheck, when a Transform sets it, applies payload rules to later
+	// packets of a UDP destination whose decision is being reused.
+	PacketCheck      func(packet []byte) error
 	deviceLimitByCID bool
 }
 

@@ -49,7 +49,9 @@ func (s *server) handlePacket(wire []byte, source net.Addr) {
 		options.Obfs = "plain" // UDP has no Host/SNI framing.
 		options.ObfsParam = ""
 	}
-	c, err := newCodec(options, s.replay, source)
+	// Each datagram still decodes with its own codec; only the user index is
+	// shared (obfs mode narrows Users, but its index is empty either way).
+	c, err := newCodecWithUsers(options, s.users, s.replay, source)
 	if err != nil {
 		return
 	}
@@ -67,7 +69,7 @@ func (s *server) handlePacket(wire []byte, source net.Addr) {
 		if len(uid) != 4 {
 			return
 		}
-		id = c.billingIDs[uid]
+		id = c.users.billing[uid]
 		if c.protocol.GetServerInfo().GetUsers()[uid] == "" {
 			return
 		}

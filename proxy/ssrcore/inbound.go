@@ -29,6 +29,7 @@ type server struct {
 	ctx     context.Context
 	router  adapter.Router
 	options Options
+	users   *userIndex // built once from options, shared read-only by every codec
 	replay  *obfs.ObfsAuthChainData
 	tlsData *obfs.ObfsAuthData
 	tcp     net.Listener
@@ -46,7 +47,7 @@ func NewInbound(ctx context.Context, router adapter.Router, _ log.ContextLogger,
 		return nil, err
 	}
 	s := &server{Adapter: inbound.NewAdapter(Type, tag), ctx: ctx, router: router,
-		options: o, replay: obfs.NewObfsAuthChainData(o.Protocol),
+		options: o, users: newUserIndex(o), replay: obfs.NewObfsAuthChainData(o.Protocol),
 		tlsData: obfs.NewObfsAuthData(),
 		conns:   make(map[net.Conn]bool), packets: make(map[string]*packetConn)}
 	if o.SinglePortType == "obfs" {
@@ -224,7 +225,9 @@ func (s *server) handle(raw net.Conn) {
 		// Static evidence: constructor 0x1ca3160 uses the carrier password;
 		// init 0x1ce4080 selects the billing user afterwards, without rekeying.
 	}
-	codec, err := newCodec(options, s.replay, transport.RemoteAddr())
+	// The obfs branch above only narrows Users for SinglePortType "obfs", whose
+	// index is empty, so the listener's shared index still matches options.
+	codec, err := newCodecWithUsers(options, s.users, s.replay, transport.RemoteAddr())
 	if err != nil {
 		done(err)
 		return

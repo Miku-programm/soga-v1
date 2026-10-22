@@ -562,6 +562,18 @@ func (n *Node) transform(ctx context.Context, req proxy.Request) (proxy.Request,
 		}
 		return req, err
 	}
+	if req.Network == "udp" && (active.DetectPacket || active.ForbidBitTorrent) {
+		// Later packets to this UDP destination reuse the decision; payload
+		// rules still inspect each of them against this policy snapshot.
+		user, unattributed, requested := req.UserID, req.Unattributed, req.Destination
+		req.PacketCheck = func(packet []byte) error {
+			err := active.CheckPacket(actual, packet)
+			if err != nil && !unattributed {
+				n.recordDenial(user, requested, err)
+			}
+			return err
+		}
+	}
 	// Pin the checked IP, so the core cannot perform a second unchecked lookup.
 	selection, err := n.routes.Load().Select(target, req.Source)
 	if err != nil {

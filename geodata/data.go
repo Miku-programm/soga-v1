@@ -2,6 +2,7 @@
 package geodata
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	_ "embed"
@@ -20,6 +21,9 @@ import (
 )
 
 // Source, release URLs, SHA-256 hashes and licenses are retained in bundled/.
+// policy.ParseGeoData only validates and indexes the data and keeps
+// referencing these bytes (and any file or download it is given); categories
+// are decoded on first use.
 //
 //go:embed bundled/geosite.dat
 var site []byte
@@ -82,11 +86,28 @@ func read(path string) ([]byte, error) {
 		return nil, err
 	}
 	defer f.Close()
-	data, err := io.ReadAll(io.LimitReader(f, 256<<20+1))
+	var size int64
+	if info, statErr := f.Stat(); statErr == nil {
+		size = info.Size()
+	}
+	data, err := readAll(f, size)
 	if len(data) > 256<<20 {
 		return nil, errors.New("geodata exceeds 256 MiB")
 	}
 	return data, err
+}
+
+// readAll reads at most 256 MiB + 1 bytes from r like io.ReadAll, but sizes
+// its buffer from hint (the expected length, if known). The returned slice
+// stays referenced by the lazily decoded GeoData, so it should not carry the
+// spare capacity of append growth.
+func readAll(r io.Reader, hint int64) ([]byte, error) {
+	var buf bytes.Buffer
+	if hint > 0 && hint <= 256<<20 {
+		buf.Grow(int(hint) + bytes.MinRead)
+	}
+	_, err := buf.ReadFrom(io.LimitReader(r, 256<<20+1))
+	return buf.Bytes(), err
 }
 
 // Update downloads and validates both datasets before publishing one manifest.
@@ -167,7 +188,7 @@ func download(ctx context.Context, uri string) ([]byte, error) {
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("geodata HTTP status %d", resp.StatusCode)
 	}
-	data, err := io.ReadAll(io.LimitReader(resp.Body, 256<<20+1))
+	data, err := readAll(resp.Body, resp.ContentLength)
 	if len(data) > 256<<20 {
 		return nil, errors.New("geodata exceeds 256 MiB")
 	}
