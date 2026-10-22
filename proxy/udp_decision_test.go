@@ -119,3 +119,51 @@ func TestUDPPacketCheckRunsOnReusedDecision(t *testing.T) {
 		t.Fatal("denied payload reached the target")
 	}
 }
+
+// One denied or unresolvable destination must only lose its own packets; the
+// association keeps serving every other flow multiplexed over it.
+func TestUDPDeniedDestinationKeepsAssociationAlive(t *testing.T) {
+	blocked, err := net.ListenPacket("udp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer blocked.Close()
+	u := User{ID: 45, UUID: testUUID, Username: "udp-keep", Password: "udp-keep-key"}
+	cfg := Config{Protocol: "shadowsocks", Listen: "127.0.0.1", Port: freePort(t, false), Users: []User{u}, Method: "aes-128-gcm",
+		Transform: func(_ context.Context, r Request) (Request, error) {
+			if r.Destination == blocked.LocalAddr().String() {
+				return r, errors.New("test destination denied")
+			}
+			return r, nil
+		}}
+	target := echoUDP(t)
+	s, err := Start(context.Background(), cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	c, err := client(t, cfg, u, nil).ListenPacket(context.Background(), M.ParseSocksaddr(target))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+	addr, err := net.ResolveUDPAddr("udp", target)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := echoOnce(t, c, addr, "first"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := c.WriteTo([]byte("must-not-arrive"), blocked.LocalAddr()); err != nil {
+		t.Fatal(err)
+	}
+	_ = blocked.SetReadDeadline(time.Now().Add(300 * time.Millisecond))
+	if n, _, err := blocked.ReadFrom(make([]byte, 64)); err == nil {
+		t.Fatalf("denied destination received %d bytes", n)
+	}
+	for i := 0; i < 3; i++ {
+		if err := echoOnce(t, c, addr, "still-alive"); err != nil {
+			t.Fatalf("association died after a denied destination (packet %d): %v", i, err)
+		}
+	}
+}

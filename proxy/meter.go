@@ -350,6 +350,16 @@ func (c *meterConn) Close() error {
 	return c.Conn.Close()
 }
 
+// CloseWrite lets a remote EOF reach the client as a half-close when the
+// protocol supports it, so buffered downlink data is still delivered; sing
+// falls back to a full close when it is not supported.
+func (c *meterConn) CloseWrite() error {
+	if closer, ok := N.UnwrapWriter(c.Conn).(N.WriteCloser); ok {
+		return closer.CloseWrite()
+	}
+	return errNoHalfClose
+}
+
 // startIdle arms one timer that re-arms itself from the last activity
 // timestamp, so the payload path never touches the timer.
 func (c *meterConn) startIdle(timeout time.Duration) {
@@ -396,13 +406,19 @@ func (c *meterPacketConn) ReadPacket(b *buf.Buffer) (M.Socksaddr, error) {
 	if err != nil {
 		return dst, err
 	}
-	if dst.IsValid() {
+	// A destination that is denied or cannot be resolved only loses its own
+	// packets; closing the association would cut every other flow (QUIC,
+	// games) multiplexed over it, which TCP never does for one refused dial.
+	for dst.IsValid() {
 		routed, routeErr := c.route(dst, b.Bytes())
-		if routeErr != nil {
-			_ = c.Close()
-			return dst, routeErr
+		if routeErr == nil {
+			dst = routed
+			break
 		}
-		dst = routed
+		b.Reset()
+		if dst, err = c.PacketConn.ReadPacket(b); err != nil {
+			return dst, err
+		}
 	}
 	if err := c.pace.pace(c.ctx, b.Len()); err != nil {
 		return dst, err

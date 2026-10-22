@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"net"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -17,6 +18,7 @@ import (
 	sbuf "github.com/sagernet/sing/common/buf"
 	M "github.com/sagernet/sing/common/metadata"
 	xlog "github.com/xtls/xray-core/app/log"
+	"github.com/xtls/xray-core/app/policy"
 	"github.com/xtls/xray-core/app/proxyman"
 	_ "github.com/xtls/xray-core/app/proxyman/inbound"
 	_ "github.com/xtls/xray-core/app/proxyman/outbound"
@@ -24,11 +26,16 @@ import (
 	xbuf "github.com/xtls/xray-core/common/buf"
 	xnet "github.com/xtls/xray-core/common/net"
 	"github.com/xtls/xray-core/common/net/cnc"
+	"github.com/xtls/xray-core/common/protocol"
 	"github.com/xtls/xray-core/common/serial"
 	"github.com/xtls/xray-core/common/session"
 	"github.com/xtls/xray-core/core"
+	xinbound "github.com/xtls/xray-core/features/inbound"
 	"github.com/xtls/xray-core/features/routing"
 	"github.com/xtls/xray-core/infra/conf"
+	xproxy "github.com/xtls/xray-core/proxy"
+	"github.com/xtls/xray-core/proxy/trojan"
+	"github.com/xtls/xray-core/proxy/vless"
 	"github.com/xtls/xray-core/transport"
 	"github.com/xtls/xray-core/transport/pipe"
 )
@@ -40,7 +47,117 @@ type xrayInbound struct {
 	instance *core.Instance
 	frontend *proxyFrontend
 	h2       *xrayH2Frontend
+	dispatch *xrayDispatcher
 	ctx      context.Context
+	mu       sync.Mutex
+	config   Config
+}
+
+// The core's session policy governs the paths the core copies itself (Mux
+// sub-streams, fallbacks); the direct VLESS path hands its link to our
+// dispatcher, where tcp_timeout applies through meterConn. Its 300 s idle
+// default is far below tcp_timeout (120 min by default), so idle follows
+// tcp_timeout here too, and the handshake and half-closed drain limits use
+// the values v2node runs in production (4 s, 2 s uplink-only, 4 s
+// downlink-only). Every field is set because a nil Second converts to zero.
+const (
+	xrayHandshakeSeconds     = 4
+	xrayUplinkDrainSeconds   = 2
+	xrayDownlinkDrainSeconds = 4
+	xrayIdleFallback         = 24 * 60 * 60
+)
+
+func xrayPolicy(tcpTimeoutSeconds int) *policy.Config {
+	idle := uint32(xrayIdleFallback)
+	if tcpTimeoutSeconds > 0 && tcpTimeoutSeconds < xrayIdleFallback {
+		idle = uint32(tcpTimeoutSeconds)
+	}
+	return &policy.Config{Level: map[uint32]*policy.Policy{0: {Timeout: &policy.Policy_Timeout{
+		Handshake:      &policy.Second{Value: xrayHandshakeSeconds},
+		ConnectionIdle: &policy.Second{Value: idle},
+		UplinkOnly:     &policy.Second{Value: xrayUplinkDrainSeconds},
+		DownlinkOnly:   &policy.Second{Value: xrayDownlinkDrainSeconds},
+	}}}}
+}
+
+// xrayAccount builds the parsed core account for one user.
+func xrayAccount(protocolName, flow string, u User) (protocol.Account, error) {
+	switch protocolName {
+	case "vless":
+		return (&vless.Account{Id: u.UUID, Flow: flow}).AsAccount()
+	case "trojan":
+		return (&trojan.Account{Password: u.Password}).AsAccount()
+	}
+	return nil, errors.New("proxy: this Xray inbound cannot update users in place")
+}
+
+func xrayCredential(protocolName, flow string, u User) string {
+	if protocolName == "trojan" {
+		return u.Password
+	}
+	return u.UUID + "/" + flow
+}
+
+// updateUsers swaps users inside the running core, so Reality, Vision and
+// XHTTP sessions of unchanged users survive a panel update. Removed or
+// re-credentialed users lose their sessions.
+func (h *xrayInbound) updateUsers(users []User) error {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	protocolName, flow := h.config.Protocol, h.config.Flow
+	manager, ok := h.instance.GetFeature(xinbound.ManagerType()).(xinbound.Manager)
+	if !ok {
+		return errors.New("proxy: Xray inbound manager unavailable")
+	}
+	handler, err := manager.GetHandler(h.ctx, h.Tag())
+	if err != nil {
+		return err
+	}
+	getter, ok := handler.(xproxy.GetInbound)
+	if !ok {
+		return errors.New("proxy: Xray handler exposes no inbound")
+	}
+	registry, ok := getter.GetInbound().(xproxy.UserManager)
+	if !ok {
+		return errors.New("proxy: Xray inbound cannot manage users")
+	}
+	previous := make(map[string]string, len(h.config.Users))
+	for _, u := range h.config.Users {
+		previous[strconv.FormatInt(u.ID, 10)] = xrayCredential(protocolName, flow, u)
+	}
+	type pending struct {
+		email   string
+		account protocol.Account
+	}
+	var add []pending
+	next := make(map[string]bool, len(users))
+	for _, u := range users {
+		email := strconv.FormatInt(u.ID, 10)
+		next[email] = true
+		if before, known := previous[email]; known && before == xrayCredential(protocolName, flow, u) {
+			continue
+		}
+		account, err := xrayAccount(protocolName, flow, u)
+		if err != nil {
+			return err
+		}
+		add = append(add, pending{email, account})
+	}
+	for email := range previous {
+		if !next[email] || slices.ContainsFunc(add, func(p pending) bool { return p.email == email }) {
+			if err := registry.RemoveUser(h.ctx, email); err != nil {
+				return err
+			}
+			h.dispatch.closeUser(email)
+		}
+	}
+	for _, p := range add {
+		if err := registry.AddUser(h.ctx, &protocol.MemoryUser{Email: p.email, Account: p.account}); err != nil {
+			return err
+		}
+	}
+	h.config.Users = slices.Clone(users)
+	return nil
 }
 
 func newXrayInbound(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options xrayOptions) (adapter.Inbound, error) {
@@ -136,13 +253,14 @@ func newXrayInbound(ctx context.Context, router adapter.Router, logger log.Conte
 		// User-facing audit/lifecycle logging is owned by the reconstruction's
 		// engine. Do not emit Xray's default per-connection console logs.
 		serial.ToTypedMessage(&xlog.Config{AccessLogType: xlog.LogType_None, ErrorLogType: xlog.LogType_None}),
+		serial.ToTypedMessage(xrayPolicy(c.TCPTimeoutSeconds)),
 		serial.ToTypedMessage(&proxyman.InboundConfig{}),
 		serial.ToTypedMessage(&proxyman.OutboundConfig{}),
 	}})
 	if err != nil {
 		return nil, err
 	}
-	dispatch := &xrayDispatcher{router: router, tag: tag, protocol: c.Protocol, active: make(map[io.Closer]bool)}
+	dispatch := &xrayDispatcher{router: router, tag: tag, protocol: c.Protocol, active: make(map[io.Closer]string)}
 	if err = instance.AddFeature(dispatch); err == nil {
 		err = core.AddInboundHandler(instance, handler)
 	}
@@ -151,8 +269,13 @@ func newXrayInbound(ctx context.Context, router adapter.Router, logger log.Conte
 		return nil, err
 	}
 	constructed = true
-	return &xrayInbound{Adapter: inbound.NewAdapter("xray-core", tag), instance: instance, frontend: frontend, h2: h2, ctx: ctx}, nil
+	return &xrayInbound{Adapter: inbound.NewAdapter("xray-core", tag), instance: instance, frontend: frontend, h2: h2, dispatch: dispatch, ctx: ctx, config: c}, nil
 }
+
+const (
+	xrayKeepAliveIdleSeconds     = 60
+	xrayKeepAliveIntervalSeconds = 30
+)
 
 func xrayStream(c Config) (json.RawMessage, error) {
 	stream := map[string]any{"network": "tcp", "security": "none"}
@@ -193,16 +316,25 @@ func xrayStream(c Config) (json.RawMessage, error) {
 			stream["tlsSettings"] = tlsSettings
 		}
 	}
+	sockopt, _ := stream["sockopt"].(map[string]any)
+	if sockopt == nil {
+		sockopt = make(map[string]any)
+	}
 	if c.ProxyProtocol || c.TCPFastOpen || c.TCPMultiPath {
-		sockopt, _ := stream["sockopt"].(map[string]any)
-		if sockopt == nil {
-			sockopt = make(map[string]any)
-		}
 		sockopt["acceptProxyProtocol"] = c.ProxyProtocol
 		sockopt["tcpFastOpen"] = c.TCPFastOpen
 		sockopt["tcpMptcp"] = c.TCPMultiPath
-		stream["sockopt"] = sockopt
 	}
+	// The core disables TCP keepalive by default; idle Reality sessions then
+	// die silently behind carrier NAT and dead sockets linger until
+	// tcp_timeout. Probe idle connections unless the stream sets its own.
+	if _, set := sockopt["tcpKeepAliveIdle"]; !set {
+		sockopt["tcpKeepAliveIdle"] = xrayKeepAliveIdleSeconds
+	}
+	if _, set := sockopt["tcpKeepAliveInterval"]; !set {
+		sockopt["tcpKeepAliveInterval"] = xrayKeepAliveIntervalSeconds
+	}
+	stream["sockopt"] = sockopt
 	return json.Marshal(stream)
 }
 
@@ -237,8 +369,23 @@ type xrayDispatcher struct {
 	tag      string
 	protocol string
 	mu       sync.Mutex
-	active   map[io.Closer]bool
+	active   map[io.Closer]string // open sessions and the user they belong to
 	closed   bool
+}
+
+// closeUser ends every session of one user, for live user removal.
+func (d *xrayDispatcher) closeUser(email string) {
+	d.mu.Lock()
+	var drop []io.Closer
+	for c, user := range d.active {
+		if user == email {
+			drop = append(drop, c)
+		}
+	}
+	d.mu.Unlock()
+	for _, c := range drop {
+		_ = c.Close()
+	}
 }
 
 func (d *xrayDispatcher) Type() interface{} { return routing.DispatcherType() }
@@ -280,8 +427,9 @@ func (d *xrayDispatcher) DispatchLink(ctx context.Context, dst xnet.Destination,
 	}
 	metadata := adapter.InboundContext{Inbound: d.tag, InboundType: d.protocol,
 		User: auth.User.Email, Source: M.ParseSocksaddr(auth.Source.NetAddr()), Destination: M.ParseSocksaddr(dst.NetAddr())}
-	stream := cnc.NewConnection(cnc.ConnectionInputMulti(link.Writer), cnc.ConnectionOutputMulti(link.Reader),
-		cnc.ConnectionRemoteAddr(auth.Source.RawNetAddr()))
+	stream := newSniffDeadlineConn(&xrayLinkConn{link: link, Connection: cnc.NewConnection(
+		cnc.ConnectionInputMulti(link.Writer), cnc.ConnectionOutputMulti(link.Reader),
+		cnc.ConnectionRemoteAddr(auth.Source.RawNetAddr()))})
 	var closer io.Closer = stream
 	var packet *xrayPacketConn
 	if dst.Network == xnet.Network_UDP {
@@ -294,7 +442,7 @@ func (d *xrayDispatcher) DispatchLink(ctx context.Context, dst xnet.Destination,
 		_ = closer.Close()
 		return net.ErrClosed
 	}
-	d.active[closer] = true
+	d.active[closer] = auth.User.Email
 	d.mu.Unlock()
 	completed := make(chan struct{})
 	var once sync.Once
