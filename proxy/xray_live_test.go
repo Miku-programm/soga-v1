@@ -70,8 +70,9 @@ func TestXrayLiveUserUpdateKeepsRealitySessions(t *testing.T) {
 	cfg, clientStream, s := startReality(t, []User{keep, gone})
 	before := s.box
 	open := func(u User) net.Conn {
-		ctx, cancel := context.WithTimeout(context.Background(), 8*time.Second)
-		defer cancel()
+		// core.Dial binds the connection to ctx, so it must outlive the session.
+		ctx, cancel := context.WithCancel(context.Background())
+		t.Cleanup(cancel)
 		c, err := newXrayTestClient(t, cfg, u, "none", clientStream).DialContext(ctx, "tcp", M.ParseSocksaddr(destination))
 		if err != nil {
 			t.Fatal(err)
