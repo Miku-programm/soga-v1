@@ -6,13 +6,49 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
 	"io"
 	"net"
+	"reconstructed.local/soga/proxy/wireproxy"
 	"strings"
 	"testing"
 	"time"
 )
+
+// A header required from every peer is exactly Xray's own acceptProxyProtocol
+// semantics, so no loopback frontend may sit in front of the core. Optional
+// headers and trusted-source lists still need it.
+func TestXrayRequiredProxyProtocolBypassesFrontend(t *testing.T) {
+	trusted, err := wireproxy.ParseTrusted("203.0.113.0/24")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tc := range []struct {
+		name     string
+		required bool
+		trusted  wireproxy.Trusted
+		frontend bool
+	}{
+		{"required-any-peer", true, nil, false},
+		{"optional", false, nil, true},
+		{"required-trusted-list", true, trusted, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := Config{Protocol: "vless", Listen: "127.0.0.1", Port: freePort(t, false), Users: []User{{ID: 42, UUID: testUUID}},
+				ProxyProtocol: true, ForceProxyProtocol: tc.required, ProxyProtocolTrusted: tc.trusted}
+			in, err := newXrayInbound(context.Background(), nil, log.NewNOPFactory().Logger(), "bypass-test", xrayOptions{Config: cfg})
+			if err != nil {
+				t.Fatal(err)
+			}
+			x := in.(*xrayInbound)
+			defer x.instance.Close()
+			if (x.frontend != nil) != tc.frontend {
+				t.Fatalf("frontend present = %t, want %t", x.frontend != nil, tc.frontend)
+			}
+		})
+	}
+}
 
 func TestProxyProtocolV1AuthenticatedSource(t *testing.T) {
 	destination, _ := echoTCP(t)

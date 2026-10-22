@@ -7,6 +7,8 @@ import (
 	"net"
 	"net/netip"
 	"sync"
+	"sync/atomic"
+	"time"
 
 	"golang.org/x/time/rate"
 )
@@ -20,14 +22,16 @@ const rateBurstBytes = 64 * 1024
 type Limiter struct {
 	mu      sync.Mutex
 	users   map[int64]*userLimit
-	node    *rate.Limiter
+	node    atomic.Pointer[rate.Limiter]
 	prefix4 int
 	prefix6 int
 }
 
+// userLimit entries are never removed, so a connection may keep the pointer
+// for its lifetime; speed changes reach it through the atomic pointer.
 type userLimit struct {
 	spec    User
-	speed   *rate.Limiter
+	speed   atomic.Pointer[rate.Limiter]
 	ips     map[string]int
 	devices map[string]int
 	tcp     map[string]int
@@ -105,7 +109,7 @@ func (l *Limiter) SetUserLimits(user User) error {
 		l.users[user.ID] = u
 	}
 	if user.SpeedLimit != u.spec.SpeedLimit {
-		u.speed = speedLimiter(user.SpeedLimit)
+		u.speed.Store(speedLimiter(user.SpeedLimit))
 	}
 	u.spec = user
 	return nil
@@ -118,11 +122,11 @@ func (l *Limiter) SetNodeSpeedLimit(mbps float64) error {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	if mbps == 0 {
-		l.node = nil
-	} else if l.node == nil {
-		l.node = speedLimiter(mbps)
+		l.node.Store(nil)
+	} else if node := l.node.Load(); node == nil {
+		l.node.Store(speedLimiter(mbps))
 	} else {
-		l.node.SetLimit(rate.Limit(mbps * 1_000_000 / 8))
+		node.SetLimit(rate.Limit(mbps * 1_000_000 / 8))
 	}
 	return nil
 }
@@ -204,27 +208,65 @@ func (l *Limiter) admissionRequest(req Request) AdmissionRequest {
 	return result
 }
 
-func (l *Limiter) wait(ctx context.Context, id int64, n int) error {
-	l.mu.Lock()
-	node := l.node
-	var speed *rate.Limiter
-	if u := l.users[id]; u != nil {
-		speed = u.speed
+// pacer is resolved once per connection, so the payload path takes no lock:
+// an unlimited node and user cost two atomic loads per read or write.
+type pacer struct {
+	l    *Limiter
+	user *userLimit // nil for unattributed traffic
+}
+
+func (l *Limiter) pacer(id int64) *pacer {
+	p := &pacer{l: l}
+	if id > 0 {
+		l.mu.Lock()
+		p.user = l.users[id]
+		l.mu.Unlock()
 	}
-	l.mu.Unlock()
+	return p
+}
+
+func (p *pacer) pace(ctx context.Context, n int) error {
+	var speed *rate.Limiter
+	if p.user != nil {
+		speed = p.user.speed.Load()
+	}
+	node := p.l.node.Load()
+	if speed == nil && node == nil {
+		return nil
+	}
 	for n > 0 {
 		chunk := min(n, rateBurstBytes)
-		if speed != nil {
-			if err := speed.WaitN(ctx, chunk); err != nil {
-				return err
+		now := time.Now()
+		var delay time.Duration
+		var reservations [2]*rate.Reservation
+		for i, limiter := range [2]*rate.Limiter{speed, node} {
+			if limiter == nil {
+				continue
 			}
+			r := limiter.ReserveN(now, chunk)
+			if !r.OK() {
+				return errors.New("proxy: rate chunk exceeds burst")
+			}
+			reservations[i] = r
+			delay = max(delay, r.DelayFrom(now))
 		}
-		if node != nil {
-			if err := node.WaitN(ctx, chunk); err != nil {
-				return err
+		if delay > 0 {
+			timer := time.NewTimer(delay)
+			select {
+			case <-timer.C:
+			case <-ctx.Done():
+				timer.Stop()
+				for _, r := range reservations {
+					if r != nil {
+						r.CancelAt(now)
+					}
+				}
+				return ctx.Err()
 			}
 		}
 		n -= chunk
 	}
 	return nil
 }
+
+func (l *Limiter) wait(ctx context.Context, id int64, n int) error { return l.pacer(id).pace(ctx, n) }

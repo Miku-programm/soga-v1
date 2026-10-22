@@ -344,7 +344,7 @@ func (n *Node) applyConfiguration(ctx context.Context, node panel.Node, users []
 			return err
 		}
 		n.key, n.started = key, true
-	} else if !reflect.DeepEqual(n.users, users) {
+	} else if !sameUsers(n.users, users) {
 		for i, server := range n.servers {
 			if err := server.UpdateUsers(configs[i].Users); err != nil {
 				n.ready.Store(false)
@@ -614,8 +614,28 @@ func (n *Node) transform(ctx context.Context, req proxy.Request) (proxy.Request,
 	}
 	req.Destination = net.JoinHostPort(ip.String(), portText)
 	req.Outbound = selection.Tag
-	n.access.Write(logging.FormatRecord(req.Network, nodeID, req.UserID, req.Source, target.Host, req.Destination))
+	n.access.Log(req.Network, nodeID, req.UserID, req.Source, target.Host, req.Destination)
 	return req, nil
+}
+
+// sameUsers ignores the panel's ordering: only a changed membership,
+// credential or limit should touch running listeners.
+func sameUsers(a, b []panel.User) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	byID := make(map[int64]panel.User, len(a))
+	for _, u := range a {
+		byID[u.ID] = u
+	}
+	for _, u := range b {
+		previous, found := byID[u.ID]
+		if !found || !reflect.DeepEqual(previous, u) {
+			return false
+		}
+		delete(byID, u.ID)
+	}
+	return len(byID) == 0
 }
 
 func (n *Node) recordDenial(user int64, target string, err error) {

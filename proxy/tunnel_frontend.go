@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"io"
 	"net"
 	"strconv"
 	"sync"
@@ -150,17 +149,7 @@ func (f *tunnelFrontend) tcp(ctx context.Context, raw net.Conn) {
 	if _, err = proxyproto.HeaderProxyFromAddrs(2, conn.RemoteAddr(), conn.LocalAddr()).WriteTo(target); err != nil {
 		return
 	}
-	done := make(chan struct{})
-	go func() {
-		_, _ = io.Copy(target, conn)
-		if tcp, ok := target.(*net.TCPConn); ok {
-			_ = tcp.CloseWrite()
-		}
-		close(done)
-	}()
-	_, _ = io.Copy(conn, target)
-	_ = conn.Close()
-	<-done
+	_ = relay(ctx, conn, target, relayIdle(f.config.TCPTimeoutSeconds))
 }
 
 func (f *tunnelFrontend) udp(ctx context.Context, conn *tunnel.Conn) {

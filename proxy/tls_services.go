@@ -8,6 +8,7 @@ import (
 	"io"
 	"net"
 	"net/netip"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -55,12 +56,13 @@ type tlsServiceInbound struct {
 	invalid   *invalidAccessGuard
 	mu        sync.Mutex
 	active    map[net.Conn]bool
+	userOf    map[net.Conn]string // authenticated user name per accepted connection
 	closed    bool
 }
 
 func newTLSServiceInbound(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, opts tlsServiceOptions) (adapter.Inbound, error) {
 	c := opts.Config
-	h := &tlsServiceInbound{Adapter: inbound.NewAdapter(c.Protocol, tag), config: c, router: uot.NewRouter(router, logger), active: make(map[net.Conn]bool)}
+	h := &tlsServiceInbound{Adapter: inbound.NewAdapter(c.Protocol, tag), config: c, router: uot.NewRouter(router, logger), active: make(map[net.Conn]bool), userOf: make(map[net.Conn]string)}
 	h.invalid = newInvalidAccessGuard(c.InvalidAccess)
 	var err error
 	if c.TLS != nil && c.TLS.Enabled {
@@ -181,6 +183,79 @@ func (h *tlsServiceInbound) Start(stage adapter.StartStage, scope *adapter.Scope
 	return nil
 }
 
+// credential is the part of a user that authenticates them; sessions of users
+// whose credential changed are closed like those of removed users.
+func (h *tlsServiceInbound) credential(u User) string {
+	switch h.config.Protocol {
+	case "trojan", "anytls":
+		return u.Password
+	case "vless":
+		return u.UUID + "/" + h.config.Flow
+	default:
+		return u.UUID + "/" + strconv.Itoa(u.AlterID)
+	}
+}
+
+// updateUsers replaces the user set without rebinding the listener. Sessions
+// of users that are gone or re-credentialed are closed; everyone else keeps
+// their connections.
+func (h *tlsServiceInbound) updateUsers(users []User) error {
+	names := make([]string, 0, len(users))
+	secrets := make([]string, 0, len(users))
+	alters := make([]int, 0, len(users))
+	flows := make([]string, 0, len(users))
+	for _, u := range users {
+		names = append(names, strconv.FormatInt(u.ID, 10))
+		alters = append(alters, u.AlterID)
+		flows = append(flows, h.config.Flow)
+		if h.config.Protocol == "trojan" || h.config.Protocol == "anytls" {
+			secrets = append(secrets, u.Password)
+		} else {
+			secrets = append(secrets, u.UUID)
+		}
+	}
+	switch {
+	case h.any != nil:
+		// sing-anytls swaps its user map without synchronization; keep the
+		// listener rebuild for AnyTLS until upstream guards it.
+		return errors.New("proxy: AnyTLS cannot update users in place")
+	case h.vless != nil:
+		h.vless.UpdateUsers(names, secrets, flows)
+	case h.trojan != nil:
+		if err := h.trojan.UpdateUsers(names, secrets); err != nil {
+			return err
+		}
+	default:
+		if err := h.vmess.UpdateUsers(names, secrets, alters); err != nil {
+			return err
+		}
+	}
+	h.mu.Lock()
+	previous := make(map[string]string, len(h.config.Users))
+	for _, u := range h.config.Users {
+		previous[strconv.FormatInt(u.ID, 10)] = h.credential(u)
+	}
+	keep := make(map[string]bool, len(users))
+	for _, u := range users {
+		name := strconv.FormatInt(u.ID, 10)
+		if before, known := previous[name]; !known || before == h.credential(u) {
+			keep[name] = true
+		}
+	}
+	var drop []net.Conn
+	for raw, name := range h.userOf {
+		if !keep[name] {
+			drop = append(drop, raw)
+		}
+	}
+	h.config.Users = slices.Clone(users)
+	h.mu.Unlock()
+	for _, raw := range drop {
+		_ = raw.Close()
+	}
+	return nil
+}
+
 type serviceCaptureKey struct{}
 type captureConn struct {
 	net.Conn
@@ -212,6 +287,7 @@ func (h *tlsServiceInbound) NewConnection(ctx context.Context, conn net.Conn, me
 			raw.Close()
 			h.mu.Lock()
 			delete(h.active, raw)
+			delete(h.userOf, raw)
 			h.mu.Unlock()
 			if onClose != nil {
 				onClose(err)
@@ -240,6 +316,7 @@ func (h *tlsServiceInbound) NewConnection(ctx context.Context, conn net.Conn, me
 			return
 		}
 	}
+	ctx = armHandshake(ctx, conn, raw)
 	if h.any != nil {
 		err := h.any.NewConnection(ctx, conn, metadata.Source, onClose)
 		closed(err)
@@ -287,6 +364,7 @@ func (h *tlsServiceInbound) NewConnection(ctx context.Context, conn net.Conn, me
 			h.invalid.failure(sourceIP)
 		}
 		if capture.recording.Load() && h.config.FallbackAddress != "" {
+			handshakeDone(ctx)
 			cached := bufio.NewCachedConn(conn, buf.As(capture.data.Bytes()))
 			h.fallback(ctx, cached, closed)
 		} else {
@@ -308,6 +386,18 @@ func (h *tlsTransportHandler) NewConnectionEx(ctx context.Context, conn net.Conn
 	(*tlsServiceInbound)(h).NewConnection(ctx, conn, adapter.InboundContext{Source: source, Destination: destination}, onClose)
 }
 
+// authenticated records which accepted connection serves a user, so a live
+// user update can close the sessions of removed or re-credentialed users.
+func (h *tlsServiceInbound) authenticated(ctx context.Context, name string) {
+	if raw := handshakeDone(ctx); raw != nil {
+		h.mu.Lock()
+		if h.active[raw] {
+			h.userOf[raw] = name
+		}
+		h.mu.Unlock()
+	}
+}
+
 func (h *tlsServiceInbound) NewConnectionEx(ctx context.Context, conn net.Conn, source, dst M.Socksaddr, onClose N.CloseHandlerFunc) {
 	if capture, ok := ctx.Value(serviceCaptureKey{}).(*captureConn); ok {
 		capture.recording.Store(false)
@@ -317,6 +407,7 @@ func (h *tlsServiceInbound) NewConnectionEx(ctx context.Context, conn net.Conn, 
 		closeDenied(conn, onClose, errors.New("proxy: authenticated identity absent"))
 		return
 	}
+	h.authenticated(ctx, name)
 	h.router.RouteConnectionEx(ctx, conn, adapter.InboundContext{Inbound: h.Tag(), InboundType: h.config.Protocol, User: name, Source: source, Destination: dst}, onClose)
 }
 func (h *tlsServiceInbound) NewPacketConnectionEx(ctx context.Context, conn N.PacketConn, source, dst M.Socksaddr, onClose N.CloseHandlerFunc) {
@@ -328,6 +419,7 @@ func (h *tlsServiceInbound) NewPacketConnectionEx(ctx context.Context, conn N.Pa
 		closeDenied(conn, onClose, errors.New("proxy: authenticated identity absent"))
 		return
 	}
+	h.authenticated(ctx, name)
 	if dst.Fqdn == packetaddr.SeqPacketMagicAddress {
 		dst = M.Socksaddr{}
 		conn = packetaddr.NewConn(bufio.NewNetPacketConn(conn), dst)
@@ -362,17 +454,7 @@ func (h *tlsServiceInbound) fallback(ctx context.Context, conn net.Conn, onClose
 		return
 	}
 	defer target.Close()
-	done := make(chan struct{})
-	go func() {
-		io.Copy(target, conn)
-		if tcp, ok := target.(*net.TCPConn); ok {
-			tcp.CloseWrite()
-		}
-		close(done)
-	}()
-	_, err = io.Copy(conn, target)
-	conn.Close()
-	<-done
+	err = relay(ctx, conn, target, relayIdle(h.config.TCPTimeoutSeconds))
 	if onClose != nil {
 		onClose(err)
 	}

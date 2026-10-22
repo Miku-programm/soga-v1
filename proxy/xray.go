@@ -56,7 +56,12 @@ func newXrayInbound(ctx context.Context, router adapter.Router, logger log.Conte
 			_ = h2.close()
 		}
 	}()
-	if c.ProxyProtocol || h2 != nil {
+	// Xray's own acceptProxyProtocol socket option means "require a header from
+	// any peer". That is exactly the required-header case without a trusted
+	// source list, so Xray then binds the public address itself (TFO/MPTCP still
+	// arrive through sockopt). The loopback frontend remains for optional
+	// headers and trusted-source lists, which Xray cannot express.
+	if h2 != nil || (c.ProxyProtocol && !(c.ForceProxyProtocol && len(c.ProxyProtocolTrusted) == 0)) {
 		// Reserve a private core port. The public listener starts only after the
 		// core has bound successfully, so a failed allocation exposes no port.
 		reservation, err := net.Listen("tcp", "127.0.0.1:0")
@@ -75,7 +80,7 @@ func newXrayInbound(ctx context.Context, router adapter.Router, logger log.Conte
 			c.XrayStream = nil
 			c.ProxyProtocol, c.ForceProxyProtocol = true, true
 		} else {
-			frontend = &proxyFrontend{address: net.JoinHostPort(c.Listen, strconv.Itoa(int(c.Port))), backend: backend, required: c.ForceProxyProtocol, trusted: c.ProxyProtocolTrusted, tfo: c.TCPFastOpen, mptcp: c.TCPMultiPath}
+			frontend = &proxyFrontend{address: net.JoinHostPort(c.Listen, strconv.Itoa(int(c.Port))), backend: backend, required: c.ForceProxyProtocol, trusted: c.ProxyProtocolTrusted, tfo: c.TCPFastOpen, mptcp: c.TCPMultiPath, idle: relayIdle(c.TCPTimeoutSeconds)}
 		}
 		c.Listen, c.Port = "127.0.0.1", uint16(port)
 	}

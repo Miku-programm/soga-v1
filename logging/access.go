@@ -2,6 +2,7 @@
 package logging
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -16,6 +17,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"reconstructed.local/soga/config"
@@ -31,19 +33,40 @@ type Record struct {
 	DestIP   string `json:"dest_ip"`
 	DestPort uint16 `json:"dest_port"`
 }
+
+// localSink is the file side of local mode. *Rotating implements it; tests
+// substitute a stub to count batches.
+type localSink interface {
+	WriteAt(at time.Time, data []byte) (int, error)
+	Close() error
+	period(t time.Time) int64
+}
+
+const (
+	// localBatchRecords bounds how many records are buffered before a file write.
+	localBatchRecords = 256
+	// localBufferSize is the size of the in-memory buffer in front of the file.
+	localBufferSize = 64 << 10
+	// localIdleFlush is how long a partial batch waits once the queue is idle.
+	localIdleFlush = 100 * time.Millisecond
+	timeLayout     = "2006-01-02 15:04:05"
+)
+
 type Access struct {
-	c        config.Config
-	queue    chan Record
-	stop     chan struct{}
-	done     chan struct{}
-	once     sync.Once
-	mu       sync.RWMutex
-	closed   bool
-	local    *Rotating
-	client   *http.Client
-	endpoint string
-	table    string
-	onError  func(error)
+	c         config.Config
+	queue     chan Record
+	stop      chan struct{}
+	done      chan struct{}
+	once      sync.Once
+	mu        sync.RWMutex
+	closed    bool
+	sink      localSink
+	clock     func() time.Time
+	idleFlush time.Duration
+	client    *http.Client
+	endpoint  string
+	table     string
+	onError   func(error)
 }
 
 func NewAccess(ctx context.Context, c config.Config, onError func(error)) (*Access, error) {
@@ -54,17 +77,17 @@ func NewAccess(ctx context.Context, c config.Config, onError func(error)) (*Acce
 		onError = func(error) {}
 	}
 	a := &Access{c: c, stop: make(chan struct{}), done: make(chan struct{}), onError: onError,
-		client: &http.Client{Timeout: 10 * time.Second}}
+		idleFlush: localIdleFlush, client: &http.Client{Timeout: 10 * time.Second}}
 	switch c.AccessLogMode {
 	case "local":
 		if c.AccessLogDir == "" || c.AccessLogRetentionHours < 0 {
 			return nil, errors.New("invalid access log directory/retention")
 		}
-		var err error
-		a.local, err = NewRotating(c.AccessLogDir, "soga-access-", true, int(c.AccessLogRetentionHours))
+		local, err := NewRotating(c.AccessLogDir, "soga-access-", true, int(c.AccessLogRetentionHours))
 		if err != nil {
 			return nil, err
 		}
+		a.sink = local
 	case "clickhouse":
 		if c.AccessLogClickhouseBatchSize <= 0 || c.AccessLogClickhouseBatchSize > 1_000_000 {
 			return nil, errors.New("invalid ClickHouse batch size")
@@ -117,6 +140,26 @@ func identifier(s string) (string, error) {
 	return "`" + strings.ReplaceAll(strings.ReplaceAll(s, "\\", "\\\\"), "`", "\\`") + "`", nil
 }
 
+// Enabled reports whether a record written now would be accepted. Callers can
+// use it to skip building a Record (FormatRecord) when the sink is nil or closed.
+func (a *Access) Enabled() bool {
+	if a == nil {
+		return false
+	}
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	return !a.closed
+}
+
+// Log is Write(FormatRecord(...)) that skips the formatting work entirely when
+// the sink is nil or closed.
+func (a *Access) Log(network string, node, user int64, source, host, destination string) {
+	if !a.Enabled() {
+		return
+	}
+	a.Write(FormatRecord(network, node, user, source, host, destination))
+}
+
 // Write never delays forwarding. A saturated queue drops the new record.
 func (a *Access) Write(r Record) {
 	if a == nil {
@@ -128,7 +171,7 @@ func (a *Access) Write(r Record) {
 		return
 	}
 	if r.Time == "" {
-		r.Time = time.Now().Format("2006-01-02 15:04:05")
+		r.Time = timestamp(time.Now())
 	}
 	select {
 	case a.queue <- r:
@@ -147,11 +190,115 @@ func (a *Access) Close(ctx context.Context) error {
 		return ctx.Err()
 	}
 }
+func (a *Access) now() time.Time {
+	if a.clock != nil {
+		return a.clock()
+	}
+	return time.Now()
+}
 func (a *Access) run() {
 	defer close(a.done)
-	if a.local != nil {
-		defer a.local.Close()
+	if a.sink != nil {
+		a.runLocal()
+		return
 	}
+	a.runClickHouse()
+}
+
+// hourWriter routes buffered bytes to the rotation period they were queued
+// in, so that a flush that happens after the hour changed still lands in the
+// file of the records' own hour.
+type hourWriter struct {
+	sink localSink
+	at   time.Time
+}
+
+func (h *hourWriter) Write(p []byte) (int, error) { return h.sink.WriteAt(h.at, p) }
+
+func (a *Access) runLocal() {
+	defer func() {
+		if err := a.sink.Close(); err != nil {
+			a.onError(err)
+		}
+	}()
+	sink := &hourWriter{sink: a.sink}
+	w := bufio.NewWriterSize(sink, localBufferSize)
+	tick := time.NewTicker(time.Second)
+	defer tick.Stop()
+	var (
+		line    []byte
+		pending int
+		period  int64
+		idle    *time.Timer
+		idleC   <-chan time.Time
+	)
+	flush := func() {
+		if idleC != nil {
+			idle.Stop()
+			idleC = nil
+		}
+		if pending == 0 {
+			return
+		}
+		pending = 0
+		if err := w.Flush(); err != nil {
+			w.Reset(sink)
+			a.onError(err)
+		}
+	}
+	add := func(r Record) {
+		now := a.now()
+		if p := a.sink.period(now); p != period {
+			flush()
+			period, sink.at = p, now
+		}
+		line = appendRecord(line[:0], r)
+		if _, err := w.Write(line); err != nil {
+			w.Reset(sink)
+			a.onError(err)
+			return
+		}
+		pending++
+		if pending >= localBatchRecords {
+			flush()
+		}
+	}
+	for {
+		select {
+		case r := <-a.queue:
+			add(r)
+		drain:
+			for i := 0; i < localBatchRecords; i++ {
+				select {
+				case r := <-a.queue:
+					add(r)
+				default:
+					break drain
+				}
+			}
+			if pending > 0 && idleC == nil && a.idleFlush > 0 {
+				idle = time.NewTimer(a.idleFlush)
+				idleC = idle.C
+			}
+		case <-idleC:
+			idleC = nil
+			flush()
+		case <-tick.C:
+			flush()
+		case <-a.stop:
+			for {
+				select {
+				case r := <-a.queue:
+					add(r)
+				default:
+					flush()
+					return
+				}
+			}
+		}
+	}
+}
+func (a *Access) runClickHouse() {
 	tick := time.NewTicker(time.Second)
 	defer tick.Stop()
 	var batch []Record
@@ -160,27 +307,18 @@ func (a *Access) run() {
 			return
 		}
 		var err error
-		if a.local != nil {
-			for _, r := range batch {
-				line := fmt.Sprintf("%s|%s|%d|%d|%s|%s|%s|%d\n", safe(r.Time), safe(r.Network), r.NodeID, r.UserID, safe(r.UserIP), safe(r.Host), safe(r.DestIP), r.DestPort)
-				if _, e := io.WriteString(a.local, line); e != nil {
-					err = errors.Join(err, e)
-				}
+		var data bytes.Buffer
+		enc := json.NewEncoder(&data)
+		for _, r := range batch {
+			if e := enc.Encode(r); e != nil {
+				err = e
+				break
 			}
-		} else {
-			var data bytes.Buffer
-			enc := json.NewEncoder(&data)
-			for _, r := range batch {
-				if e := enc.Encode(r); e != nil {
-					err = e
-					break
-				}
-			}
-			if err == nil {
-				ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-				err = a.post(ctx, "INSERT INTO "+a.table+" FORMAT JSONEachRow", data.Bytes())
-				cancel()
-			}
+		}
+		if err == nil {
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			err = a.post(ctx, "INSERT INTO "+a.table+" FORMAT JSONEachRow", data.Bytes())
+			cancel()
 		}
 		batch = nil
 		if err != nil {
@@ -191,11 +329,7 @@ func (a *Access) run() {
 		select {
 		case r := <-a.queue:
 			batch = append(batch, r)
-			size := int(a.c.AccessLogClickhouseBatchSize)
-			if a.local != nil {
-				size = 1
-			}
-			if len(batch) >= size {
+			if len(batch) >= int(a.c.AccessLogClickhouseBatchSize) {
 				flush()
 			}
 		case <-tick.C:
@@ -213,8 +347,52 @@ func (a *Access) run() {
 		}
 	}
 }
+
+type cachedStamp struct {
+	sec  int64
+	text string
+}
+
+var stampCache atomic.Pointer[cachedStamp]
+
+// timestamp formats now in the record layout, reusing the previous result
+// while the wall-clock second is unchanged.
+func timestamp(now time.Time) string {
+	sec := now.Unix()
+	if c := stampCache.Load(); c != nil && c.sec == sec {
+		return c.text
+	}
+	s := &cachedStamp{sec: sec, text: now.Format(timeLayout)}
+	stampCache.Store(s)
+	return s.text
+}
+
+// appendRecord appends the local-mode line for r, identical to the former
+// fmt.Sprintf("%s|%s|%d|%d|%s|%s|%s|%d\n", ...) output.
+func appendRecord(b []byte, r Record) []byte {
+	b = append(b, safe(r.Time)...)
+	b = append(b, '|')
+	b = append(b, safe(r.Network)...)
+	b = append(b, '|')
+	b = strconv.AppendInt(b, r.NodeID, 10)
+	b = append(b, '|')
+	b = strconv.AppendInt(b, r.UserID, 10)
+	b = append(b, '|')
+	b = append(b, safe(r.UserIP)...)
+	b = append(b, '|')
+	b = append(b, safe(r.Host)...)
+	b = append(b, '|')
+	b = append(b, safe(r.DestIP)...)
+	b = append(b, '|')
+	b = strconv.AppendUint(b, uint64(r.DestPort), 10)
+	return append(b, '\n')
+}
+func formatLine(r Record) string { return string(appendRecord(nil, r)) }
+
+var safeReplacer = strings.NewReplacer("\r", "\\r", "\n", "\\n", "|", "\\x7c")
+
 func safe(s string) string {
-	return strings.NewReplacer("\r", "\\r", "\n", "\\n", "|", "\\x7c").Replace(s)
+	return safeReplacer.Replace(s)
 }
 func (a *Access) post(ctx context.Context, query string, data []byte) error {
 	u, err := url.Parse(a.endpoint)
@@ -249,6 +427,7 @@ type Rotating struct {
 	retention      int
 	file           *os.File
 	name           string
+	cur            int64
 	closed         bool
 	stop, done     chan struct{}
 	maintenanceErr error
@@ -301,11 +480,22 @@ func (r *Rotating) layout() string {
 	}
 	return "2006-01-02"
 }
+
+// period identifies the file t belongs to (local day, plus hour when hourly)
+// without formatting; it is always positive.
+func (r *Rotating) period(t time.Time) int64 {
+	p := int64(t.Year())<<9 | int64(t.YearDay())
+	if r.hourly {
+		p = p<<5 | int64(t.Hour())
+	}
+	return p
+}
 func (r *Rotating) rotate(now time.Time) error {
-	name := r.prefix + now.Format(r.layout()) + ".log"
-	if name == r.name && r.file != nil {
+	p := r.period(now)
+	if p == r.cur && r.file != nil {
 		return nil
 	}
+	name := r.prefix + now.Format(r.layout()) + ".log"
 	f, err := os.OpenFile(filepath.Join(r.dir, name), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0640)
 	if err != nil {
 		return err
@@ -313,7 +503,7 @@ func (r *Rotating) rotate(now time.Time) error {
 	if r.file != nil {
 		_ = r.file.Close()
 	}
-	r.file, r.name = f, name
+	r.file, r.name, r.cur = f, name, p
 	return r.prune(now)
 }
 func (r *Rotating) prune(now time.Time) error {
@@ -348,13 +538,21 @@ func (r *Rotating) prune(now time.Time) error {
 	}
 	return nil
 }
+
+// Write appends data to the file of the current period.
 func (r *Rotating) Write(data []byte) (int, error) {
+	return r.WriteAt(time.Now(), data)
+}
+
+// WriteAt appends data to the file of the period containing at, rotating
+// (forwards or backwards) when necessary.
+func (r *Rotating) WriteAt(at time.Time, data []byte) (int, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if r.closed {
 		return 0, os.ErrClosed
 	}
-	if err := r.rotate(time.Now()); err != nil {
+	if err := r.rotate(at); err != nil {
 		return 0, err
 	}
 	n, err := r.file.Write(data)

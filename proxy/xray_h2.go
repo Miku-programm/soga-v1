@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"io"
 	"net"
 	"strconv"
 	"sync"
@@ -179,18 +178,7 @@ func (h *xrayH2Frontend) NewConnectionEx(ctx context.Context, conn net.Conn, sou
 			result = err
 			return
 		}
-		done := make(chan struct{})
-		go func() {
-			_, _ = io.Copy(target, conn)
-			if tcp, ok := target.(*net.TCPConn); ok {
-				_ = tcp.CloseWrite()
-			}
-			close(done)
-		}()
-		_, result = io.Copy(conn, target)
-		_ = conn.Close()
-		_ = target.Close()
-		<-done
+		result = relay(ctx, conn, target, relayIdle(h.config.TCPTimeoutSeconds))
 	}()
 }
 

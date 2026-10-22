@@ -41,7 +41,7 @@ func (o inspectionOptions) stream(ctx context.Context, conn net.Conn, metadata *
 		case "http":
 			parsers = append(parsers, sniff.HTTPHost)
 		case "tls":
-			parsers = append(parsers, sniff.TLSClientHello)
+			parsers = append(parsers, sniffTLSClientHello)
 		}
 	}
 	b := buf.NewSize(max(16384, o.maxPacket))

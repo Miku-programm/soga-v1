@@ -170,6 +170,9 @@ func ValidateConfig(cfg Config) error {
 	return err
 }
 
+// inboundTag names the single inbound of each listener's sing-box instance.
+const inboundTag = "soga-reconstruction"
+
 func Start(ctx context.Context, cfg Config) (*Server, error) {
 	if ctx == nil {
 		return nil, errors.New("proxy: nil context")
@@ -269,8 +272,30 @@ func (s *Server) Addr() string {
 	return net.JoinHostPort(s.cfg.Listen, strconv.Itoa(int(s.cfg.Port)))
 }
 
-// UpdateUsers recreates the listener on the same port, terminating existing
-// sessions. This is not a seamless hot update. A failed restart leaves it closed.
+// userUpdater is implemented by inbounds that can replace their user set in
+// place. Sessions of removed users are closed by the inbound itself.
+type userUpdater interface {
+	updateUsers(users []User) error
+}
+
+// liveUserUpdater returns the running inbound when it supports in-place user
+// updates; nil means the listener has to be recreated.
+func (s *Server) liveUserUpdater() userUpdater {
+	if s.box == nil {
+		return nil
+	}
+	in, found := s.box.Inbound().Get(inboundTag)
+	if !found {
+		return nil
+	}
+	updater, _ := in.(userUpdater)
+	return updater
+}
+
+// UpdateUsers replaces the authorized users. Inbounds that support it keep
+// the listener and every unaffected session; otherwise the listener is
+// recreated on the same port, terminating existing sessions. A failed restart
+// leaves it closed.
 func (s *Server) UpdateUsers(users []User) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -281,6 +306,18 @@ func (s *Server) UpdateUsers(users []User) error {
 	next.Users = slices.Clone(users)
 	if _, err := inboundOptions(next); err != nil {
 		return err
+	}
+	if updater := s.liveUserUpdater(); updater != nil && len(next.Users) > 0 {
+		for _, user := range next.Users {
+			if err := s.cfg.Limiter.SetUserLimits(user); err != nil {
+				return err
+			}
+		}
+		if err := updater.updateUsers(next.Users); err == nil {
+			s.cfg = next
+			return nil
+		}
+		// The inbound could not apply the change in place; rebuild it.
 	}
 	if s.tunnel != nil {
 		_ = s.tunnel.close()
@@ -402,7 +439,7 @@ func inboundOptions(c Config) (option.Inbound, error) {
 		listen.UDPTimeout = option.UDPTimeoutCompat(time.Duration(c.UDPTimeoutMinutes) * time.Minute)
 	}
 	tls := option.InboundTLSOptionsContainer{TLS: c.TLS}
-	in := option.Inbound{Type: c.Protocol, Tag: "soga-reconstruction"}
+	in := option.Inbound{Type: c.Protocol, Tag: inboundTag}
 	if c.VMessAuthMode != "" && c.VMessAuthMode != "auto" && c.VMessAuthMode != "md5" && c.VMessAuthMode != "aead" {
 		return option.Inbound{}, errors.New("proxy: invalid VMess authentication mode")
 	}

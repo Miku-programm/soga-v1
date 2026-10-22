@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/sagernet/sing-box/adapter"
@@ -20,27 +21,48 @@ import (
 
 type meter struct {
 	mu           sync.Mutex
-	traffic      map[int64]Traffic
+	traffic      map[int64]*userTraffic
 	online       map[int64]map[string]int
 	prefix4      int
 	prefix6      int
 	submitRealIP bool
 }
 
-func newMeter() *meter {
-	return &meter{traffic: make(map[int64]Traffic), online: make(map[int64]map[string]int), prefix4: 32, prefix6: 128}
+// userTraffic is resolved once per connection; the payload path then counts
+// with atomics instead of taking the meter lock on every read and write.
+type userTraffic struct {
+	upload, download atomic.Uint64
 }
 
-func (m *meter) add(id int64, upload, download int) {
-	if id <= 0 {
+func (t *userTraffic) add(upload, download int) {
+	if t == nil {
 		return
+	}
+	if upload > 0 {
+		t.upload.Add(uint64(upload))
+	}
+	if download > 0 {
+		t.download.Add(uint64(download))
+	}
+}
+
+func newMeter() *meter {
+	return &meter{traffic: make(map[int64]*userTraffic), online: make(map[int64]map[string]int), prefix4: 32, prefix6: 128}
+}
+
+// counters returns cumulative counters for a user, nil for unattributed traffic.
+func (m *meter) counters(id int64) *userTraffic {
+	if id <= 0 {
+		return nil
 	}
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	t := m.traffic[id]
-	t.Upload += uint64(upload)
-	t.Download += uint64(download)
-	m.traffic[id] = t
+	if t == nil {
+		t = &userTraffic{}
+		m.traffic[id] = t
+	}
+	return t
 }
 
 func (m *meter) connect(id int64, source string) func() {
@@ -78,7 +100,7 @@ func (m *meter) trafficSnapshot() map[int64]Traffic {
 	defer m.mu.Unlock()
 	out := make(map[int64]Traffic, len(m.traffic))
 	for id, t := range m.traffic {
-		out[id] = t
+		out[id] = Traffic{Upload: t.upload.Load(), Download: t.download.Load()}
 	}
 	return out
 }
@@ -218,7 +240,8 @@ func (r *guardedRouter) RouteConnectionEx(ctx context.Context, conn net.Conn, me
 		closeDenied(conn, onClose, err)
 		return
 	}
-	counted := &meterConn{Conn: conn, meter: r.meter, id: requestMeterID(req), done: done, ctx: ctx, limiter: r.limiter}
+	id := requestMeterID(req)
+	counted := &meterConn{Conn: conn, traffic: r.meter.counters(id), pace: r.limiter.pacer(id), done: done, ctx: ctx}
 	counted.startIdle(r.inspection.tcpTimeout)
 	metadata.Destination = M.ParseSocksaddr(req.Destination)
 	metadata.Network = "tcp"
@@ -260,7 +283,8 @@ func (r *guardedRouter) RoutePacketConnectionEx(ctx context.Context, conn N.Pack
 		closeDenied(conn, onClose, err)
 		return
 	}
-	counted := &meterPacketConn{PacketConn: conn, meter: r.meter, req: req, router: r, ctx: ctx, metadata: metadata, done: done, originalDestinations: make(map[M.Socksaddr]M.Socksaddr), decisions: make(map[M.Socksaddr]udpDecision)}
+	meterID := requestMeterID(req)
+	counted := &meterPacketConn{PacketConn: conn, traffic: r.meter.counters(meterID), pace: r.limiter.pacer(meterID), req: req, router: r, ctx: ctx, metadata: metadata, done: done, originalDestinations: make(map[M.Socksaddr]M.Socksaddr), decisions: make(map[M.Socksaddr]udpDecision)}
 	metadata.Destination = M.ParseSocksaddr(req.Destination)
 	metadata.Network = "udp"
 	if r.udpTimeout > 0 {
@@ -289,15 +313,13 @@ func (r *guardedRouter) RoutePacketConnection(ctx context.Context, conn N.Packet
 
 type meterConn struct {
 	net.Conn
-	meter       *meter
-	id          int64
+	traffic     *userTraffic
+	pace        *pacer
 	done        func()
 	ctx         context.Context
-	limiter     *Limiter
-	idleMu      sync.Mutex
-	idle        *time.Timer
+	lastActive  atomic.Int64 // UnixNano of the last payload byte
 	idleTimeout time.Duration
-	closed      bool
+	closed      atomic.Bool
 }
 
 func (c *meterConn) Read(p []byte) (int, error) {
@@ -305,54 +327,60 @@ func (c *meterConn) Read(p []byte) (int, error) {
 	if n > 0 {
 		c.touch()
 	}
-	if paceErr := c.limiter.wait(c.ctx, c.id, n); paceErr != nil {
+	if paceErr := c.pace.pace(c.ctx, n); paceErr != nil {
 		return 0, paceErr
 	}
-	c.meter.add(c.id, n, 0)
+	c.traffic.add(n, 0)
 	return n, err
 }
 func (c *meterConn) Write(p []byte) (int, error) {
-	if err := c.limiter.wait(c.ctx, c.id, len(p)); err != nil {
+	if err := c.pace.pace(c.ctx, len(p)); err != nil {
 		return 0, err
 	}
 	n, err := c.Conn.Write(p)
 	if n > 0 {
 		c.touch()
 	}
-	c.meter.add(c.id, 0, n)
+	c.traffic.add(0, n)
 	return n, err
 }
 func (c *meterConn) Close() error {
-	c.idleMu.Lock()
-	c.closed = true
-	if c.idle != nil {
-		c.idle.Stop()
-	}
-	c.idleMu.Unlock()
+	c.closed.Store(true)
 	c.done()
 	return c.Conn.Close()
 }
 
+// startIdle arms one timer that re-arms itself from the last activity
+// timestamp, so the payload path never touches the timer.
 func (c *meterConn) startIdle(timeout time.Duration) {
 	if timeout <= 0 {
 		return
 	}
-	c.idleMu.Lock()
 	c.idleTimeout = timeout
-	c.idle = time.AfterFunc(timeout, func() { c.Close() })
-	c.idleMu.Unlock()
+	c.lastActive.Store(time.Now().UnixNano())
+	var timer *time.Timer
+	timer = time.AfterFunc(timeout, func() {
+		if c.closed.Load() {
+			return
+		}
+		remaining := timeout - time.Since(time.Unix(0, c.lastActive.Load()))
+		if remaining > 0 {
+			timer.Reset(remaining)
+			return
+		}
+		c.Close()
+	})
 }
 func (c *meterConn) touch() {
-	c.idleMu.Lock()
-	if c.idle != nil && !c.closed {
-		c.idle.Reset(c.idleTimeout)
+	if c.idleTimeout > 0 {
+		c.lastActive.Store(time.Now().UnixNano())
 	}
-	c.idleMu.Unlock()
 }
 
 type meterPacketConn struct {
 	N.PacketConn
-	meter                *meter
+	traffic              *userTraffic
+	pace                 *pacer
 	req                  Request
 	router               *guardedRouter
 	ctx                  context.Context
@@ -376,10 +404,10 @@ func (c *meterPacketConn) ReadPacket(b *buf.Buffer) (M.Socksaddr, error) {
 		}
 		dst = routed
 	}
-	if err := c.router.limiter.wait(c.ctx, requestMeterID(c.req), b.Len()); err != nil {
+	if err := c.pace.pace(c.ctx, b.Len()); err != nil {
 		return dst, err
 	}
-	c.meter.add(requestMeterID(c.req), b.Len(), 0)
+	c.traffic.add(b.Len(), 0)
 	return dst, nil
 }
 // A UDP association repeats the full per-destination decision (sniffing, DNS,
@@ -457,7 +485,7 @@ func (c *meterPacketConn) route(dst M.Socksaddr, payload []byte) (M.Socksaddr, e
 }
 
 func (c *meterPacketConn) WritePacket(b *buf.Buffer, dst M.Socksaddr) error {
-	if err := c.router.limiter.wait(c.ctx, requestMeterID(c.req), b.Len()); err != nil {
+	if err := c.pace.pace(c.ctx, b.Len()); err != nil {
 		b.Release()
 		return err
 	}
@@ -469,7 +497,7 @@ func (c *meterPacketConn) WritePacket(b *buf.Buffer, dst M.Socksaddr) error {
 	n := b.Len()
 	err := c.PacketConn.WritePacket(b, dst)
 	if err == nil {
-		c.meter.add(requestMeterID(c.req), 0, n)
+		c.traffic.add(0, n)
 	}
 	return err
 }

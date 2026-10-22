@@ -2,7 +2,6 @@ package proxy
 
 import (
 	"context"
-	"io"
 	"net"
 	"sync"
 	"time"
@@ -12,15 +11,18 @@ import (
 	"reconstructed.local/soga/proxy/wireproxy"
 )
 
-// Xray's native socket setting always requires a PROXY header. This local
-// frontend implements the documented optional/required distinction and forwards
-// an unambiguous v2 header to an Xray listener bound only to loopback. Encrypted
-// protocol bytes pass through untouched; no target traffic is decoded here.
+// Xray's native socket setting always requires a PROXY header from any peer.
+// This local frontend implements the documented optional/required distinction
+// and the trusted-source list, and forwards an unambiguous v2 header to an Xray
+// listener bound only to loopback. It is not created when a header is required
+// from every peer, which Xray enforces by itself. Encrypted protocol bytes pass
+// through untouched; no target traffic is decoded here.
 type proxyFrontend struct {
 	address, backend string
 	required         bool
 	trusted          wireproxy.Trusted
 	tfo, mptcp       bool
+	idle             time.Duration
 	listener         net.Listener
 	mu               sync.Mutex
 	conns            map[net.Conn]bool
@@ -81,17 +83,7 @@ func (f *proxyFrontend) serve(ctx context.Context, raw net.Conn) {
 	if _, err = proxyproto.HeaderProxyFromAddrs(2, conn.RemoteAddr(), conn.LocalAddr()).WriteTo(target); err != nil {
 		return
 	}
-	done := make(chan struct{})
-	go func() {
-		io.Copy(target, conn)
-		if tcp, ok := target.(*net.TCPConn); ok {
-			tcp.CloseWrite()
-		}
-		close(done)
-	}()
-	io.Copy(conn, target)
-	conn.Close()
-	<-done
+	_ = relay(ctx, conn, target, f.idle)
 }
 
 func (f *proxyFrontend) close() error {

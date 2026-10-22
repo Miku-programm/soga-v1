@@ -55,6 +55,8 @@ type shadowsocksInbound struct {
 	mu        sync.Mutex
 	closed    bool
 	active    map[io.Closer]bool
+	userOf    map[io.Closer]string          // authenticated user per tracked connection
+	multi     shadowsocks.MultiService[string] // nil in single-user (obfs carrier) mode
 	muHosts   map[string]string
 	carrierID string
 }
@@ -177,7 +179,7 @@ func validateShadowsocks(c Config) error {
 
 func newShadowsocksInbound(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, opts shadowsocksOptions) (adapter.Inbound, error) {
 	c := opts.Config
-	h := &shadowsocksInbound{Adapter: inbound.NewAdapter("shadowsocks", tag), ctx: ctx, config: c, router: uot.NewRouter(router, logger), invalid: newInvalidAccessGuard(c.InvalidAccess), active: make(map[io.Closer]bool)}
+	h := &shadowsocksInbound{Adapter: inbound.NewAdapter("shadowsocks", tag), ctx: ctx, config: c, router: uot.NewRouter(router, logger), invalid: newInvalidAccessGuard(c.InvalidAccess), active: make(map[io.Closer]bool), userOf: make(map[io.Closer]string)}
 	handler := adapter.NewLegacyUpstreamHandler(adapter.InboundContext{}, h.newConnection, h.newPacketConnection, h)
 	timeout := int64(300)
 	if c.UDPTimeoutMinutes > 0 {
@@ -215,7 +217,7 @@ func newShadowsocksInbound(ctx context.Context, router adapter.Router, logger lo
 		if err = multi.UpdateUsersWithPasswords(ids, passwords); err != nil {
 			return nil, err
 		}
-		h.service = multi
+		h.service, h.multi = multi, multi
 	}
 	addr := badoption.Addr(netip.MustParseAddr(c.Listen))
 	networks := []string{"tcp", "udp"}
@@ -260,7 +262,62 @@ func (h *shadowsocksInbound) track(c io.Closer) bool {
 	h.active[c] = true
 	return true
 }
-func (h *shadowsocksInbound) untrack(c io.Closer) { h.mu.Lock(); delete(h.active, c); h.mu.Unlock() }
+func (h *shadowsocksInbound) untrack(c io.Closer) {
+	h.mu.Lock()
+	delete(h.active, c)
+	delete(h.userOf, c)
+	h.mu.Unlock()
+}
+
+// authenticated records the user behind a tracked connection for live updates.
+func (h *shadowsocksInbound) authenticated(c io.Closer, id string) {
+	h.mu.Lock()
+	if h.active[c] {
+		h.userOf[c] = id
+	}
+	h.mu.Unlock()
+}
+
+// updateUsers replaces the multi-user password set in place and closes the
+// sessions of removed or re-keyed users. The single-user obfs carrier mode
+// derives its host table from the users, so it still needs a rebuild.
+func (h *shadowsocksInbound) updateUsers(users []User) error {
+	if h.multi == nil || h.muHosts != nil {
+		return errors.New("proxy: this Shadowsocks mode cannot update users in place")
+	}
+	ids := make([]string, 0, len(users))
+	passwords := make([]string, 0, len(users))
+	for _, u := range users {
+		ids = append(ids, strconv.FormatInt(u.ID, 10))
+		passwords = append(passwords, u.Password)
+	}
+	if err := h.multi.UpdateUsersWithPasswords(ids, passwords); err != nil {
+		return err
+	}
+	h.mu.Lock()
+	previous := make(map[string]string, len(h.config.Users))
+	for _, u := range h.config.Users {
+		previous[strconv.FormatInt(u.ID, 10)] = u.Password
+	}
+	keep := make(map[string]bool, len(users))
+	for i, id := range ids {
+		if before, known := previous[id]; !known || before == passwords[i] {
+			keep[id] = true
+		}
+	}
+	var drop []io.Closer
+	for c, id := range h.userOf {
+		if !keep[id] {
+			drop = append(drop, c)
+		}
+	}
+	h.config.Users = slices.Clone(users)
+	h.mu.Unlock()
+	for _, c := range drop {
+		_ = c.Close()
+	}
+	return nil
+}
 
 type ssAuthenticatedKey struct{}
 
@@ -314,6 +371,7 @@ func (h *shadowsocksInbound) NewConnection(ctx context.Context, conn net.Conn, m
 	}
 	authenticated := new(atomic.Bool)
 	ctx = context.WithValue(ctx, ssAuthenticatedKey{}, authenticated)
+	ctx = armHandshake(ctx, conn, raw)
 	err = h.service.NewConnection(ctx, conn, adapter.UpstreamMetadata(metadata))
 	if err != nil && !authenticated.Load() {
 		h.invalid.failure(ip)
@@ -358,6 +416,9 @@ func (h *shadowsocksInbound) newConnection(ctx context.Context, conn net.Conn, m
 	if flag, _ := ctx.Value(ssAuthenticatedKey{}).(*atomic.Bool); flag != nil {
 		flag.Store(true)
 	}
+	if raw := handshakeDone(ctx); raw != nil {
+		h.authenticated(raw, id)
+	}
 	if h.muHosts == nil {
 		h.config.AuthCache.Remember(metadata.Source.Addr.String(), id)
 	}
@@ -381,6 +442,7 @@ func (h *shadowsocksInbound) newPacketConnection(ctx context.Context, conn N.Pac
 		return net.ErrClosed
 	}
 	defer h.untrack(conn)
+	h.authenticated(conn, id)
 	return h.router.RoutePacketConnection(ctx, conn, metadata)
 }
 func (h *shadowsocksInbound) NewError(context.Context, error) {}
