@@ -127,21 +127,30 @@ func TestMuUnknownHostAndOrdinaryPasswordDoNotRoute(t *testing.T) {
 			o := muOptions(protocol, obfuscator)
 			s, router := startTestServer(t, o)
 			host, _ := HostForUser(o.Users[0], "%5m%id.%suffix", "microsoft.com")
-			for _, wrong := range [][2]string{{"unknown.microsoft.com", o.Password}, {host, o.Users[0].Password}} {
+			for i, wrong := range [][2]string{{"unknown.microsoft.com", o.Password}, {host, o.Users[0].Password}} {
 				c := muClient(t, s.tcp.Addr().String(), o, wrong[0], wrong[1])
 				c.SetDeadline(time.Now().Add(time.Second))
 				header, _ := appendAddress(nil, M.ParseSocksaddr("example.com:443"))
 				c.Write(append(header, bytes.Repeat([]byte("bad"), 500)...))
-				if _, err := c.Read(make([]byte, 100)); err == nil {
-					c.Close()
+				_, err := c.Read(make([]byte, 100))
+				c.Close()
+				// The origin protocol carries no authentication: a wrong key is
+				// only noticed because the address decrypts to garbage, and about
+				// 3 in 256 garbage headers still parse. Such a stream must never
+				// reach the requested target; authenticated cases must be refused.
+				if err == nil && (i == 0 || protocol != "origin") {
 					t.Fatal("invalid host or wrong carrier key accepted")
 				}
-				c.Close()
 			}
 			router.mu.Lock()
 			defer router.mu.Unlock()
-			if len(router.users) != 0 {
+			if protocol != "origin" && len(router.users) != 0 {
 				t.Fatalf("invalid carrier credentials routed: %v", router.users)
+			}
+			for _, target := range router.targets {
+				if target == "example.com:443" {
+					t.Fatalf("invalid carrier credentials reached the requested target: %v", router.targets)
+				}
 			}
 		})
 	}
