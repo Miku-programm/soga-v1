@@ -69,7 +69,7 @@ func TestSniffDeadlineConnReadsDirectlyWithoutDeadline(t *testing.T) {
 func TestXrayLinkConnCloseWriteKeepsBufferedTail(t *testing.T) {
 	reader, writer := pipe.New(pipe.WithSizeLimit(64 * 1024))
 	link := &transport.Link{Reader: reader, Writer: writer}
-	stream := &xrayLinkConn{link: link, Connection: cnc.NewConnection(cnc.ConnectionInputMulti(writer), cnc.ConnectionOutputMulti(reader))}
+	stream := &xrayLinkConn{link: link, Conn: cnc.NewConnection(cnc.ConnectionInputMulti(writer), cnc.ConnectionOutputMulti(reader))}
 	if _, err := stream.Write([]byte("tail-of-response")); err != nil {
 		t.Fatal(err)
 	}

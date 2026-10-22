@@ -8,7 +8,6 @@ import (
 	"time"
 
 	xcommon "github.com/xtls/xray-core/common"
-	"github.com/xtls/xray-core/common/net/cnc"
 	"github.com/xtls/xray-core/transport"
 	"github.com/xtls/xray-core/transport/pipe"
 )
@@ -22,8 +21,8 @@ var errNoHalfClose = errors.New("proxy: stream cannot half-close")
 // a response. The direct VLESS link cannot half-close, so sing falls back to
 // a full close there and the client still sees the remote end.
 type xrayLinkConn struct {
-	*cnc.Connection
-	link *transport.Link
+	net.Conn // the core connection over the link
+	link     *transport.Link
 }
 
 func (s *xrayLinkConn) CloseWrite() error {

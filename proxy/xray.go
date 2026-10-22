@@ -427,7 +427,7 @@ func (d *xrayDispatcher) DispatchLink(ctx context.Context, dst xnet.Destination,
 	}
 	metadata := adapter.InboundContext{Inbound: d.tag, InboundType: d.protocol,
 		User: auth.User.Email, Source: M.ParseSocksaddr(auth.Source.NetAddr()), Destination: M.ParseSocksaddr(dst.NetAddr())}
-	stream := newSniffDeadlineConn(&xrayLinkConn{link: link, Connection: cnc.NewConnection(
+	stream := newSniffDeadlineConn(&xrayLinkConn{link: link, Conn: cnc.NewConnection(
 		cnc.ConnectionInputMulti(link.Writer), cnc.ConnectionOutputMulti(link.Reader),
 		cnc.ConnectionRemoteAddr(auth.Source.RawNetAddr()))})
 	var closer io.Closer = stream
